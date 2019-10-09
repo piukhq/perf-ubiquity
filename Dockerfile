@@ -6,4 +6,4 @@ ADD . .
 RUN pip install pipenv && pipenv install --system --deploy \
     && chmod +x locust-start.sh
 
-ENTRYPOINT ["locust-start.sh"]
+ENTRYPOINT ["/app/locust-start.sh"]

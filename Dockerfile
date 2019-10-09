@@ -4,3 +4,5 @@ WORKDIR /app
 ADD . .
 
 RUN pip install pipenv && pipenv install --system --deploy
+
+ENTRYPOINT ["locust-start.sh"]

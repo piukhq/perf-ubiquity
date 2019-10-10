@@ -5,5 +5,5 @@ WORKDIR /app
 ADD . .
 
 RUN pip install pipenv && \
-    pipenv install --system && \
+    pipenv install --system
 

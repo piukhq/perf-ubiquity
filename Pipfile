@@ -7,6 +7,12 @@ verify_ssl = true
 
 [packages]
 locustio = "*"
+hashids = "*"
+geventhttpclient-wheels = "*"
+faker = "*"
 
 [requires]
 python_version = "3.7"
+
+[pipenv]
+allow_prereleases = true

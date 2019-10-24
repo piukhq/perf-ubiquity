@@ -1,3 +1,5 @@
+from random import randint
+
 from hashids import Hashids
 from locust import HttpLocust, TaskSet, task
 
@@ -7,10 +9,6 @@ ALPHABET = "abcdefghijklmnopqrstuvwxyz1234567890"
 hash_ids = Hashids(
     min_length=32, salt="pfNqP7AzQbitjGIv9SsD7pYKDBNvxkys", alphabet=ALPHABET
 )
-
-SERVICE_ID = 1
-MCARD_SERVICE_ID = 1
-PCARD_SERVICE_ID = 1
 
 
 # total task weight: 153
@@ -22,26 +20,23 @@ class UserBehavior(TaskSet):
 
     @task(105)
     def get_wallet(self):
-        global SERVICE_ID
-        SERVICE_ID += 1
-        print(f"Get wallet with service id: {SERVICE_ID}")
-        self.client.get("/service", headers=self.get_headers(SERVICE_ID))
+        service_id = randint(1, 27000000)
+        print(f"Get wallet with service id: {service_id}")
+        self.client.get("/service", headers=self.get_headers(service_id))
 
     @task(41)
     def create_pcard(self):
-        global PCARD_SERVICE_ID
-        PCARD_SERVICE_ID += 1
+        service_id = randint(1, 27000000)
         pcard = generate_pcard()
-        print(f"Create payment card with service id: {PCARD_SERVICE_ID}")
-        self.client.post("/payment_cards", json=pcard, headers=self.get_headers(PCARD_SERVICE_ID))
+        print(f"Create payment card with service id: {service_id}")
+        self.client.post("/payment_cards", json=pcard, headers=self.get_headers(service_id))
 
     @task(7)
     def create_mcard(self):
-        global MCARD_SERVICE_ID
-        MCARD_SERVICE_ID += 1
+        service_id = randint(1, 27000000)
         mcard = generate_mcard()
-        print(f"Create membership card with service id: {MCARD_SERVICE_ID}")
-        self.client.post("/membership_cards", json=mcard, headers=self.get_headers(MCARD_SERVICE_ID))
+        print(f"Create membership card with service id: {service_id}")
+        self.client.post("/membership_cards", json=mcard, headers=self.get_headers(service_id))
 
 
 class WebsiteUser(HttpLocust):

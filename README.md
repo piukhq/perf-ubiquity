@@ -29,6 +29,7 @@
 
 # TODO
 * Finish PUT and PATCH endpoints 
+* Fix script running bug
 * Finish readme on how to import tsv files
 * Add test performance scripts to allowed schemes for endpoints
 * Set up midas performance-test slug agent to always return balance

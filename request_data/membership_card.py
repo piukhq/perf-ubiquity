@@ -39,4 +39,3 @@ def generate_static():
         },
         "membership_plan": SCHEME_ID
     }
-

@@ -1,10 +1,8 @@
 import csv
-from enum import Enum
 import os
-import sys
 import time
+from enum import Enum
 
-sys.path.append('.')
 from db.hermes import create_data
 from settings import TSV_PATH
 

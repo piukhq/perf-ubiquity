@@ -120,12 +120,7 @@ def user(user_id):
 
 
 def service(user_id):
-    return [
-        user_id,  # id
-        "\\N",  # latitude
-        "\\N",  # longitude
-        "2019-03-07 12:42:15+00",  # timestamp
-    ]
+    return [user_id, "\\N", "\\N", "2019-03-07 12:42:15+00"]  # id, latitude, longitude, timestamp
 
 
 def membership_card(card_id):
@@ -145,12 +140,7 @@ def membership_card(card_id):
 
 
 def card_number_answer(answer_id):
-    return [
-        answer_id,  # id
-        uuid.uuid4(),  # answer
-        answer_id,  # scheme_account_id
-        CARD_NO_QUESTION_ID,  # question_id
-    ]
+    return [answer_id, uuid.uuid4(), answer_id, CARD_NO_QUESTION_ID]  # id, answer, scheme_account_id, question_id
 
 
 def postcode_answer(answer_id, scheme_account_id):
@@ -190,17 +180,8 @@ def payment_card(card_id):
 
 
 def card_service_link(user_id):
-    return [
-        user_id,  # id
-        user_id,  # scheme_account_id / payment_card_account_id
-        user_id,  # user_id
-    ]
+    return [user_id, user_id, user_id]  # id, scheme_account_id, payment_card_account_id, user_id
 
 
 def pll_link(user_id):
-    return [
-        user_id,  # id
-        True,  # active_link
-        user_id,  # payment_card_account_id
-        user_id,  # scheme_account_id
-    ]
+    return [user_id, True, user_id, user_id]  # id, active_link, payment_card_account_id, scheme_account_id

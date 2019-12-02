@@ -1,21 +1,11 @@
-stages:
-  - tests
-  - build
-
-flake8:
-  stage: tests
+complexity:
+  stage: test
   script:
-    - flake8
+    - xenon --max-average A --max-modules B --max-absolute B .
 
-build:
-  stage: build
-  image: docker:latest
-  services:
-    - docker:dind
+style:
+  stage: test
   before_script:
-    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
+    - pip install black
   script:
-    - docker build --pull -t "$CI_REGISTRY/locust:latest" .
-    - docker push "$CI_REGISTRY/locust:latest"
-  only:
-    - master
+    - flake8 && black --line-length 120 --check .

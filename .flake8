@@ -1,9 +1,0 @@
-[flake8]
-exlcude =
-    Dockerfile,
-    .git,
-    Pipfile,
-    Pipfile.lock,
-    .dockerignore,
-    .gitignore,
-    .gitlab-ci.yml

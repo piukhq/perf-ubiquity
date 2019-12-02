@@ -12,18 +12,18 @@ BULK_SIZE = 1000
 
 
 class Files(str, Enum):
-    USER = 'users.tsv',
-    SCHEME = 'scheme_scheme.tsv',
-    QUESTION = 'scheme_schemecredentialquestion.tsv',
-    ANSWER = 'scheme_schemeaccountcredentialanswer.tsv',
-    SCHEME_ACCOUNT = 'scheme_schemeaccount.tsv',
-    PAYMENT_ACCOUNT = 'payment_card_paymentcardaccount.tsv',
-    PAYMENT_ACCOUNT_ENTRY = 'ubiquity_paymentcardaccountentry.tsv',
-    SCHEME_ACCOUNT_ENTRY = 'ubiquity_schemeaccountentry.tsv',
-    PAYMENT_SCHEME_ENTRY = 'ubiquity_paymentcardschemeentry.tsv',
-    CONSENT = 'ubiquity_serviceconsent.tsv',
-    CLIENT_APP = 'scheme_scheme.tsv',
-    ORGANISATION = 'scheme_scheme.tsv',
+    USER = ("users.tsv",)
+    SCHEME = ("scheme_scheme.tsv",)
+    QUESTION = ("scheme_schemecredentialquestion.tsv",)
+    ANSWER = ("scheme_schemeaccountcredentialanswer.tsv",)
+    SCHEME_ACCOUNT = ("scheme_schemeaccount.tsv",)
+    PAYMENT_ACCOUNT = ("payment_card_paymentcardaccount.tsv",)
+    PAYMENT_ACCOUNT_ENTRY = ("ubiquity_paymentcardaccountentry.tsv",)
+    SCHEME_ACCOUNT_ENTRY = ("ubiquity_schemeaccountentry.tsv",)
+    PAYMENT_SCHEME_ENTRY = ("ubiquity_paymentcardschemeentry.tsv",)
+    CONSENT = ("ubiquity_serviceconsent.tsv",)
+    CLIENT_APP = ("scheme_scheme.tsv",)
+    ORGANISATION = ("scheme_scheme.tsv",)
 
 
 def tsv_path(file_name):
@@ -32,8 +32,8 @@ def tsv_path(file_name):
 
 def write_to_tsv(file_name, rows):
     path = tsv_path(file_name)
-    with open(path, 'a') as f:
-        tsv_writer = csv.writer(f, delimiter='\t')
+    with open(path, "a") as f:
+        tsv_writer = csv.writer(f, delimiter="\t")
         tsv_writer.writerows(rows)
 
 

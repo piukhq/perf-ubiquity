@@ -115,7 +115,7 @@ def user(user_id):
         BARCLAYS_CLIENT_ID,  # client_id
         "xTKtQx6e",  # salt
         user_id,  # external_id
-        False  # is_tester
+        False,  # is_tester
     ]
 
 
@@ -139,8 +139,8 @@ def membership_card(card_id):
         True,  # is_deleted
         "\\N",  # link_date
         "\\N",  # join_date
-        '[{}]',  # balances
-        '{}',  # vouchers
+        "[{}]",  # balances
+        "{}",  # vouchers
     ]
 
 
@@ -185,7 +185,7 @@ def payment_card(card_id):
         True,  # is_deleted
         token,  # fingerprint
         token,  # psp_token
-        '{}',  # consents
+        "{}",  # consents
     ]
 
 

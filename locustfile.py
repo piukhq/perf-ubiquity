@@ -8,25 +8,22 @@ WALLET_SIZE = 3
 
 # total task weight: 5
 class UserBehavior(TaskSet):
-
     def setup(self):
         consent = service.generate_static()
-        email = consent['consent']['email']
-        timestamp = consent['consent']['timestamp']
+        email = consent["consent"]["email"]
+        timestamp = consent["consent"]["timestamp"]
         self.test_headers = service.generate_auth_header(email, timestamp)
         self.client.post("/service", json=consent, headers=self.test_headers)
 
         resp = self.client.get("/membership_plans", headers=self.test_headers)
-        membership_plan_ids = [str(plan['id']) for plan in resp.json()]
+        membership_plan_ids = [str(plan["id"]) for plan in resp.json()]
         if SCHEME_ID not in membership_plan_ids:
-            raise ValueError(
-                f"No performance test scheme in database (ID: {SCHEME_ID}), please run data population.."
-            )
+            raise ValueError(f"No performance test scheme in database (ID: {SCHEME_ID}), please run data population..")
 
     def create_user(self):
         consent = service.generate_random()
-        email = consent['consent']['email']
-        timestamp = consent['consent']['timestamp']
+        email = consent["consent"]["email"]
+        timestamp = consent["consent"]["timestamp"]
         headers = service.generate_auth_header(email, timestamp)
         self.client.post("/service", json=consent, headers=headers)
         return headers
@@ -60,24 +57,26 @@ class UserBehavior(TaskSet):
         headers = self.create_user()
         mcard = membership_card.generate_random()
         resp = self.client.post("/membership_cards", json=mcard, headers=headers)
-        mcard_id = resp.json()['id']
+        mcard_id = resp.json()["id"]
 
         pcard = payment_card.generate_random()
         resp = self.client.post("/payment_cards", json=pcard, headers=headers)
-        pcard_id = resp.json()['id']
+        pcard_id = resp.json()["id"]
 
         self.client.patch(
             f"/membership_card/{mcard_id}/payment_card/{pcard_id}",
-            headers=headers, name='/membership_card/<mcard_id>/payment_card/<pcard_id>'
+            headers=headers,
+            name="/membership_card/<mcard_id>/payment_card/<pcard_id>",
         )
 
         for _ in range(0, WALLET_SIZE):
             mcard = membership_card.generate_random()
             resp = self.client.post("/membership_cards", json=mcard, headers=headers)
-            mcard_id = resp.json()['id']
+            mcard_id = resp.json()["id"]
             self.client.patch(
                 f"/payment_card/{pcard_id}/membership_card/{mcard_id}",
-                headers=headers, name='/payment_card/<pcard_id>/membership_card/<mcard_id>'
+                headers=headers,
+                name="/payment_card/<pcard_id>/membership_card/<mcard_id>",
             )
 
 

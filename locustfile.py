@@ -1,4 +1,4 @@
-from locust import HttpLocust, TaskSet, task
+from locust import HttpLocust, TaskSet, task, constant
 
 from request_data import service, membership_card, payment_card
 from settings import SCHEME_ID
@@ -14,9 +14,8 @@ class UserBehavior(TaskSet):
         timestamp = consent["consent"]["timestamp"]
         self.test_headers = service.generate_auth_header(email, timestamp)
         self.client.post("/service", json=consent, headers=self.test_headers)
-
         resp = self.client.get("/membership_plans", headers=self.test_headers)
-        membership_plan_ids = [str(plan["id"]) for plan in resp.json()]
+        membership_plan_ids = [plan["id"] for plan in resp.json()]
         if SCHEME_ID not in membership_plan_ids:
             raise ValueError(f"No performance test scheme in database (ID: {SCHEME_ID}), please run data population..")
 
@@ -82,3 +81,4 @@ class UserBehavior(TaskSet):
 
 class WebsiteUser(HttpLocust):
     task_set = UserBehavior
+    wait_time = constant(0)

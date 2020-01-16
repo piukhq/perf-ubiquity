@@ -1,6 +1,5 @@
 import time
 import uuid
-from random import randint
 
 import jwt
 

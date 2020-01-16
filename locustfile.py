@@ -96,12 +96,12 @@ class UserBehavior(TaskSequence):
     def delete_payment_card(self):
         pass
 
-    # 
+    #
     # @task(1)
     # def get_service(self):
     #     headers = self.create_user()
     #     self.client.get("/service", headers=headers)
-    # 
+    #
     # @task(1)
     # def get_membership_plans(self):
     #     self.client.get("/membership_plans", headers=self.test_headers)
@@ -109,35 +109,35 @@ class UserBehavior(TaskSequence):
     # @task(1)
     # def get_membership_plan(self):
     #     self.client.get(f"/membership_plan/{SCHEME_ID}", headers=self.test_headers, name="/membership_plan/<id>")
-    # 
+    #
     # @task(1)
     # def populate_wallet_autolink(self):
     #     headers = self.create_user()
     #     params = {"autoLink": "True"}
     #     pcard = payment_card.generate_random()
     #     self.client.post("/payment_cards", json=pcard, headers=headers)
-    # 
+    #
     #     for _ in range(0, WALLET_SIZE):
     #         mcard = membership_card.generate_random()
     #         self.client.post("/membership_cards", json=mcard, headers=headers, params=params)
-    # 
+    #
     # @task(1)
     # def populate_wallet_manual(self):
     #     headers = self.create_user()
     #     mcard = membership_card.generate_random()
     #     resp = self.client.post("/membership_cards", json=mcard, headers=headers)
     #     mcard_id = resp.json()["id"]
-    # 
+    #
     #     pcard = payment_card.generate_random()
     #     resp = self.client.post("/payment_cards", json=pcard, headers=headers)
     #     pcard_id = resp.json()["id"]
-    # 
+    #
     #     self.client.patch(
     #         f"/membership_card/{mcard_id}/payment_card/{pcard_id}",
     #         headers=headers,
     #         name="/membership_card/<mcard_id>/payment_card/<pcard_id>",
     #     )
-    # 
+    #
     #     for _ in range(0, WALLET_SIZE):
     #         mcard = membership_card.generate_random()
     #         resp = self.client.post("/membership_cards", json=mcard, headers=headers)

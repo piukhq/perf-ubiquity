@@ -4,7 +4,17 @@ from settings import fake
 from request_data.membership_plan import PlanIDs
 
 
-def generate_random():
+def static_add_json():
+    return {
+        "account": {
+            "add_fields": [{"column": "Card Number", "value": "9000000000000000016"}],
+            "authorise_fields": [{"column": "Postcode", "value": "rg5 5aa"}],
+        },
+        "membership_plan": PlanIDs.TEST_SCHEME_ID,
+    }
+
+
+def random_add_json():
     return {
         "account": {
             "add_fields": [{"column": "Card Number", "value": str(uuid.uuid4())}],
@@ -14,11 +24,26 @@ def generate_random():
     }
 
 
-def generate_static():
+def random_join_json():
     return {
         "account": {
-            "add_fields": [{"column": "Card Number", "value": "9000000000000000016"}],
-            "authorise_fields": [{"column": "Postcode", "value": "rg5 5aa"}],
+            "enrol_fields": [{"column": "First Name", "value": str(uuid.uuid4())}],
         },
         "membership_plan": PlanIDs.TEST_SCHEME_ID,
+    }
+
+
+def random_patch_json():
+    return {
+        "account": {
+            "add_fields": [{"column": "Card Number", "value": str(uuid.uuid4())}],
+        }
+    }
+
+
+def random_registration_json():
+    return {
+        "account": {
+            "registration_fields": [{"column": "First Name", "value": str(uuid.uuid4())}],
+        }
     }

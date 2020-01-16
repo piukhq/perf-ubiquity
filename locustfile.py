@@ -8,7 +8,6 @@ from request_data.membership_plan import PlanIDs
 WALLET_SIZE = 3
 
 
-# total task weight: 5
 class UserBehavior(TaskSequence):
 
     def __init__(self, parent):
@@ -16,6 +15,7 @@ class UserBehavior(TaskSequence):
         self.headers = {}
         self.payment_cards = []
         self.membership_cards = []
+        self.put_counter = 0
 
     def setup(self):
         consent = service.generate_static()
@@ -68,109 +68,78 @@ class UserBehavior(TaskSequence):
     @seq_task(6)
     @task(8)
     def post_membership_cards_add(self):
-        mcard_json = membership_card.generate_random()
+        mcard_json = membership_card.random_add_json()
         resp = self.client.post("/membership_cards", json=mcard_json, headers=self.headers)
         mcard_id = resp.json()['id']
         self.membership_cards.append(mcard_id)
 
     @seq_task(7)
-    @task(1)
     def post_membership_cards_join(self):
-        mcard_json = membership_card.generate_random()
+        mcard_json = membership_card.random_join_json()
         resp = self.client.post("/membership_cards", json=mcard_json, headers=self.headers)
         mcard_id = resp.json()['id']
         self.membership_cards.append(mcard_id)
 
     @seq_task(8)
-    def patch_payment_cards_id_membership_card_id(self):
-        pass
+    def patch_payment_card_id_membership_card_id(self):
+        pcard_id = self.payment_cards[0]
+        mcard_id = self.membership_cards[0]
+        self.client.patch(f"/payment_card/{pcard_id}/membership_card/{mcard_id}", headers=self.headers)
 
     @seq_task(9)
-    def put_membership_card(self):
-        pass
+    def patch_membership_card_id_payment_card_id(self):
+        mcard_id = self.membership_cards[1]
+        pcard_id = self.payment_cards[1]
+        self.client.patch(f"/membership_card/{mcard_id}/payment_card/{pcard_id}", headers=self.headers)
 
     @seq_task(10)
-    def patch_membership_cards_id(self):
-        pass
+    def put_membership_card(self):
+        self.put_counter += 1
+        # remove me after we test this once
+        print(self.put_counter)
+        if self.put_counter % 4 == 0:
+            mcard_id = self.membership_cards[0]
+            mcard_json = membership_card.random_add_json()
+            self.client.put(f"/membership_card/{mcard_id}", json=mcard_json, headers=self.headers)
 
     @seq_task(11)
+    def patch_membership_cards_id_add(self):
+        mcard_id = self.membership_cards[1]
+        mcard_json = membership_card.random_patch_json()
+        self.client.patch(f"/membership_card/{mcard_id}", json=mcard_json, headers=self.headers)
+
+    @seq_task(12)
+    def patch_membership_cards_id_ghost(self):
+        for x in range(2, 4):
+            mcard_id = self.membership_cards[x]
+            mcard_json = membership_card.random_registration_json()
+            self.client.patch(f"/membership_card/{mcard_id}", json=mcard_json, headers=self.headers)
+
+    @seq_task(13)
     def get_payment_cards(self):
         self.client.get("/payment_cards", headers=self.headers)
 
-    @seq_task(12)
+    @seq_task(14)
     def get_membership_cards(self):
         self.client.get("/membership_cards", headers=self.headers)
 
-    @seq_task(13)
+    @seq_task(15)
     def get_membership_card(self):
         self.client.get("/membership_card", headers=self.headers)
 
-    @seq_task(14)
+    @seq_task(16)
     def get_membership_transactions(self):
         self.client.get("/membership_transactions", headers=self.headers)
 
-    @seq_task(15)
+    @seq_task(17)
     def delete_payment_card(self):
         for pcard_id in self.payment_cards:
             self.client.delete(f"/payment_card/{pcard_id}", headers=self.headers)
 
-    @seq_task(16)
+    @seq_task(18)
     def delete_membership_card(self):
         for mcard_id in self.membership_cards:
             self.client.delete(f"/membership_card/{mcard_id}", headers=self.headers)
-
-
-    #
-    # @task(1)
-    # def get_service(self):
-    #     headers = self.create_user()
-    #     self.client.get("/service", headers=headers)
-    #
-    # @task(1)
-    # def get_membership_plans(self):
-    #     self.client.get("/membership_plans", headers=self.test_headers)
-
-    # @task(1)
-    # def get_membership_plan(self):
-    #     self.client.get(f"/membership_plan/{SCHEME_ID}", headers=self.test_headers, name="/membership_plan/<id>")
-    #
-    # @task(1)
-    # def populate_wallet_autolink(self):
-    #     headers = self.create_user()
-    #     params = {"autoLink": "True"}
-    #     pcard = payment_card.generate_random()
-    #     self.client.post("/payment_cards", json=pcard, headers=headers)
-    #
-    #     for _ in range(0, WALLET_SIZE):
-    #         mcard = membership_card.generate_random()
-    #         self.client.post("/membership_cards", json=mcard, headers=headers, params=params)
-    #
-    # @task(1)
-    # def populate_wallet_manual(self):
-    #     headers = self.create_user()
-    #     mcard = membership_card.generate_random()
-    #     resp = self.client.post("/membership_cards", json=mcard, headers=headers)
-    #     mcard_id = resp.json()["id"]
-    #
-    #     pcard = payment_card.generate_random()
-    #     resp = self.client.post("/payment_cards", json=pcard, headers=headers)
-    #     pcard_id = resp.json()["id"]
-    #
-    #     self.client.patch(
-    #         f"/membership_card/{mcard_id}/payment_card/{pcard_id}",
-    #         headers=headers,
-    #         name="/membership_card/<mcard_id>/payment_card/<pcard_id>",
-    #     )
-    #
-    #     for _ in range(0, WALLET_SIZE):
-    #         mcard = membership_card.generate_random()
-    #         resp = self.client.post("/membership_cards", json=mcard, headers=headers)
-    #         mcard_id = resp.json()["id"]
-    #         self.client.patch(
-    #             f"/payment_card/{pcard_id}/membership_card/{mcard_id}",
-    #             headers=headers,
-    #             name="/payment_card/<pcard_id>/membership_card/<mcard_id>",
-    #         )
 
 
 class WebsiteUser(HttpLocust):

@@ -13,20 +13,28 @@ class UserBehavior(TaskSequence):
 
     def __init__(self, parent):
         super(UserBehavior, self).__init__(parent)
-        self.headers = None
-        self.test_number = 0
+        self.headers = {}
+        self.payment_cards = []
+        self.membership_cards = []
 
     def setup(self):
         consent = service.generate_static()
         email = consent["consent"]["email"]
         timestamp = consent["consent"]["timestamp"]
-        self.test_headers = service.generate_auth_header(email, timestamp)
-        self.client.post("/service", json=consent, headers=self.test_headers)
-        resp = self.client.get("/membership_plans", headers=self.test_headers)
+        test_headers = service.generate_auth_header(email, timestamp)
+        self.client.post("/service", json=consent, headers=test_headers)
+        resp = self.client.get("/membership_plans", headers=test_headers)
         membership_plan_ids = [plan["id"] for plan in resp.json()]
         if PlanIDs.TEST_SCHEME_ID not in membership_plan_ids:
-            raise ValueError(f"No performance test scheme in database (ID: {PlanIDs.TEST_SCHEME_ID}), "
-                             f"please run data population..")
+            raise ValueError(
+                f"No performance test scheme in database (ID: {PlanIDs.TEST_SCHEME_ID}), "
+                f"please run data population.."
+            )
+
+    def on_start(self):
+        self.headers = {}
+        self.payment_cards = []
+        self.membership_cards = []
 
     @seq_task(1)
     def post_service(self):
@@ -53,19 +61,25 @@ class UserBehavior(TaskSequence):
     @task(2)
     def post_payment_cards(self):
         pcard_json = payment_card.generate_random()
-        self.client.post("/payment_cards", json=pcard_json, headers=self.headers)
+        resp = self.client.post("/payment_cards", json=pcard_json, headers=self.headers)
+        pcard_id = resp.json()['id']
+        self.payment_cards.append(pcard_id)
 
     @seq_task(6)
     @task(8)
     def post_membership_cards_add(self):
         mcard_json = membership_card.generate_random()
-        self.client.post("/membership_cards", json=mcard_json, headers=self.headers)
+        resp = self.client.post("/membership_cards", json=mcard_json, headers=self.headers)
+        mcard_id = resp.json()['id']
+        self.membership_cards.append(mcard_id)
 
     @seq_task(7)
     @task(1)
     def post_membership_cards_join(self):
         mcard_json = membership_card.generate_random()
-        self.client.post("/membership_cards", json=mcard_json, headers=self.headers)
+        resp = self.client.post("/membership_cards", json=mcard_json, headers=self.headers)
+        mcard_id = resp.json()['id']
+        self.membership_cards.append(mcard_id)
 
     @seq_task(8)
     def patch_payment_cards_id_membership_card_id(self):
@@ -96,12 +110,15 @@ class UserBehavior(TaskSequence):
         self.client.get("/membership_transactions", headers=self.headers)
 
     @seq_task(15)
-    def delete_membership_card(self):
-        pass
+    def delete_payment_card(self):
+        for pcard_id in self.payment_cards:
+            self.client.delete(f"/payment_card/{pcard_id}", headers=self.headers)
 
     @seq_task(16)
-    def delete_payment_card(self):
-        pass
+    def delete_membership_card(self):
+        for mcard_id in self.membership_cards:
+            self.client.delete(f"/membership_card/{mcard_id}", headers=self.headers)
+
 
     #
     # @task(1)

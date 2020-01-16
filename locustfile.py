@@ -1,6 +1,6 @@
 import random
 
-from locust import HttpLocust, TaskSequence, seq_task, constant
+from locust import HttpLocust, TaskSequence, seq_task, constant, task
 
 from request_data import service, membership_card, payment_card, membership_plan
 from request_data.membership_plan import PlanIDs
@@ -25,7 +25,8 @@ class UserBehavior(TaskSequence):
         resp = self.client.get("/membership_plans", headers=self.test_headers)
         membership_plan_ids = [plan["id"] for plan in resp.json()]
         if PlanIDs.TEST_SCHEME_ID not in membership_plan_ids:
-            raise ValueError(f"No performance test scheme in database (ID: {PlanIDs.TEST_SCHEME_ID}), please run data population..")
+            raise ValueError(f"No performance test scheme in database (ID: {PlanIDs.TEST_SCHEME_ID}), "
+                             f"please run data population..")
 
     @seq_task(1)
     def post_service(self):
@@ -49,19 +50,25 @@ class UserBehavior(TaskSequence):
         self.client.get(f"/membership_plan/{plan_id}", headers=self.headers)
 
     @seq_task(5)
+    @task(2)
     def post_payment_cards(self):
-        pass
+        pcard_json = payment_card.generate_random()
+        self.client.post("/payment_cards", json=pcard_json, headers=self.headers)
 
     @seq_task(6)
-    def post_membership_cards(self):
-        pass
+    @task(8)
+    def post_membership_cards_add(self):
+        mcard_json = membership_card.generate_random()
+        self.client.post("/membership_cards", json=mcard_json, headers=self.headers)
 
     @seq_task(7)
-    def patch_payment_cards_id_membership_card_id(self):
-        pass
+    @task(1)
+    def post_membership_cards_join(self):
+        mcard_json = membership_card.generate_random()
+        self.client.post("/membership_cards", json=mcard_json, headers=self.headers)
 
     @seq_task(8)
-    def post_membership_plans(self):
+    def patch_payment_cards_id_membership_card_id(self):
         pass
 
     @seq_task(9)

@@ -1,3 +1,5 @@
+import uuid
+
 from settings import fake
 from request_data.membership_plan import PlanIDs
 
@@ -5,7 +7,7 @@ from request_data.membership_plan import PlanIDs
 def generate_random():
     return {
         "account": {
-            "add_fields": [{"column": "Card Number", "value": str(fake.random.randint(1000000, 9999999))}],
+            "add_fields": [{"column": "Card Number", "value": str(uuid.uuid4())}],
             "authorise_fields": [{"column": "Postcode", "value": fake.postcode()}],
         },
         "membership_plan": PlanIDs.TEST_SCHEME_ID,

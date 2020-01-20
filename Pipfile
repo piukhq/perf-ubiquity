@@ -5,7 +5,6 @@ verify_ssl = true
 
 [dev-packages]
 flake8 = "*"
-black = "==19.3b0"
 
 [packages]
 locustio = "*"

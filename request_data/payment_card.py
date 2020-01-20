@@ -26,7 +26,14 @@ def generate_random():
             "fingerprint": str(uuid.uuid4()),
         },
         "account": {
-            "consents": [{"latitude": 51.405372, "longitude": -0.678357, "timestamp": int(time.time()), "type": 2}]
+            "consents": [
+                {
+                    "latitude": 51.405372,
+                    "longitude": -0.678357,
+                    "timestamp": int(time.time()),
+                    "type": 2,
+                }
+            ]
         },
     }
 
@@ -42,5 +49,14 @@ def generate_static():
             "year": 2059,
             "fingerprint": "262154d2-7cdd-43dc-a285-397e35444292",
         },
-        "account": {"consents": [{"latitude": 51.405372, "longitude": -0.678357, "timestamp": 1573658810, "type": 2}]},
+        "account": {
+            "consents": [
+                {
+                    "latitude": 51.405372,
+                    "longitude": -0.678357,
+                    "timestamp": 1573658810,
+                    "type": 2,
+                }
+            ]
+        },
     }

@@ -8,4 +8,4 @@ style:
   before_script:
     - pip install black
   script:
-    - flake8 && black --line-length 120 --check .
+    - flake8 *

@@ -21,8 +21,15 @@ def generate_auth_header(user_email, iat):
 
 def generate_random():
     email_id = str(uuid.uuid4())
-    return {"consent": {"email": f"performance-{email_id}@testbink.com", "timestamp": int(time.time())}}
+    return {
+        "consent": {
+            "email": f"performance-{email_id}@testbink.com",
+            "timestamp": int(time.time()),
+        }
+    }
 
 
 def generate_static():
-    return {"consent": {"email": f"performance-test@testbink.com", "timestamp": 1542189471}}
+    return {
+        "consent": {"email": f"performance-test@testbink.com", "timestamp": 1542189471}
+    }

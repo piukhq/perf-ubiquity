@@ -6,3 +6,7 @@ class PlanIDs(IntEnum):
     HARVEY_NICHOLS = 194
     COOP = 242
     TEST_SCHEME_ID = 5050
+
+
+class ClientIDs(IntEnum):
+    BARCLAYS = 2

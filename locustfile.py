@@ -54,7 +54,7 @@ class UserBehavior(TaskSequence):
         self.client.get(
             f"/membership_plan/{plan_id}",
             headers=self.headers,
-            name="/membership_plan/{plan_id}",
+            name="/membership_plan/{plan_id} - RETRIEVE MEMBERSHIP PLAN",
         )
 
     @seq_task(5)
@@ -91,7 +91,7 @@ class UserBehavior(TaskSequence):
         self.client.patch(
             f"/payment_card/{pcard_id}/membership_card/{mcard_id}",
             headers=self.headers,
-            name="/payment_card/{pcard_id}/membership_card/{mcard_id}",
+            name="/payment_card/{pcard_id}/membership_card/{mcard_id} - LINK PAYMENT CARD TO MEMBERSHIP CARD",
         )
 
     @seq_task(9)
@@ -101,7 +101,7 @@ class UserBehavior(TaskSequence):
         self.client.patch(
             f"/membership_card/{mcard_id}/payment_card/{pcard_id}",
             headers=self.headers,
-            name="/membership_card/{mcard_id}/payment_card/{pcard_id}",
+            name="/membership_card/{mcard_id}/payment_card/{pcard_id} - LINK MEMBERSHIP CARD TO PAYMENT CARD",
         )
 
     @seq_task(10)
@@ -114,7 +114,7 @@ class UserBehavior(TaskSequence):
                 f"/membership_card/{mcard_id}",
                 json=mcard_json,
                 headers=self.headers,
-                name="/membership_card/{mcard_id}",
+                name="/membership_card/{mcard_id} - REPLACE MEMBERSHIP CARD",
             )
 
     @seq_task(11)
@@ -125,7 +125,7 @@ class UserBehavior(TaskSequence):
             f"/membership_card/{mcard_id}",
             json=mcard_json,
             headers=self.headers,
-            name="/membership_card/{mcard_id} - ADD",
+            name="/membership_card/{mcard_id} - UPDATE MEMBERSHIP CARD",
         )
 
     @seq_task(12)
@@ -139,7 +139,7 @@ class UserBehavior(TaskSequence):
                 f"/membership_card/{mcard_id}",
                 json=mcard_json,
                 headers=self.headers,
-                name="/membership_card/{mcard_id} - GHOST",
+                name="/membership_card/{mcard_id} - REGISTER GHOST CARD",
             )
 
     @seq_task(13)
@@ -159,7 +159,7 @@ class UserBehavior(TaskSequence):
             self.client.get(
                 f"/membership_card/{mcard_id}",
                 headers=self.headers,
-                name="/membership_card/{mcard_id}",
+                name="/membership_card/{mcard_id} - RETRIEVE MEMBERSHIP CARD",
             )
 
     @seq_task(16)
@@ -172,7 +172,7 @@ class UserBehavior(TaskSequence):
             self.client.delete(
                 f"/payment_card/{pcard_id}",
                 headers=self.headers,
-                name="/payment_card/{pcard_id}",
+                name="/payment_card/{pcard_id} - DELETE PAYMENT CARD",
             )
 
     @seq_task(18)
@@ -181,7 +181,7 @@ class UserBehavior(TaskSequence):
             self.client.delete(
                 f"/membership_card/{mcard_id}",
                 headers=self.headers,
-                name="/membership_card/{mcard_id}",
+                name="/membership_card/{mcard_id} - DELETE MEMBERSHIP CARD",
             )
 
     @seq_task(19)

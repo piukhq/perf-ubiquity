@@ -76,7 +76,9 @@ def create_tsv():
             card_answer_id = START_ID + remaining_card_no
             postcode_answer_id = START_ID + postcode_id
             manual_answers.append(create_data.card_number_answer(card_answer_id))
-            auth_answers.append(create_data.postcode_answer(postcode_answer_id, card_answer_id))
+            auth_answers.append(
+                create_data.postcode_answer(postcode_answer_id, card_answer_id)
+            )
 
         write_to_tsv(Files.ANSWER, manual_answers)
         write_to_tsv(Files.ANSWER, auth_answers)

@@ -5,7 +5,6 @@ from environment import env_var, read_env
 read_env()
 fake = Faker("en_GB")
 
-SCHEME_ID = 5050
 TSV_PATH = "tsv"
 
 JWT_SECRET = env_var("JWT_SECRET")

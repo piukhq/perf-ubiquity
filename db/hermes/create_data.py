@@ -1,6 +1,7 @@
 import uuid
 
-from settings import SCHEME_ID, BARCLAYS_CLIENT_ID
+from settings import BARCLAYS_CLIENT_ID
+from request_data.membership_plan import PlanIDs
 
 CARD_NO_QUESTION_ID = 5050
 POSTCODE_QUESTION_ID = 5051
@@ -8,7 +9,7 @@ POSTCODE_QUESTION_ID = 5051
 
 def membership_plan():
     return [
-        SCHEME_ID,  # id
+        PlanIDs.TEST_SCHEME_ID,  # id
         "performance test scheme",  # name
         "performance-test",  # slug
         "url",  # url
@@ -55,7 +56,7 @@ def card_no_question():
     return [
         CARD_NO_QUESTION_ID,  # id
         "Card Number",  # label
-        SCHEME_ID,  # scheme_id
+        PlanIDs.TEST_SCHEME_ID,  # scheme_id
         "card_number",  # type
         0,  # order
         True,  # manual_question
@@ -78,7 +79,7 @@ def postcode_question():
     return [
         POSTCODE_QUESTION_ID,  # id
         "Postcode",  # label
-        SCHEME_ID,  # scheme_id
+        PlanIDs.TEST_SCHEME_ID,  # scheme_id
         "postcode",  # type
         0,  # order
         False,  # manual_question
@@ -130,7 +131,7 @@ def membership_card(card_id):
         0,  # order
         "2019-03-12 15:51:36.390742+00",  # created
         "2019-03-15 05:55:28.532571+00",  # updated
-        SCHEME_ID,  # scheme_id
+        PlanIDs.TEST_SCHEME_ID,  # scheme_id
         True,  # is_deleted
         "\\N",  # link_date
         "\\N",  # join_date

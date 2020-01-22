@@ -38,15 +38,16 @@ class UserBehavior(TaskSequence):
         email = consent["consent"]["email"]
         timestamp = consent["consent"]["timestamp"]
         self.headers = service.generate_auth_header(email, timestamp)
-        self.client.post("/service", json=consent, headers=self.headers)
+        self.client.post("/service", json=consent, headers=self.headers, name="/service - REGISTER SERVICE")
 
     @seq_task(2)
     def get_service(self):
-        self.client.get("/service", headers=self.headers)
+        self.client.get("/service", headers=self.headers, name="/service - RETRIEVE SERVICE")
 
     @seq_task(3)
     def get_membership_plans(self):
-        self.client.get("/membership_plans", headers=self.headers)
+        self.client.get("/membership_plans", headers=self.headers, name="/membership_plans - "
+                                                                        "RETRIEVE ALL MEMBERSHIP PLANS")
 
     @seq_task(4)
     def get_membership_plan_id(self):
@@ -61,7 +62,8 @@ class UserBehavior(TaskSequence):
     @task(2)
     def post_payment_cards(self):
         pcard_json = payment_card.generate_random()
-        resp = self.client.post("/payment_cards", json=pcard_json, headers=self.headers)
+        resp = self.client.post("/payment_cards", json=pcard_json, headers=self.headers, name="/payment_card - "
+                                                                                              "ADD PAYMENT CARD")
         pcard_id = resp.json()["id"]
         self.payment_cards.append(pcard_id)
 
@@ -70,7 +72,7 @@ class UserBehavior(TaskSequence):
     def post_membership_cards_add(self):
         mcard_json = membership_card.random_add_json()
         resp = self.client.post(
-            "/membership_cards", json=mcard_json, headers=self.headers
+            "/membership_cards", json=mcard_json, headers=self.headers, name="/membership_cards - ADD MEMBERSHIP CARD"
         )
         mcard_id = resp.json()["id"]
         self.membership_cards.append(mcard_id)
@@ -79,7 +81,7 @@ class UserBehavior(TaskSequence):
     def post_membership_cards_join(self):
         mcard_json = membership_card.random_join_json()
         resp = self.client.post(
-            "/membership_cards", json=mcard_json, headers=self.headers
+            "/membership_cards", json=mcard_json, headers=self.headers, name="/membership_cards - ENROL MEMBERSHIP CARD"
         )
         mcard_id = resp.json()["id"]
         self.membership_cards.append(mcard_id)
@@ -144,11 +146,11 @@ class UserBehavior(TaskSequence):
 
     @seq_task(13)
     def get_payment_cards(self):
-        self.client.get("/payment_cards", headers=self.headers)
+        self.client.get("/payment_cards", headers=self.headers, name="/payment_cards - RETRIEVE PAYMENT CARDS")
 
     @seq_task(14)
     def get_membership_cards(self):
-        self.client.get("/membership_cards", headers=self.headers)
+        self.client.get("/membership_cards", headers=self.headers, name="/membership_cards - RETRIEVE MEMBERSHIP CARDS")
 
     @seq_task(15)
     def get_membership_card(self):
@@ -163,10 +165,6 @@ class UserBehavior(TaskSequence):
             )
 
     @seq_task(16)
-    def get_membership_transactions(self):
-        self.client.get("/membership_transactions", headers=self.headers)
-
-    @seq_task(17)
     def delete_payment_card(self):
         for pcard_id in self.payment_cards:
             self.client.delete(
@@ -175,7 +173,7 @@ class UserBehavior(TaskSequence):
                 name="/payment_card/{pcard_id} - DELETE PAYMENT CARD",
             )
 
-    @seq_task(18)
+    @seq_task(17)
     def delete_membership_card(self):
         for mcard_id in self.membership_cards:
             self.client.delete(
@@ -184,11 +182,11 @@ class UserBehavior(TaskSequence):
                 name="/membership_card/{mcard_id} - DELETE MEMBERSHIP CARD",
             )
 
-    @seq_task(19)
+    @seq_task(18)
     def delete_service(self):
         self.service_counter += 1
         if self.service_counter % 10 == 0:
-            self.client.delete("/service", headers=self.headers)
+            self.client.delete("/service", headers=self.headers, name="/service - DELETE SERVICE")
 
 
 class WebsiteUser(HttpLocust):

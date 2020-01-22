@@ -152,5 +152,7 @@ dmypy.json
 .idea/
 # End of https://www.gitignore.io/api/macos,python
 
-.tsv
+*.tsv
 tsv/
+
+*.bak

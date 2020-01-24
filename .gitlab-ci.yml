@@ -1,11 +1,39 @@
+stages:
+  - tests
+  - build
+  - dev
+
 complexity:
-  stage: test
+  stage: tests
   script:
     - xenon --max-average A --max-modules B --max-absolute B .
 
 style:
-  stage: test
+  stage: tests
   before_script:
     - pip install black
   script:
     - flake8 *
+
+build-master:
+  stage: build
+  image: docker:latest
+  services:
+    - docker:dind
+  before_script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
+  script:
+    - docker build --pull -t "$CI_REGISTRY/ubiquity-performance:latest" .
+    - docker push "$CI_REGISTRY/ubiquity-performance:latest"
+  only:
+    - master
+
+tag-master:
+  stage: dev
+  image: binkops.azurecr.io/tagbot:latest
+  environment: dev
+  script:
+    - tagbot --username "$CI_REGISTRY_USER" --password "$CI_REGISTRY_PASSWORD" --source "$CI_REGISTRY/ubiquity-performance:latest" --tag "develop-$CI_COMMIT_SHORT_SHA"
+  only:
+    - master
+

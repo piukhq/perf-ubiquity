@@ -33,7 +33,7 @@ tag-master:
   image: binkops.azurecr.io/tagbot:latest
   environment: dev
   script:
-    - tagbot --username "$CI_REGISTRY_USER" --password "$CI_REGISTRY_PASSWORD" --source "$CI_REGISTRY/ubiquity-performance:latest" --tag "develop-$CI_COMMIT_SHORT_SHA"
+    - tagbot --username "$CI_REGISTRY_USER" --password "$CI_REGISTRY_PASSWORD" --source "$CI_REGISTRY/ubiquity-performance:latest" --tag "master-$CI_COMMIT_SHORT_SHA"
   only:
     - master
 

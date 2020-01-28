@@ -10,13 +10,13 @@ from settings import CHANNEL_VAULT_PATH, VAULT_URL, VAULT_TOKEN
 
 class UserBehavior(TaskSequence):
     def __init__(self, parent):
-        super(UserBehavior, self).__init__(parent)
         self.headers = {}
         self.payment_cards = []
         self.membership_cards = []
         self.put_counter = 0
         self.service_counter = 0
         self.client_secrets = secrets.read_vault(CHANNEL_VAULT_PATH, VAULT_URL, VAULT_TOKEN)
+        super(UserBehavior, self).__init__(parent)
 
     def setup(self):
         barclays_secret = self.client_secrets[ClientBundleIDs.BARCLAYS]

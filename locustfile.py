@@ -1,9 +1,11 @@
 import random
 
 from locust import HttpLocust, TaskSequence, seq_task, constant, task
+from shared_config_storage.vault import secrets
 
 from request_data import service, membership_card, payment_card, membership_plan
-from request_data.membership_plan import PlanIDs
+from request_data.membership_plan import PlanIDs, ClientBundleIDs
+from settings import CHANNEL_VAULT_PATH, VAULT_URL, VAULT_TOKEN
 
 
 class UserBehavior(TaskSequence):
@@ -14,12 +16,14 @@ class UserBehavior(TaskSequence):
         self.membership_cards = []
         self.put_counter = 0
         self.service_counter = 0
+        self.client_secrets = secrets.read_vault(CHANNEL_VAULT_PATH, VAULT_URL, VAULT_TOKEN)
 
     def setup(self):
+        barclays_secret = self.client_secrets[ClientBundleIDs.BARCLAYS]
         consent = service.generate_static()
         email = consent["consent"]["email"]
         timestamp = consent["consent"]["timestamp"]
-        test_headers = service.generate_auth_header(email, timestamp)
+        test_headers = service.generate_auth_header(email, timestamp, barclays_secret)
         self.client.post("/service", json=consent, headers=test_headers)
         resp = self.client.get("/membership_plans", headers=test_headers)
         membership_plan_ids = [plan["id"] for plan in resp.json()]
@@ -46,8 +50,8 @@ class UserBehavior(TaskSequence):
 
     @seq_task(3)
     def get_membership_plans(self):
-        self.client.get("/membership_plans", headers=self.headers, name="/membership_plans - "
-                                                                        "RETRIEVE ALL MEMBERSHIP PLANS")
+        self.client.get("/membership_plans", headers=self.headers,
+                        name="/membership_plans - RETRIEVE ALL MEMBERSHIP PLANS")
 
     @seq_task(4)
     def get_membership_plan_id(self):
@@ -62,8 +66,8 @@ class UserBehavior(TaskSequence):
     @task(2)
     def post_payment_cards(self):
         pcard_json = payment_card.generate_random()
-        resp = self.client.post("/payment_cards", json=pcard_json, headers=self.headers, name="/payment_card - "
-                                                                                              "ADD PAYMENT CARD")
+        resp = self.client.post("/payment_cards", json=pcard_json, headers=self.headers,
+                                name="/payment_card - ADD PAYMENT CARD")
         pcard_id = resp.json()["id"]
         self.payment_cards.append(pcard_id)
 
@@ -80,9 +84,8 @@ class UserBehavior(TaskSequence):
     @seq_task(7)
     def post_membership_cards_join(self):
         mcard_json = membership_card.random_join_json()
-        resp = self.client.post(
-            "/membership_cards", json=mcard_json, headers=self.headers, name="/membership_cards - ENROL MEMBERSHIP CARD"
-        )
+        resp = self.client.post("/membership_cards", json=mcard_json, headers=self.headers,
+                                name="/membership_cards - ENROL MEMBERSHIP CARD")
         mcard_id = resp.json()["id"]
         self.membership_cards.append(mcard_id)
 
@@ -150,7 +153,8 @@ class UserBehavior(TaskSequence):
 
     @seq_task(14)
     def get_membership_cards(self):
-        self.client.get("/membership_cards", headers=self.headers, name="/membership_cards - RETRIEVE MEMBERSHIP CARDS")
+        self.client.get("/membership_cards", headers=self.headers,
+                        name="/membership_cards - RETRIEVE MEMBERSHIP CARDS")
 
     @seq_task(15)
     def get_membership_card(self):

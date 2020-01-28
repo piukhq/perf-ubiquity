@@ -1,6 +1,5 @@
 import uuid
 
-from settings import BARCLAYS_CLIENT_ID
 from request_data.membership_plan import PlanIDs
 
 CARD_NO_QUESTION_ID = 5050
@@ -95,28 +94,6 @@ def postcode_question():
         True,  # auth_field
         False,  # enrol_field
         False,  # register_field
-    ]
-
-
-def user(user_id):
-    return [
-        user_id,  # id
-        "LfClBmyjJOtEAodU0VBNXbVa3IbrDXGkPaslMH2cshpF2ZPB34",  # password
-        "\\N",  # last_login
-        False,  # is_superuser
-        "\\N",  # email
-        True,  # is_active
-        "2019-03-12 15:51:36.390742+00",  # date_joined
-        False,  # is_staff
-        str(uuid.uuid4()),  # uid
-        "\\N",  # facebook
-        "\\N",  # twitter
-        "\\N",  # reset_token
-        "\\N",  # marketing_code_id
-        BARCLAYS_CLIENT_ID,  # client_id
-        "xTKtQx6e",  # salt
-        user_id,  # external_id
-        False,  # is_tester
     ]
 
 

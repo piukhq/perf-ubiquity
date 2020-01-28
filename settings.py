@@ -7,5 +7,6 @@ fake = Faker("en_GB")
 
 TSV_PATH = "tsv"
 
-JWT_SECRET = env_var("JWT_SECRET")
-BARCLAYS_CLIENT_ID = env_var("BARCLAYS_CLIENT_ID")
+CHANNEL_VAULT_PATH = env_var("CHANNEL_VAULT_PATH")
+VAULT_URL = env_var("VAULT_URL")
+VAULT_TOKEN = env_var("VAULT_TOKEN")

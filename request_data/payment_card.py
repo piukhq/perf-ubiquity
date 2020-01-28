@@ -28,6 +28,7 @@ def generate_unencrypted_random():
     card_bin = random.choice(list(PaymentProvider))
     return {
         "card": {
+            "hash": str(uuid.uuid4()),
             "token": str(uuid.uuid4()),
             "last_four_digits": random_four,
             "first_six_digits": f"{card_bin}{random_four}",

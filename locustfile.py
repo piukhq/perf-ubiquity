@@ -15,7 +15,8 @@ class UserBehavior(TaskSequence):
         self.membership_cards = []
         self.put_counter = 0
         self.service_counter = 0
-        self.client_secrets = secrets.read_vault(CHANNEL_VAULT_PATH, VAULT_URL, VAULT_TOKEN)
+        channel_info = secrets.read_vault(CHANNEL_VAULT_PATH, VAULT_URL, VAULT_TOKEN)
+        self.client_secrets = {client: secret["jwt_secret"] for client, secret in channel_info.items()}
         super(UserBehavior, self).__init__(parent)
 
     def setup(self):
@@ -41,7 +42,8 @@ class UserBehavior(TaskSequence):
         consent = service.generate_random()
         email = consent["consent"]["email"]
         timestamp = consent["consent"]["timestamp"]
-        self.headers = service.generate_auth_header(email, timestamp)
+        jwt_secret = self.client_secrets[ClientBundleIDs.BARCLAYS]
+        self.headers = service.generate_auth_header(email, timestamp, jwt_secret)
         self.client.post("/service", json=consent, headers=self.headers, name="/service - REGISTER SERVICE")
 
     @seq_task(2)

@@ -3,11 +3,8 @@ import uuid
 
 import jwt
 
-from settings import JWT_SECRET
 
-
-def generate_auth_header(user_email, iat):
-    secret = JWT_SECRET
+def generate_auth_header(user_email, iat, secret):
     claims = {
         "bundle_id": "com.barclays.test",
         "iat": iat,

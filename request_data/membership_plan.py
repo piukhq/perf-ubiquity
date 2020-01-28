@@ -10,3 +10,7 @@ class PlanIDs(IntEnum):
 
 class ClientIDs(IntEnum):
     BARCLAYS = 2
+
+
+class ClientBundleIDs(IntEnum):
+    BARCLAYS = "com.barclays.test"

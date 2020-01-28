@@ -58,7 +58,7 @@ def create_tsv():
         for _ in range(0, BULK_SIZE):
             remaining_services -= 1
             user_id = START_ID + remaining_services
-            users.append(create_data.user(user_id))
+            # users.append(create_data.user(user_id))
             services.append(create_data.service(user_id))
             membership_cards.append(create_data.membership_card(user_id))
             payment_cards.append(create_data.payment_card(user_id))

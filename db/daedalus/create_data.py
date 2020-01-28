@@ -33,16 +33,6 @@ def membership_plan():
             "company_url": "https://goo.gl/xPNXKv",
             "plan_description": "Test plan description",
             "tiers": [],
-            "add_fields": [
-                {
-                    "choice": [],
-                    "validation": "(.*)",
-                    "column": "Card Number",
-                    "type": 0,
-                    "common_name": "card_number"
-                }
-            ],
-            "registration_fields": [],
             "plan_name_card": "Performance Test",
             "fees": [
                 {
@@ -54,9 +44,49 @@ def membership_plan():
             "category": "Household",
             "company_name": "Performance test",
             "plan_register_info": "Registrations typically processed in 24hrs",
-            "enrol_fields": [],
             "plan_summary": "Test plan summary",
+            "add_fields": [
+                {
+                    "choice": [],
+                    "validation": "(.*)",
+                    "column": "Card Number",
+                    "type": 0,
+                    "common_name": "card_number"
+                }
+            ],
             "authorise_fields": [
+                {
+                    "choice": [],
+                    "validation": "(.*)",
+                    "column": "Postcode",
+                    "type": 0,
+                    "common_name": "postcode"
+                }
+            ],
+            "enrol_fields": [
+                {
+                    "choice": [],
+                    "validation": "(.*)",
+                    "column": "Card Number",
+                    "type": 0,
+                    "common_name": "card_number"
+                },
+                {
+                    "choice": [],
+                    "validation": "(.*)",
+                    "column": "Postcode",
+                    "type": 0,
+                    "common_name": "postcode"
+                }
+            ],
+            "registration_fields": [
+                {
+                    "choice": [],
+                    "validation": "(.*)",
+                    "column": "Card Number",
+                    "type": 0,
+                    "common_name": "card_number"
+                },
                 {
                     "choice": [],
                     "validation": "(.*)",

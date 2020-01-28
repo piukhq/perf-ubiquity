@@ -27,7 +27,10 @@ def random_add_json():
 def random_join_json():
     return {
         "account": {
-            "enrol_fields": [{"column": "First Name", "value": str(uuid.uuid4())}]
+            "enrol_fields": [
+                {"column": "Card Number", "value": str(uuid.uuid4())},
+                {"column": "Postcode", "value": fake.postcode()}
+            ]
         },
         "membership_plan": PlanIDs.TEST_SCHEME_ID,
     }
@@ -45,7 +48,8 @@ def random_registration_json():
     return {
         "account": {
             "registration_fields": [
-                {"column": "First Name", "value": str(uuid.uuid4())}
+                {"column": "Card Number", "value": str(uuid.uuid4())},
+                {"column": "Postcode", "value": fake.postcode()}
             ]
         }
     }

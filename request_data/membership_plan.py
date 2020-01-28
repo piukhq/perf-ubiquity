@@ -1,4 +1,4 @@
-from enum import IntEnum
+from enum import Enum, IntEnum
 
 
 class PlanIDs(IntEnum):
@@ -12,5 +12,5 @@ class ClientIDs(IntEnum):
     BARCLAYS = 2
 
 
-class ClientBundleIDs(IntEnum):
+class ClientBundleIDs(str, Enum):
     BARCLAYS = "com.barclays.test"

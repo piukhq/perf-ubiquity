@@ -6,11 +6,11 @@ CARD_NO_QUESTION_ID = 5050
 POSTCODE_QUESTION_ID = 5051
 
 
-def membership_plan():
+def membership_plan(scheme_id, name, slug,):
     return [
-        PlanIDs.TEST_SCHEME_ID,  # id
-        "performance test scheme",  # name
-        "performance-test",  # slug
+        scheme_id,  # id
+        name, # name
+        slug,  # slug
         "url",  # url
         "company",  # company
         "company-url",  # company_url
@@ -51,11 +51,11 @@ def membership_plan():
     ]
 
 
-def card_no_question():
+def card_no_question(scheme_id):
     return [
         CARD_NO_QUESTION_ID,  # id
         "Card Number",  # label
-        PlanIDs.TEST_SCHEME_ID,  # scheme_id
+        scheme_id, # scheme id
         "card_number",  # type
         0,  # order
         True,  # manual_question
@@ -74,11 +74,11 @@ def card_no_question():
     ]
 
 
-def postcode_question():
+def postcode_question(scheme_id):
     return [
         POSTCODE_QUESTION_ID,  # id
         "Postcode",  # label
-        PlanIDs.TEST_SCHEME_ID,  # scheme_id
+        scheme_id,  # scheme_id
         "postcode",  # type
         0,  # order
         False,  # manual_question
@@ -101,14 +101,14 @@ def service(user_id):
     return [user_id, "\\N", "\\N", "2019-03-07 12:42:15+00"]  # id, latitude, longitude, timestamp
 
 
-def membership_card(card_id):
+def membership_card(card_id, scheme_id):
     return [
         card_id,  # id
         1,  # status
         0,  # order
         "2019-03-12 15:51:36.390742+00",  # created
         "2019-03-15 05:55:28.532571+00",  # updated
-        PlanIDs.TEST_SCHEME_ID,  # scheme_id
+        scheme_id,  # scheme_id
         True,  # is_deleted
         "\\N",  # link_date
         "\\N",  # join_date
@@ -166,8 +166,17 @@ def pll_link(user_id):
 
 
 def organisation(fixture):
-    return [fixture['organisation_id'], fixture['organisation'], fixture['organisation_t_and_c']]
+    return [fixture['id'], fixture['organisation'], fixture['organisation_t_and_c']]
 
 
 def client_application(fixture):
-    return [fixture['client_id'], fixture['name'], fixture['organisation_id'], fixture['secret']]
+    return [fixture['client_id'], fixture['name'], fixture['id'], fixture['secret']]
+
+
+def client_application_bundle(fixture):
+    return [fixture['id'], fixture['bundle_id'], fixture['client_id']]
+
+
+def scheme_whitelist(fixture):
+    return [fixture['id'], fixture['status'], fixture['bundle_id'], fixture['scheme_id']]
+

@@ -34,6 +34,8 @@ class Files(str, Enum):
     CONSENT = ("ubiquity_serviceconsent.tsv",)
     ORGANISATION = ("user_organisation.tsv",)
     CLIENT_APP = ("user_clientapplication.tsv",)
+    CLIENT_APP_BUNDLE = ("user_clientapplicationbundle.tsv",)
+    SCHEME_WHITELIST = ("scheme_schemebundleassociation.tsv",)
 
 
 def tsv_path(file_name):
@@ -60,6 +62,19 @@ def create_tsv():
     write_to_tsv(Files.ORGANISATION, organisations)
     client_applications = [create_data.client_application(client) for client in CLIENTS]
     write_to_tsv(Files.CLIENT_APP, client_applications)
+
+    remaining_membership_plans = MEMBERSHIP_PLANS
+    membership_plans = []
+
+    while remaining_membership_plans > 0:
+        remaining_membership_plans -= 1
+        plan_id = 5000 + remaining_membership_plans
+        plan_name = f"performance plan {remaining_membership_plans}"
+        plan_slug = f"performance-plan-{remaining_membership_plans}"
+        membership_plan = create_data.membership_plan(plan_id, plan_name, plan_slug)
+        membership_plans.append(membership_plan)
+
+    for membership_plan in membership_plans:
 
     remaining_services = TOTAL_RECORDS
     remaining_links = TOTAL_RECORDS

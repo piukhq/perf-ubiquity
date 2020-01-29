@@ -3,12 +3,22 @@ import os
 import time
 from enum import Enum
 
-from db.hermes import create_data
+from data_population.hermes import create_data
+from data_population.fixtures import CLIENT_ONE, CLIENT_TWO, CLIENT_RESTRICTED
 from settings import TSV_PATH
 
 START_ID = 2000000
-TOTAL_RECORDS = 10000
 BULK_SIZE = 1000
+
+CLIENTS = [CLIENT_ONE, CLIENT_TWO, CLIENT_RESTRICTED]
+MEMBERSHIP_PLANS = 40
+# USERS = 13017000
+# MCARDS = 88953620
+# PCARDS = 19525500
+TOTAL_RECORDS = 100000
+USERS = 100
+MCARDS = 800
+PCARDS = 200
 
 
 class Files(str, Enum):
@@ -22,8 +32,8 @@ class Files(str, Enum):
     SCHEME_ACCOUNT_ENTRY = ("ubiquity_schemeaccountentry.tsv",)
     PAYMENT_SCHEME_ENTRY = ("ubiquity_paymentcardschemeentry.tsv",)
     CONSENT = ("ubiquity_serviceconsent.tsv",)
-    CLIENT_APP = ("scheme_scheme.tsv",)
-    ORGANISATION = ("scheme_scheme.tsv",)
+    ORGANISATION = ("user_organisation.tsv",)
+    CLIENT_APP = ("user_clientapplication.tsv",)
 
 
 def tsv_path(file_name):
@@ -45,6 +55,11 @@ def create_tsv():
             os.remove(tsv_path(file))
         except FileNotFoundError:
             pass
+
+    organisations = [create_data.organisation(client) for client in CLIENTS]
+    write_to_tsv(Files.ORGANISATION, organisations)
+    client_applications = [create_data.client_application(client) for client in CLIENTS]
+    write_to_tsv(Files.CLIENT_APP, client_applications)
 
     remaining_services = TOTAL_RECORDS
     remaining_links = TOTAL_RECORDS

@@ -62,15 +62,15 @@ def card_no_question():
         False,  # scan_question
         False,  # third_party_identifier
         False,  # one_question_link
-        1,  # options
+        3,  # options
         0,  # answer_type
         "\\N",  # choice
         "description",  # description
         "(.*)",  # validation
         True,  # add_field
         False,  # auth_field
-        False,  # enrol_field
-        False,  # register_field
+        True,  # enrol_field
+        True,  # register_field
     ]
 
 
@@ -85,15 +85,15 @@ def postcode_question():
         False,  # scan_question
         False,  # third_party_identifier
         False,  # one_question_link
-        1,  # options
+        3,  # options
         0,  # answer_type
         "\\N",  # choice
         "description",  # description
         "(.*)",  # validation
         False,  # add_field
         True,  # auth_field
-        False,  # enrol_field
-        False,  # register_field
+        True,  # enrol_field
+        True,  # register_field
     ]
 
 
@@ -163,3 +163,11 @@ def card_service_link(user_id):
 
 def pll_link(user_id):
     return [user_id, True, user_id, user_id]  # id, active_link, payment_card_account_id, scheme_account_id
+
+
+def organisation(fixture):
+    return [fixture['organisation_id'], fixture['organisation'], fixture['organisation_t_and_c']]
+
+
+def client_application(fixture):
+    return [fixture['client_id'], fixture['name'], fixture['organisation_id'], fixture['secret']]

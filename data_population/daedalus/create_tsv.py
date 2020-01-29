@@ -3,7 +3,7 @@ import os
 import time
 from enum import Enum
 
-from db.daedalus import create_data
+from data_population.daedalus import create_data
 from settings import TSV_PATH
 
 TSV_PATH = f"{TSV_PATH}/"

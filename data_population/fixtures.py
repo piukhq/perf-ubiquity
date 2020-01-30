@@ -9,8 +9,7 @@ CLIENT_ONE = {
     'organisation_name': 'performance test one',
     'organisation_t_and_c': 'one',
     'bundle_id': 'performance_bundle_one',
-    'status': 'performance_status',
-    'scheme_id': 'performance_scheme',
+    'status': 0,
 }
 
 
@@ -22,8 +21,7 @@ CLIENT_TWO = {
     'organisation_name': 'performance test one',
     'organisation_t_and_c': 'one',
     'bundle_id': 'performance_bundle_two',
-    'status': 'performance_status',
-    'scheme_id': 'performance_scheme',
+    'status': 0,
 }
 
 
@@ -35,6 +33,5 @@ CLIENT_RESTRICTED = {
     'organisation_name': 'performance test one',
     'organisation_t_and_c': 'one',
     'bundle_id': 'performance_bundle_three',
-    'status': 'performance_status',
-    'scheme_id': 'performance_scheme',
+    'status': 2,
 }

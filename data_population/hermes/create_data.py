@@ -2,14 +2,11 @@ import uuid
 
 from request_data.membership_plan import PlanIDs
 
-CARD_NO_QUESTION_ID = 5050
-POSTCODE_QUESTION_ID = 5051
 
-
-def membership_plan(scheme_id, name, slug,):
+def membership_plan(scheme_id, name, slug):
     return [
         scheme_id,  # id
-        name, # name
+        name,  # name
         slug,  # slug
         "url",  # url
         "company",  # company
@@ -51,11 +48,11 @@ def membership_plan(scheme_id, name, slug,):
     ]
 
 
-def card_no_question(scheme_id):
+def card_no_question(question_id, scheme_id):
     return [
-        CARD_NO_QUESTION_ID,  # id
+        question_id,  # id
         "Card Number",  # label
-        scheme_id, # scheme id
+        scheme_id,  # scheme id
         "card_number",  # type
         0,  # order
         True,  # manual_question
@@ -74,9 +71,9 @@ def card_no_question(scheme_id):
     ]
 
 
-def postcode_question(scheme_id):
+def postcode_question(question_id, scheme_id):
     return [
-        POSTCODE_QUESTION_ID,  # id
+        question_id,  # id
         "Postcode",  # label
         scheme_id,  # scheme_id
         "postcode",  # type
@@ -117,16 +114,16 @@ def membership_card(card_id, scheme_id):
     ]
 
 
-def card_number_answer(answer_id):
-    return [answer_id, uuid.uuid4(), answer_id, CARD_NO_QUESTION_ID]  # id, answer, scheme_account_id, question_id
+def card_number_answer(answer_id, question_id):
+    return [answer_id, uuid.uuid4(), answer_id, question_id]  # id, answer, scheme_account_id, question_id
 
 
-def postcode_answer(answer_id, scheme_account_id):
+def postcode_answer(answer_id, scheme_account_id, question_id):
     return [
         answer_id,  # id
         uuid.uuid4(),  # answer
         scheme_account_id,  # scheme_account_id
-        POSTCODE_QUESTION_ID,  # question_id
+        question_id,  # question_id
     ]
 
 
@@ -177,6 +174,6 @@ def client_application_bundle(fixture):
     return [fixture['id'], fixture['bundle_id'], fixture['client_id']]
 
 
-def scheme_whitelist(fixture):
-    return [fixture['id'], fixture['status'], fixture['bundle_id'], fixture['scheme_id']]
+def scheme_whitelist(fixture, bundle_pk, scheme_id):
+    return [fixture['id'], fixture['status'], bundle_pk, scheme_id]
 

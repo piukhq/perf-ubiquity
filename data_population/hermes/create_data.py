@@ -48,7 +48,7 @@ def membership_plan(scheme_id, name, slug):
     ]
 
 
-def card_no_question(question_id, scheme_id):
+def card_no_question(question_id, scheme_id=105):
     return [
         question_id,  # id
         "Card Number",  # label
@@ -174,6 +174,6 @@ def client_application_bundle(fixture):
     return [fixture['id'], fixture['bundle_id'], fixture['client_id']]
 
 
-def scheme_whitelist(fixture, bundle_pk, scheme_id):
-    return [fixture['id'], fixture['status'], bundle_pk, scheme_id]
+def scheme_whitelist(whitelist_id, fixture, scheme_id):
+    return [whitelist_id, fixture['status'], fixture['id'], scheme_id]
 

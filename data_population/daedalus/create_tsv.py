@@ -7,9 +7,9 @@ import requests
 
 from data_population.daedalus import create_data
 from data_population.fixtures import CLIENT_ONE, CLIENT_TWO, CLIENT_RESTRICTED
-from settings import TSV_PATH, VAULT_URL, VAULT_TOKEN
+from settings import VAULT_URL, VAULT_TOKEN, CHANNEL_VAULT_PATH
 
-TSV_PATH = f"{TSV_PATH}/"
+TSV_PATH = f"{os.path.dirname(__file__)}/tsv"
 LOAD_START_ID = 2000000
 STATIC_START_ID = 5000
 BULK_SIZE = 1000
@@ -24,7 +24,7 @@ class Files(str, Enum):
 
 
 def tsv_path(file_name):
-    return f"{TSV_PATH}{file_name}"
+    return f"{TSV_PATH}/{file_name}"
 
 
 def write_to_tsv(file_name, rows):
@@ -65,14 +65,18 @@ def create_tsv():
             plan_id = plan[0]
             whitelist_list.append(create_data.channel_whitelist(whitelist_id, client_fixture, plan_id))
 
+    write_to_tsv(Files.CHANNEL_WHITELIST, whitelist_list)
+
+    all_channels = {}
     for client_fixture in client_fixtures:
-        headers = {"X-Vault-Token": VAULT_TOKEN}
-        data = {
-            client_fixture["bundle_id"]: {
-                "jwt_secret": client_fixture["secret"]
-            }
+        all_channels[client_fixture["bundle_id"]] = {
+            "jwt_secret": client_fixture["secret"]
         }
-        requests.post(f"{VAULT_URL}/v1/secret/channel", headers=headers, json=data)
+
+    headers = {"X-Vault-Token": VAULT_TOKEN}
+    vault_channels = requests.get(f"{VAULT_URL}/v1/secret{CHANNEL_VAULT_PATH}", headers=headers).json()
+    all_channels.update(vault_channels['data'])
+    requests.post(f"{VAULT_URL}/v1/secret{CHANNEL_VAULT_PATH}", headers=headers, json=all_channels)
 
     end = time.perf_counter()
     print(f"Elapsed time: {end - start}")

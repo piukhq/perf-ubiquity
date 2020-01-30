@@ -107,5 +107,5 @@ def channel_whitelist(whitelist_id, fixture, plan_id):
         whitelist_id,  # id
         fixture['id'],  # channel_id
         plan_id,  # membership_plan_id
-        fixture["status"]  # status
+        fixture["daedalus_status"]  # status
     ]

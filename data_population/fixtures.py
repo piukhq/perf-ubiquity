@@ -10,6 +10,7 @@ CLIENT_ONE = {
     'organisation_t_and_c': 'one',
     'bundle_id': 'performance_bundle_one',
     'status': 0,
+    'daedalus_status': "ACTIVE",
 }
 
 
@@ -22,6 +23,7 @@ CLIENT_TWO = {
     'organisation_t_and_c': 'one',
     'bundle_id': 'performance_bundle_two',
     'status': 0,
+    'daedalus_status': "ACTIVE",
 }
 
 
@@ -32,6 +34,7 @@ CLIENT_RESTRICTED = {
     'id': 5052,
     'organisation_name': 'performance test restricted',
     'organisation_t_and_c': 'one',
-    'bundle_id': 'performance_bundle_three',
+    'bundle_id': 'performance_bundle_restricted',
     'status': 2,
+    'daedalus_status': "INACTIVE",
 }

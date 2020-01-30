@@ -163,11 +163,11 @@ def pll_link(user_id):
 
 
 def organisation(fixture):
-    return [fixture['id'], fixture['organisation'], fixture['organisation_t_and_c']]
+    return [fixture['id'], fixture['organisation_name'], fixture['organisation_t_and_c']]
 
 
 def client_application(fixture):
-    return [fixture['client_id'], fixture['name'], fixture['id'], fixture['secret']]
+    return [fixture['client_id'], fixture['client_name'], fixture['id'], fixture['secret']]
 
 
 def client_application_bundle(fixture):

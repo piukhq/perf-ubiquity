@@ -3,7 +3,7 @@ from enum import Enum
 
 CLIENT_ONE = {
     'client_id': 'performance_one',
-    'client_name': 'performance_one',
+    'client_name': 'performance one',
     'secret': 'one',
     'id': 5050,
     'organisation_name': 'performance test one',
@@ -15,10 +15,10 @@ CLIENT_ONE = {
 
 CLIENT_TWO = {
     'client_id': 'performance_two',
-    'client_name': 'performance_two',
+    'client_name': 'performance two',
     'secret': 'one',
     'id': 5051,
-    'organisation_name': 'performance test one',
+    'organisation_name': 'performance test two',
     'organisation_t_and_c': 'one',
     'bundle_id': 'performance_bundle_two',
     'status': 0,
@@ -27,10 +27,10 @@ CLIENT_TWO = {
 
 CLIENT_RESTRICTED = {
     'client_id': 'performance_restricted',
-    'client_name': 'performance_restricted',
+    'client_name': 'performance restricted',
     'secret': 'one',
     'id': 5052,
-    'organisation_name': 'performance test one',
+    'organisation_name': 'performance test restricted',
     'organisation_t_and_c': 'one',
     'bundle_id': 'performance_bundle_three',
     'status': 2,

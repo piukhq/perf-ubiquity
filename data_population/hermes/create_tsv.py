@@ -83,7 +83,7 @@ def create_tsv():
 
     whitelist_id = STATIC_START_ID
     whitelist_list = []
-    for client_fixture in CLIENTS:
+    for client_fixture in [CLIENT_ONE, CLIENT_TWO]:
         for plan in membership_plans:
             whitelist_id += 1
             plan_id = plan[0]

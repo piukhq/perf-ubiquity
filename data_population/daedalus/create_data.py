@@ -1,36 +1,24 @@
 import json
 
-from request_data.membership_plan import PlanIDs, ClientIDs
 
-
-def membership_plan():
+def membership_plan(plan_id, name):
     return [
-        PlanIDs.TEST_SCHEME_ID.value,  # id
+        plan_id,  # id
         json.dumps({
-            "plan_name": "performance test scheme",
+            "plan_name": name,
             "plan_documents": [
                 {
                     "name": "Terms & conditions",
                     "checkbox": True,
-                    "url": "https://policies.bink.com/iceland/tc.html",
+                    "url": "url",
                     "display": [
                         "REGISTRATION",
                         "ENROL"
                     ],
                     "description": "Terms & conditions"
-                },
-                {
-                    "name": "Privacy Policy",
-                    "checkbox": True,
-                    "url": "https://policies.bink.com/iceland/pp.html",
-                    "display": [
-                        "REGISTRATION",
-                        "ENROL"
-                    ],
-                    "description": "Privacy Policy"
                 }
             ],
-            "company_url": "https://goo.gl/xPNXKv",
+            "company_url": "company-url",
             "plan_description": "Test plan description",
             "tiers": [],
             "add_fields": [
@@ -52,7 +40,7 @@ def membership_plan():
             ],
             "enrol_incentive": "Placeholder Enrol Incentive",
             "category": "Household",
-            "company_name": "Performance test",
+            "company_name": "company",
             "plan_register_info": "Registrations typically processed in 24hrs",
             "enrol_fields": [],
             "plan_summary": "Test plan summary",
@@ -89,65 +77,16 @@ def membership_plan():
             ]
         }),  # feature_set
         json.dumps({
-            "colour": "#f80000",
-            "scan_message": "Please turn over to scan barcode",
+            "colour": "#fc03e3",
+            "scan_message": "please scan",
             "barcode_type": 0
         }),  # card
         json.dumps([
-            {
-                "url": "https://api.dev.gb.bink.com/content/dev-media/hermes/schemes/iceland-asset.png",
-                "id": 373,
-                "type": 4,
-                "description": "",
-                "encoding": "png"
-            },
             {
                 "url": "https://api.dev.gb.bink.com/content/dev-media/hermes/schemes/Iceland_dwPpkoM.jpg",
                 "id": 372,
                 "type": 0,
                 "description": "Performance test Hero Image",
-                "encoding": "jpg"
-            },
-            {
-                "url": "https://api.dev.gb.bink.com/content/dev-media/hermes/schemes/Iceland-icon4.png",
-                "id": 374,
-                "type": 3,
-                "description": "Performance test Icon",
-                "encoding": "png"
-            },
-            {
-                "url": "https://api.dev.gb.bink.com/content/dev-media/hermes/schemes/Tier-4-a_copy_B9FdOEH.png",
-                "id": 540,
-                "type": 2,
-                "description": "Tier-4-barcode_tile",
-                "encoding": "png"
-            },
-            {
-                "url": "https://api.dev.gb.bink.com/content/dev-media/hermes/schemes/iceland_ref3.jpg",
-                "id": 521,
-                "type": 5,
-                "description": "Performance test Reference",
-                "encoding": "jpg"
-            },
-            {
-                "url": "https://api.dev.gb.bink.com/content/dev-media/hermes/schemes/iceland-300x197.jpg",
-                "id": 545,
-                "type": 1,
-                "description": "Performance test Test Banner",
-                "encoding": "jpg"
-            },
-            {
-                "url": "https://api.dev.gb.bink.com/content/dev-media/hermes/schemes/iceland-300x197_pxucuAx.jpg",
-                "id": 546,
-                "type": 6,
-                "description": "Performance test Test Personal Offer",
-                "encoding": "jpg"
-            },
-            {
-                "url": "https://api.dev.gb.bink.com/content/dev-media/hermes/schemes/iceland-300x197_jQohtHm.jpg",
-                "id": 547,
-                "type": 7,
-                "description": "Performance test Test Promo",
                 "encoding": "jpg"
             }
         ]),  # images
@@ -156,10 +95,17 @@ def membership_plan():
     ]
 
 
-def channel_whitelist():
+def channel(fixture):
     return [
-        5050,  # id
-        ClientIDs.BARCLAYS.value,  # channel_id
-        PlanIDs.TEST_SCHEME_ID.value,  # membership_plan_id
-        "ACTIVE"  # status
+        fixture['id'],
+        fixture['bundle_id']  # bundle_id
+    ]
+
+
+def channel_whitelist(whitelist_id, fixture, plan_id):
+    return [
+        whitelist_id,  # id
+        fixture['id'],  # channel_id
+        plan_id,  # membership_plan_id
+        fixture["status"]  # status
     ]

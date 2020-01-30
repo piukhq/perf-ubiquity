@@ -11,7 +11,8 @@ locustio = "*"
 geventhttpclient-wheels = "*"
 faker = "*"
 pyjwt = "*"
-shared-config-storage = {git = "ssh://git@git.bink.com/libs/shared-config-storage.git", version="*"}
+shared-config-storage = {git = "ssh://git@git.bink.com/libs/shared-config-storage.git",version = "*"}
+requests = "*"
 
 [requires]
 python_version = "3.7"

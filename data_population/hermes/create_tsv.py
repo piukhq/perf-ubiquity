@@ -5,8 +5,8 @@ from enum import Enum
 
 from data_population.hermes import create_data
 from data_population.fixtures import CLIENT_ONE, CLIENT_TWO, CLIENT_RESTRICTED
-from settings import TSV_PATH
 
+TSV_PATH = f"{os.path.dirname(__file__)}/tsv"
 LOAD_START_ID = 2000000
 STATIC_START_ID = 5000
 BULK_SIZE = 1000

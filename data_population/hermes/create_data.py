@@ -1,7 +1,5 @@
 import uuid
 
-from request_data.membership_plan import PlanIDs
-
 
 def membership_plan(scheme_id, name, slug):
     return [
@@ -176,4 +174,3 @@ def client_application_bundle(fixture):
 
 def scheme_whitelist(whitelist_id, fixture, scheme_id):
     return [whitelist_id, fixture['status'], fixture['id'], scheme_id]
-

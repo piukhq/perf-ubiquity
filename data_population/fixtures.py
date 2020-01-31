@@ -1,5 +1,3 @@
-from enum import Enum
-
 
 CLIENT_ONE = {
     'client_id': 'performance_one',

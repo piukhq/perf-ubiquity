@@ -6,15 +6,12 @@ from enum import Enum
 import requests
 
 from data_population.daedalus import create_data
-from data_population.fixtures import CLIENT_ONE, CLIENT_TWO, CLIENT_RESTRICTED
+from data_population.fixtures import CLIENT_ONE, CLIENT_TWO, CLIENT_RESTRICTED, STATIC_START_ID, MEMBERSHIP_PLAN_IDS
 from settings import VAULT_URL, VAULT_TOKEN, CHANNEL_VAULT_PATH
 
 TSV_PATH = f"{os.path.dirname(__file__)}/tsv"
 LOAD_START_ID = 2000000
-STATIC_START_ID = 5000
 BULK_SIZE = 1000
-
-MEMBERSHIP_PLANS = 40
 
 
 class Files(str, Enum):
@@ -47,12 +44,9 @@ def create_tsv():
     channels = [create_data.channel(client) for client in client_fixtures]
     write_to_tsv(Files.CHANNEL, channels)
 
-    remaining_membership_plans = MEMBERSHIP_PLANS
     membership_plans = []
-    while remaining_membership_plans > 0:
-        remaining_membership_plans -= 1
-        plan_id = STATIC_START_ID + remaining_membership_plans
-        plan_name = f"performance plan {remaining_membership_plans}"
+    for plan_id in MEMBERSHIP_PLAN_IDS:
+        plan_name = f"performance plan {plan_id}"
         membership_plans.append(create_data.membership_plan(plan_id, plan_name))
 
     write_to_tsv(Files.MEMBERSHIP_PLAN, membership_plans)

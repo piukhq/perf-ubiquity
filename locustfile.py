@@ -6,7 +6,7 @@ from requests import codes
 from shared_config_storage.vault import secrets
 
 from data_population.fixtures import CLIENT_ONE, CLIENT_TWO, CLIENT_RESTRICTED, MEMBERSHIP_PLAN_IDS
-from request_data import service, membership_card, payment_card, membership_plan
+from request_data import service, membership_card, payment_card
 from settings import CHANNEL_VAULT_PATH, VAULT_URL, VAULT_TOKEN
 
 
@@ -256,7 +256,6 @@ class UserBehavior(TaskSequence):
                 if response.status_code == codes.NOT_FOUND:
                     response.success()
 
-
     @seq_task(13)
     def get_payment_cards(self):
         for auth_header in self.non_restricted_auth_headers:
@@ -295,8 +294,9 @@ class UserBehavior(TaskSequence):
                                 name=f"/membership_card/<card_id> {label}")
 
         mcard = self.membership_cards[0]
-        with self.client.get(f"/membership_card/{mcard['id']}", headers=self.restricted_prop_header, catch_response=True,
-                             name=f"/membership_card {LocustLabel.RESTRICTED_PROPERTY}") as response:
+        with self.client.get(f"/membership_card/{mcard['id']}", headers=self.restricted_prop_header,
+                             name=f"/membership_card {LocustLabel.RESTRICTED_PROPERTY}",
+                             catch_response=True) as response:
             if response.status_code == codes.NOT_FOUND:
                 response.success()
 

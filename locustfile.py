@@ -98,16 +98,6 @@ class UserBehavior(TaskSequence):
         self.client.post("/payment_cards", json=pcard_json, headers=self.multi_prop_header,
                          name=f"/payment_cards {LocustLabel.MULTI_PROPERTY}")
 
-    # @seq_task(5)
-    # @task(2)
-    # def post_payment_cards_restricted(self):
-    #     # find out what a restricted payment card is
-    #     pcard_json = payment_card.generate_random()
-    #     resp = self.client.post("/payment_cards", json=pcard_json, headers=self.restricted_prop_header,
-    #                             name="/payment_card {LocustLabel.SINGLE_PROPERTY}")
-    #     pcard_id = resp.json()["id"]
-    #     self.payment_cards.append(pcard_id)
-
     @seq_task(9)
     @task(7)
     def post_membership_cards_add(self):
@@ -133,7 +123,7 @@ class UserBehavior(TaskSequence):
         with self.client.get("/membership_cards", json=mcard_json, headers=self.restricted_prop_header,
                              name=f"/membership_cards {LocustLabel.RESTRICTED_PROPERTY}",
                              catch_response=True) as response:
-            if response.status_code == codes.NOT_FOUND:
+            if response.status_code == codes.BAD_REQUEST:
                 response.success()
 
     @seq_task(11)
@@ -158,7 +148,7 @@ class UserBehavior(TaskSequence):
         with self.client.get("/membership_cards", json=mcard_json, headers=self.restricted_prop_header,
                              name=f"/membership_cards {LocustLabel.RESTRICTED_PROPERTY}",
                              catch_response=True) as response:
-            if response.status_code == codes.NOT_FOUND:
+            if response.status_code == codes.BAD_REQUEST:
                 response.success()
 
     @seq_task(8)
@@ -178,7 +168,7 @@ class UserBehavior(TaskSequence):
                                headers=self.restricted_prop_header, catch_response=True,
                                name=f"/payment_card/<pcard_id>/membership_card/<mcard_id> "
                                     f"{LocustLabel.RESTRICTED_PROPERTY}") as response:
-            if response.status_code == codes.NOT_FOUND:
+            if response.status_code == codes.FORBIDDEN:
                 response.success()
 
     @seq_task(9)
@@ -198,7 +188,7 @@ class UserBehavior(TaskSequence):
                                headers=self.restricted_prop_header, catch_response=True,
                                name=f"/membership_card/<mcard_id>/payment_card/<pcard_id> "
                                     f"{LocustLabel.RESTRICTED_PROPERTY}") as response:
-            if response.status_code == codes.NOT_FOUND:
+            if response.status_code == codes.FORBIDDEN:
                 response.success()
 
     @seq_task(10)
@@ -227,12 +217,12 @@ class UserBehavior(TaskSequence):
         self.client.patch(f"/membership_card/{mcard_id}", json=mcard_json, headers=self.multi_prop_header,
                           name=f"/membership_card/<mcard_id> {LocustLabel.MULTI_PROPERTY}")
 
-        mcard_id = self.membership_cards[3]
-        with self.client.patch(f"/membership_card/{mcard_id}", json=mcard_json, headers=self.restricted_prop_header,
-                               name=f"/membership_card/<mcard_id> {LocustLabel.RESTRICTED_PROPERTY}",
-                               catch_response=True) as response:
-            if response.status_code == codes.NOT_FOUND:
-                response.success()
+        # mcard_id = self.membership_cards[3]
+        # with self.client.patch(f"/membership_card/{mcard_id}", json=mcard_json, headers=self.restricted_prop_header,
+        #                        name=f"/membership_card/<mcard_id> {LocustLabel.RESTRICTED_PROPERTY}",
+        #                        catch_response=True) as response:
+        #     if response.status_code == codes.NOT_FOUND:
+        #         response.success()
 
     @seq_task(12)
     def patch_membership_cards_id_ghost(self):
@@ -250,17 +240,20 @@ class UserBehavior(TaskSequence):
             self.client.patch(f"/membership_card/{mcard_id}", json=mcard_json, headers=self.multi_prop_header,
                               name=f"/membership_card/<mcard_id> {LocustLabel.MULTI_PROPERTY}")
 
-            with self.client.patch(f"/membership_card/{mcard_id}", json=mcard_json, headers=self.restricted_prop_header,
-                                   name=f"/membership_card/<mcard_id> {LocustLabel.RESTRICTED_PROPERTY}",
-                                   catch_response=True) as response:
-                if response.status_code == codes.NOT_FOUND:
-                    response.success()
+            # with self.client.patch(f"/membership_card/{mcard_id}", json=mcard_json, headers=self.restricted_prop_header,
+            #                        name=f"/membership_card/<mcard_id> {LocustLabel.RESTRICTED_PROPERTY}",
+            #                        catch_response=True) as response:
+            #     if response.status_code == codes.NOT_FOUND:
+            #         response.success()
 
     @seq_task(13)
     def get_payment_cards(self):
         for auth_header in self.non_restricted_auth_headers:
             self.client.get("/payment_cards", headers=auth_header,
                             name=f"/payment_cards {LocustLabel.SINGLE_PROPERTY}")
+
+        self.client.get("/payment_cards", headers=self.restricted_prop_header,
+                        name=f"/payment_cards {LocustLabel.RESTRICTED_PROPERTY}")
 
     @seq_task(13)
     def get_payment_card(self):
@@ -282,6 +275,9 @@ class UserBehavior(TaskSequence):
             self.client.get("/membership_cards", headers=auth_header,
                             name=f"/membership_cards {LocustLabel.SINGLE_PROPERTY}")
 
+        self.client.get("/membership_cards", headers=self.restricted_prop_header,
+                        name=f"/membership_cards {LocustLabel.RESTRICTED_PROPERTY}")
+
     @seq_task(16)
     def get_membership_card(self):
         task_counter = 8
@@ -292,13 +288,6 @@ class UserBehavior(TaskSequence):
             for label, auth_header in self.non_restricted_auth_headers.items():
                 self.client.get(f"/membership_card/{mcard_id}", headers=auth_header,
                                 name=f"/membership_card/<card_id> {label}")
-
-        mcard = self.membership_cards[0]
-        with self.client.get(f"/membership_card/{mcard['id']}", headers=self.restricted_prop_header,
-                             name=f"/membership_card {LocustLabel.RESTRICTED_PROPERTY}",
-                             catch_response=True) as response:
-            if response.status_code == codes.NOT_FOUND:
-                response.success()
 
     @seq_task(17)
     def delete_payment_card(self):

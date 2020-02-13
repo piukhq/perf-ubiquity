@@ -1,3 +1,4 @@
+import hashlib
 import json
 
 
@@ -138,4 +139,106 @@ def channel_whitelist(whitelist_id, fixture, plan_id):
         fixture['id'],  # channel_id
         plan_id,  # membership_plan_id
         fixture["daedalus_status"]  # status
+    ]
+
+
+# TODO: add dynamic service_id and email
+def service(fixture, service_id=1, email='performance@test.locust'):
+    return [
+        service_id,
+        f"{email}:{fixture['bundle_id']}",
+        fixture['id'],
+        {
+            "email": email,
+            "timestamp": 1581597325
+        }
+    ]
+
+
+def membership_card(mcard_id='1', membership_plan_id='242', card_number='633174911234560000'):
+    add_fields = json.dumps([
+        {
+            "column": "Card Number",
+            "value": card_number
+        }
+    ], sort_keys=True)
+    return [
+        mcard_id,
+        membership_plan_id,
+        json.dumps({  # status
+            "state": "pending",
+            "reason_codes": [
+                "X100"
+            ]
+        }),
+        json.dumps({  # card
+            "barcode_type": 0,
+            "colour": "#f80000"
+        }),
+        json.dumps([  # images
+            {
+                "url": "https://api.dev.gb.bink.com/content/dev-media/hermes/schemes/Iceland_dwPpkoM.jpg",
+                "id": 372,
+                "type": 0,
+                "description": "Performance test Hero Image",
+                "encoding": "jpg"
+            }
+        ]),
+        add_fields,
+        hashlib.md5(add_fields.encode()).hexdigest(),  # add_fields hash
+        '[]',  # auth fields
+        ''  # auth fields hash
+    ]
+
+
+def membership_card_association(association_id, service_id, membership_card_id, plan_whitelist_id):
+    return [
+        association_id,
+        membership_card_id,
+        service_id,
+        plan_whitelist_id,
+        'active'
+    ]
+
+
+def payment_card(payment_card_id='1', fingerprint='test_fingerprint', token='test_token'):
+    return [
+        payment_card_id,
+        'active',  # status
+        '2020-02-13 15:50:13.879026+00:00',  # status_updated
+        fingerprint,
+        token,
+        json.dumps(False),  # is_deleted
+        json.dumps({  # card
+            "first_six_digits": "555555",
+            "last_four_digits": "4444",
+            "month": 11,
+            "year": 2022,
+            "country": "UK",
+            "currency_code": "GBP",
+            "name_on_card": "Test Card",
+            "provider": "mastercard",
+            "type": "debit"
+        }),
+        json.dumps({  # account
+            "verification_in_progress": False,
+            "status": 1,
+            "consents": [
+                {
+                    "type": 1,
+                    "timestamp": 1581597325
+                }
+            ]
+        }),
+        '[]',  # images
+        # hash is created in hermes using the salt in the vault, this can slow down things a lot.
+        # if it is not needed for lookups its better to just leave it empty
+    ]
+
+
+def payment_card_association(association_id, service_id, payment_card_id):
+    return [
+        association_id,
+        payment_card_id,
+        service_id
     ]

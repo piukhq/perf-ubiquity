@@ -1,3 +1,4 @@
+import hashlib
 import json
 
 
@@ -139,3 +140,66 @@ def channel_whitelist(whitelist_id, fixture, plan_id):
         plan_id,  # membership_plan_id
         fixture["daedalus_status"]  # status
     ]
+
+
+# TODO: add dynamic service_id and email
+def service(fixture, service_id=1, email='performance@test.locust'):
+    return [
+        service_id,
+        f"{email}:{fixture['bundle_id']}",
+        fixture['id'],
+        {
+            "email": email,
+            "timestamp": 1581597325
+        }
+    ]
+
+
+def membership_card(mcard_id, membership_plan_id, card_number=633174911234560000):
+    add_fields = json.dumps([
+        {
+            "column": "Card Number",
+            "value": card_number
+        }
+    ], sort_keys=True)
+    return [
+        mcard_id,
+        membership_plan_id,
+        json.dumps({  # status
+            "state": "pending",
+            "reason_codes": [
+                "X100"
+            ]
+        }),
+        json.dumps({  # card
+            "barcode_type": 0,
+            "colour": "#f80000"
+        }),
+        json.dumps([  # images
+            {
+                "url": "https://api.dev.gb.bink.com/content/dev-media/hermes/schemes/Iceland_dwPpkoM.jpg",
+                "id": 372,
+                "type": 0,
+                "description": "Performance test Hero Image",
+                "encoding": "jpg"
+            }
+        ]),
+        add_fields,
+        hashlib.md5(add_fields.encode()).hexdigest(),  # add_fields hash
+        '[]',  # auth fields
+        ''  # auth fields hash
+    ]
+
+
+def membership_card_association(association_id, service_id, membership_card_id, plan_whitelist_id):
+    return [
+        association_id,
+        membership_card_id,
+        service_id,
+        plan_whitelist_id,
+        'active'
+    ]
+
+
+def payment_card():
+    pass

@@ -239,12 +239,6 @@ class UserBehavior(TaskSequence):
             self.client.patch(f"/membership_card/{mcard_id}", json=mcard_json, headers=self.multi_prop_header,
                               name=f"/membership_card/<mcard_id> {LocustLabel.MULTI_PROPERTY}")
 
-            # with self.client.patch(f"/membership_card/{mcard_id}", json=mcard_json, headers=self.restricted_prop_header,
-            #                        name=f"/membership_card/<mcard_id> {LocustLabel.RESTRICTED_PROPERTY}",
-            #                        catch_response=True) as response:
-            #     if response.status_code == codes.NOT_FOUND:
-            #         response.success()
-
     @seq_task(13)
     def get_payment_cards(self):
         for auth_header in self.non_restricted_auth_headers.values():

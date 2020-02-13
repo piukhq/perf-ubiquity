@@ -1,3 +1,4 @@
+import random
 import uuid
 
 from settings import fake
@@ -14,17 +15,17 @@ def static_add_json():
     }
 
 
-def random_add_json():
+def random_add_json(plan_id):
     return {
         "account": {
             "add_fields": [{"column": "Card Number", "value": str(uuid.uuid4())}],
             "authorise_fields": [{"column": "Postcode", "value": fake.postcode()}],
         },
-        "membership_plan": PlanIDs.TEST_SCHEME_ID,
+        "membership_plan": plan_id,
     }
 
 
-def random_join_json():
+def random_join_json(plan_id_list):
     return {
         "account": {
             "enrol_fields": [
@@ -32,7 +33,7 @@ def random_join_json():
                 {"column": "Postcode", "value": fake.postcode()}
             ]
         },
-        "membership_plan": PlanIDs.TEST_SCHEME_ID,
+        "membership_plan": random.choice(plan_id_list)
     }
 
 

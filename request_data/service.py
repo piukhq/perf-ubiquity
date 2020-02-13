@@ -4,15 +4,15 @@ import uuid
 import jwt
 
 
-def generate_auth_header(user_email, iat, secret):
+def generate_auth_header(user_email, iat, client_fixture):
     claims = {
-        "bundle_id": "com.barclays.test",
+        "bundle_id": client_fixture["bundle_id"],
         "iat": iat,
-        "organisation_id": "Barclays",
+        "organisation_id": client_fixture["organisation_name"],
         "property_id": "unused",
         "user_id": user_email,
     }
-    token = jwt.encode(claims, secret, algorithm="HS512").decode("UTF-8")
+    token = jwt.encode(claims, client_fixture["secret"], algorithm="HS512").decode("UTF-8")
     return {"Authorization": f"Bearer {token}"}
 
 

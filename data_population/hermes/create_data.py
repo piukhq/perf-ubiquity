@@ -1,16 +1,11 @@
 import uuid
 
-from request_data.membership_plan import PlanIDs
 
-CARD_NO_QUESTION_ID = 5050
-POSTCODE_QUESTION_ID = 5051
-
-
-def membership_plan():
+def membership_plan(scheme_id, name, slug):
     return [
-        PlanIDs.TEST_SCHEME_ID,  # id
-        "performance test scheme",  # name
-        "performance-test",  # slug
+        scheme_id,  # id
+        name,  # name
+        slug,  # slug
         "url",  # url
         "company",  # company
         "company-url",  # company_url
@@ -51,49 +46,49 @@ def membership_plan():
     ]
 
 
-def card_no_question():
+def card_no_question(question_id, scheme_id=105):
     return [
-        CARD_NO_QUESTION_ID,  # id
+        question_id,  # id
         "Card Number",  # label
-        PlanIDs.TEST_SCHEME_ID,  # scheme_id
+        scheme_id,  # scheme id
         "card_number",  # type
         0,  # order
         True,  # manual_question
         False,  # scan_question
         False,  # third_party_identifier
         False,  # one_question_link
-        1,  # options
+        3,  # options
         0,  # answer_type
         "\\N",  # choice
         "description",  # description
         "(.*)",  # validation
         True,  # add_field
         False,  # auth_field
-        False,  # enrol_field
-        False,  # register_field
+        True,  # enrol_field
+        True,  # register_field
     ]
 
 
-def postcode_question():
+def postcode_question(question_id, scheme_id):
     return [
-        POSTCODE_QUESTION_ID,  # id
+        question_id,  # id
         "Postcode",  # label
-        PlanIDs.TEST_SCHEME_ID,  # scheme_id
+        scheme_id,  # scheme_id
         "postcode",  # type
         0,  # order
         False,  # manual_question
         False,  # scan_question
         False,  # third_party_identifier
         False,  # one_question_link
-        1,  # options
+        3,  # options
         0,  # answer_type
         "\\N",  # choice
         "description",  # description
         "(.*)",  # validation
         False,  # add_field
         True,  # auth_field
-        False,  # enrol_field
-        False,  # register_field
+        True,  # enrol_field
+        True,  # register_field
     ]
 
 
@@ -101,14 +96,14 @@ def service(user_id):
     return [user_id, "\\N", "\\N", "2019-03-07 12:42:15+00"]  # id, latitude, longitude, timestamp
 
 
-def membership_card(card_id):
+def membership_card(card_id, scheme_id):
     return [
         card_id,  # id
         1,  # status
         0,  # order
         "2019-03-12 15:51:36.390742+00",  # created
         "2019-03-15 05:55:28.532571+00",  # updated
-        PlanIDs.TEST_SCHEME_ID,  # scheme_id
+        scheme_id,  # scheme_id
         True,  # is_deleted
         "\\N",  # link_date
         "\\N",  # join_date
@@ -117,16 +112,16 @@ def membership_card(card_id):
     ]
 
 
-def card_number_answer(answer_id):
-    return [answer_id, uuid.uuid4(), answer_id, CARD_NO_QUESTION_ID]  # id, answer, scheme_account_id, question_id
+def card_number_answer(answer_id, question_id):
+    return [answer_id, uuid.uuid4(), answer_id, question_id]  # id, answer, scheme_account_id, question_id
 
 
-def postcode_answer(answer_id, scheme_account_id):
+def postcode_answer(answer_id, scheme_account_id, question_id):
     return [
         answer_id,  # id
         uuid.uuid4(),  # answer
         scheme_account_id,  # scheme_account_id
-        POSTCODE_QUESTION_ID,  # question_id
+        question_id,  # question_id
     ]
 
 
@@ -163,3 +158,19 @@ def card_service_link(user_id):
 
 def pll_link(user_id):
     return [user_id, True, user_id, user_id]  # id, active_link, payment_card_account_id, scheme_account_id
+
+
+def organisation(fixture):
+    return [fixture['id'], fixture['organisation_name'], fixture['organisation_t_and_c']]
+
+
+def client_application(fixture):
+    return [fixture['client_id'], fixture['client_name'], fixture['id'], fixture['secret']]
+
+
+def client_application_bundle(fixture):
+    return [fixture['id'], fixture['bundle_id'], fixture['client_id']]
+
+
+def scheme_whitelist(whitelist_id, fixture, scheme_id):
+    return [whitelist_id, fixture['status'], fixture['id'], scheme_id]

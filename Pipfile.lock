@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "a7470dfdfff12c9f76a26acba2a89ca3c17b16a8ac4e3e2a47c5389759b54cb1"
+            "sha256": "4e3de0fd9b45a9df507ca8f459d3b116e430eca68c5f3db2f9da497b362c7bfe"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -151,10 +151,10 @@
         },
         "jinja2": {
             "hashes": [
-                "sha256:74320bb91f31270f9551d46522e33af46a80c3d619f4a4bf42b3164d30b5911f",
-                "sha256:9fe95f19286cfefaa917656583d020be14e7859c6b0252588391e47db34527de"
+                "sha256:6e7a3c2934694d59ad334c93dd1b6c96699cf24c53fdb8ec848ac6b23e685734",
+                "sha256:d6609ae5ec3d56212ca7d802eda654eaf2310000816ce815361041465b108be4"
             ],
-            "version": "==2.10.3"
+            "version": "==2.11.0"
         },
         "locustio": {
             "hashes": [
@@ -261,11 +261,12 @@
                 "sha256:11e007a8a2aa0323f5a921e9e6a2d7e4e67d9877e85773fba9ba6419025cbeb4",
                 "sha256:9cf5292fcd0f598c671cfc1e0d7d1a7f13bb8085e9a590f48c010551dc6c4b31"
             ],
+            "index": "pypi",
             "version": "==2.22.0"
         },
         "shared-config-storage": {
             "git": "ssh://git@git.bink.com/libs/shared-config-storage.git",
-            "ref": "a7deba1ae91ea37158dc454021bc295963ee2615"
+            "ref": "4e83f7b07998d406d7541fe4010acd3ca0e75e7e"
         },
         "six": {
             "hashes": [

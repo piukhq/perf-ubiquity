@@ -30,7 +30,22 @@ def membership_plan(plan_id, name):
                     "common_name": "card_number"
                 }
             ],
-            "registration_fields": [],
+            "registration_fields": [
+                {
+                    "choice": [],
+                    "validation": "(.*)",
+                    "column": "Card Number",
+                    "type": 0,
+                    "common_name": "card_number"
+                },
+                {
+                    "choice": [],
+                    "validation": "(.*)",
+                    "column": "Postcode",
+                    "type": 0,
+                    "common_name": "postcode"
+                }
+            ],
             "plan_name_card": "Performance Test",
             "fees": [
                 {
@@ -42,7 +57,22 @@ def membership_plan(plan_id, name):
             "category": "Household",
             "company_name": "company",
             "plan_register_info": "Registrations typically processed in 24hrs",
-            "enrol_fields": [],
+            "enrol_fields": [
+                {
+                    "choice": [],
+                    "validation": "(.*)",
+                    "column": "Card Number",
+                    "type": 0,
+                    "common_name": "card_number"
+                },
+                {
+                    "choice": [],
+                    "validation": "(.*)",
+                    "column": "Postcode",
+                    "type": 0,
+                    "common_name": "postcode"
+                }
+            ],
             "plan_summary": "Test plan summary",
             "authorise_fields": [
                 {

@@ -39,9 +39,9 @@ class UserBehavior(TaskSequence):
         self.consent = service.generate_random()
         email = self.consent["consent"]["email"]
         timestamp = self.consent["consent"]["timestamp"]
-        self.single_prop_header = service.generate_auth_header(email, timestamp, CLIENT_ONE["bundle_id"])
-        self.multi_prop_header = service.generate_auth_header(email, timestamp, CLIENT_TWO["bundle_id"])
-        self.restricted_prop_header = service.generate_auth_header(email, timestamp, CLIENT_RESTRICTED["bundle_id"])
+        self.single_prop_header = service.generate_auth_header(email, timestamp, CLIENT_ONE)
+        self.multi_prop_header = service.generate_auth_header(email, timestamp, CLIENT_TWO)
+        self.restricted_prop_header = service.generate_auth_header(email, timestamp, CLIENT_RESTRICTED)
         self.non_restricted_auth_headers = {
             LocustLabel.SINGLE_PROPERTY: self.single_prop_header,
             LocustLabel.MULTI_PROPERTY: self.multi_prop_header
@@ -61,7 +61,7 @@ class UserBehavior(TaskSequence):
 
     @seq_task(4)
     def get_membership_plans(self):
-        for locust_label, auth_header in self.non_restricted_auth_headers.values():
+        for locust_label, auth_header in self.non_restricted_auth_headers.items():
             self.client.get("/membership_plans", headers=auth_header,
                             name=f"/membership_plans {LocustLabel.SINGLE_PROPERTY}")
 
@@ -101,14 +101,13 @@ class UserBehavior(TaskSequence):
     @seq_task(9)
     @task(7)
     def post_membership_cards_add(self):
-        # TODO: Save membership card number and auth cred for put and patch later
         plan_id = random.choice(MEMBERSHIP_PLAN_IDS)
         mcard_json = membership_card.random_add_json(plan_id)
         resp = self.client.post("/membership_cards", json=mcard_json, headers=self.single_prop_header,
                                 name=f"/membership_cards {LocustLabel.SINGLE_PROPERTY}")
 
         mcard = {
-            'id': resp.json('id'),
+            'id': resp.json()['id'],
             'plan_id': plan_id
         }
         self.membership_cards.append(mcard)
@@ -129,12 +128,12 @@ class UserBehavior(TaskSequence):
     @seq_task(11)
     def post_membership_cards_join(self):
         plan_id = random.choice(MEMBERSHIP_PLAN_IDS)
-        mcard_json = membership_card.random_join_json(plan_id)
+        mcard_json = membership_card.random_join_json(MEMBERSHIP_PLAN_IDS)
         resp = self.client.post("/membership_cards", json=mcard_json, headers=self.single_prop_header,
                                 name=f"/membership_cards {LocustLabel.SINGLE_PROPERTY}")
 
         mcard = {
-            'id': resp.json('id'),
+            'id': resp.json()['id'],
             'plan_id': plan_id
         }
         self.membership_cards.append(mcard)
@@ -248,7 +247,7 @@ class UserBehavior(TaskSequence):
 
     @seq_task(13)
     def get_payment_cards(self):
-        for auth_header in self.non_restricted_auth_headers:
+        for auth_header in self.non_restricted_auth_headers.values():
             self.client.get("/payment_cards", headers=auth_header,
                             name=f"/payment_cards {LocustLabel.SINGLE_PROPERTY}")
 
@@ -258,7 +257,7 @@ class UserBehavior(TaskSequence):
     @seq_task(13)
     def get_payment_card(self):
         for payment_card_id in self.payment_cards:
-            for auth_header in self.non_restricted_auth_headers:
+            for auth_header in self.non_restricted_auth_headers.values():
                 self.client.get(f"/payment_card/{payment_card_id}", headers=auth_header,
                                 name=f"/payment_card/<pcard_id> {LocustLabel.SINGLE_PROPERTY}")
 

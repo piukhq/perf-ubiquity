@@ -7,6 +7,7 @@ import requests
 
 from data_population.daedalus import create_data
 from data_population.fixtures import CLIENT_ONE, CLIENT_TWO, CLIENT_RESTRICTED, STATIC_START_ID, MEMBERSHIP_PLAN_IDS
+from request_data.membership_plan import ClientBundleIDs
 from settings import VAULT_URL, VAULT_TOKEN, CHANNEL_VAULT_PATH
 
 TSV_PATH = f"{os.path.dirname(__file__)}/tsv"
@@ -68,9 +69,21 @@ def create_tsv():
         }
 
     headers = {"X-Vault-Token": VAULT_TOKEN}
-    vault_channels = requests.get(f"{VAULT_URL}/v1/secret{CHANNEL_VAULT_PATH}", headers=headers).json()
-    all_channels.update(vault_channels['data'])
-    requests.post(f"{VAULT_URL}/v1/secret{CHANNEL_VAULT_PATH}", headers=headers, json=all_channels)
+    vault_channels = requests.get(f"{VAULT_URL}/v1/secret{CHANNEL_VAULT_PATH}", headers=headers).json()['data']
+
+    if not all(item in vault_channels.items() for item in all_channels.items()):
+        all_channels.update(vault_channels)
+        requests.post(f"{VAULT_URL}/v1/secret{CHANNEL_VAULT_PATH}", headers=headers, json=all_channels)
+
+    test_keys_url = f"{VAULT_URL}/v1/secret/data/{ClientBundleIDs.BARCLAYS}"
+    test_payment_card_keys = requests.get(test_keys_url, headers=headers).json()['data']
+
+    for client in client_fixtures:
+        keys_url = f"{VAULT_URL}/v1/secret/data/{client['bundle_id']}"
+        resp = requests.get(keys_url, headers=headers)
+        if resp.status_code == 404:
+            data = test_payment_card_keys
+            requests.post(keys_url, headers=headers, json=data)
 
     end = time.perf_counter()
     print(f"Elapsed time: {end - start}")

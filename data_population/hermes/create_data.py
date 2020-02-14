@@ -6,14 +6,14 @@ def membership_plan(scheme_id, name, slug):
         scheme_id,  # id
         name,  # name
         slug,  # slug
-        "url",  # url
+        "https://goo.gl/u72nN9",  # url
         "company",  # company
-        "company-url",  # company_url
+        "https://goo.gl/xPNXKv",  # company_url
         2,  # tier
         "please scan",  # scan_message
         "pts",  # point_name
         1,  # category_id
-        "forgot-url",  # forgotten_password_url
+        "https://www.iceland.co.uk/bonus-card/my-bonus-card/forgotten-password/",  # forgotten_password_url
         "identifier",  # identifier
         True,  # has_transactions
         True,  # has_points
@@ -23,12 +23,12 @@ def membership_plan(scheme_id, name, slug):
         "",  # barcode_prefix
         "",  # card_number_prefix
         1,  # barcode_type
-        "android app id",  # android_app_id
-        "ios scheme",  # ios_scheme
-        "itunes-url",  # itunes_url
-        "play-store-url",  # play_store_url
+        "",  # android_app_id
+        "",  # ios_scheme
+        "",  # itunes_url
+        "",  # play_store_url
         4,  # max_points_value_length
-        "join-url",  # join_url
+        "https://goo.gl/YzLHX1",  # join_url
         "link account text",  # link_account_text
         "join t and c",  # join_t_and_c
         {"Date", "Reference", "Points"},  # transaction_headers

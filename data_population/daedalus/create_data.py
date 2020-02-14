@@ -11,7 +11,7 @@ def membership_plan(plan_id, name):
                 {
                     "name": "Terms & conditions",
                     "checkbox": True,
-                    "url": "url",
+                    "url": "https://goo.gl/u72nN9",
                     "display": [
                         "REGISTRATION",
                         "ENROL"
@@ -19,7 +19,7 @@ def membership_plan(plan_id, name):
                     "description": "Terms & conditions"
                 }
             ],
-            "company_url": "company-url",
+            "company_url": "https://goo.gl/xPNXKv",
             "plan_description": "Test plan description",
             "tiers": [],
             "add_fields": [

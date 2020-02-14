@@ -138,9 +138,6 @@ class UserBehavior(TaskSequence):
         }
         self.membership_cards.append(mcard)
 
-        self.client.post("/membership_cards", json=mcard_json, headers=self.multi_prop_header,
-                         name=f"/membership_cards {LocustLabel.MULTI_PROPERTY}")
-
     @seq_task(12)
     def post_membership_cards_join_restricted(self):
         mcard_json = membership_card.random_join_json(MEMBERSHIP_PLAN_IDS)

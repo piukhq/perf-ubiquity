@@ -11,6 +11,9 @@ LOAD_START_ID = 2000000
 BULK_SIZE = 1000
 CLIENT_FIXTURES = [CLIENT_ONE, CLIENT_TWO, CLIENT_RESTRICTED]
 SERVICE_COUNT = 180_000_000
+MCARDS_PER_SERVICE = 8
+
+MEMBERSHIP_COUNT = SERVICE_COUNT * MCARDS_PER_SERVICE
 
 
 class Files(str, Enum):
@@ -82,6 +85,22 @@ def create_tsv():
             total_services_remaining -= 1
 
         write_to_tsv(Files.SERVICE, services)
+
+    # Create Membership Cards
+
+    total_mcards_remaining = MEMBERSHIP_COUNT
+    while total_mcards_remaining > 0:
+        mcards = []
+        batch_counter = BULK_SIZE
+        while batch_counter > 0 and total_mcards_remaining > 0:
+            mcard_id = MEMBERSHIP_COUNT - total_mcards_remaining
+            mcards.append(
+                create_data.membership_card(
+                    mcard_id=mcard_id,
+                    membership_plan_id=client_fixtures[mcard_id % fixture_count]['id'],
+                    card_number=f'63317491{mcard_id:010}'
+                )
+            )
 
     end = time.perf_counter()
     print(f"Elapsed time: {end - start}")

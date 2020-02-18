@@ -197,14 +197,14 @@ def membership_card_association(association_id, service_id, membership_card_id, 
         membership_card_id,
         service_id,
         plan_whitelist_id,
-        'active'
+        'ACTIVE'
     ]
 
 
 def payment_card(payment_card_id='1', fingerprint='test_fingerprint', token='test_token'):
     return [
         payment_card_id,
-        'active',  # status
+        'ACTIVE',  # status
         '2020-02-13 15:50:13.879026+00:00',  # status_updated
         fingerprint,
         token,

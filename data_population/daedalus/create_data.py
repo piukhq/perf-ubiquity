@@ -1,5 +1,6 @@
 import hashlib
 import json
+import uuid
 
 
 def membership_plan(plan_id, name):
@@ -201,7 +202,8 @@ def membership_card_association(association_id, service_id, membership_card_id, 
     ]
 
 
-def payment_card(payment_card_id='1', fingerprint='test_fingerprint', token='test_token'):
+def payment_card(payment_card_id, fingerprint, token):
+    payment_card_id = str(payment_card_id)
     return [
         payment_card_id,
         'ACTIVE',  # status
@@ -210,14 +212,14 @@ def payment_card(payment_card_id='1', fingerprint='test_fingerprint', token='tes
         token,
         json.dumps(False),  # is_deleted
         json.dumps({  # card
-            "first_six_digits": "555555",
-            "last_four_digits": "4444",
+            "first_six_digits": f"4{payment_card_id[:5]}",
+            "last_four_digits": payment_card_id[:4],
             "month": 11,
             "year": 2022,
             "country": "UK",
             "currency_code": "GBP",
             "name_on_card": "Test Card",
-            "provider": "mastercard",
+            "provider": "visa",
             "type": "debit"
         }),
         json.dumps({  # account
@@ -231,8 +233,7 @@ def payment_card(payment_card_id='1', fingerprint='test_fingerprint', token='tes
             ]
         }),
         '[]',  # images
-        # hash is created in hermes using the salt in the vault, this can slow down things a lot.
-        # if it is not needed for lookups its better to just leave it empty
+        uuid.uuid4()
     ]
 
 

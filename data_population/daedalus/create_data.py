@@ -1,6 +1,5 @@
 import hashlib
 import json
-import uuid
 
 
 def membership_plan(plan_id, name):
@@ -233,7 +232,7 @@ def payment_card(payment_card_id, fingerprint, token):
             ]
         }),
         '[]',  # images
-        uuid.uuid4()
+        # hash left null to save time as it is not needed for performance testing for now.
     ]
 
 

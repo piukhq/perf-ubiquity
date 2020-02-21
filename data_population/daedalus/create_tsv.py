@@ -8,9 +8,16 @@ from data_population.fixtures import CLIENT_ONE, CLIENT_TWO, CLIENT_RESTRICTED, 
 
 TSV_PATH = f"{os.path.dirname(__file__)}/tsv"
 LOAD_START_ID = 2000000
-BULK_SIZE = 1000
+SERVICE_BATCH_SIZE = 1000
 CLIENT_FIXTURES = [CLIENT_ONE, CLIENT_TWO, CLIENT_RESTRICTED]
 SERVICE_COUNT = 180_000_000
+MCARDS_PER_SERVICE = 8
+
+SERVICE_START_ID = STATIC_START_ID
+MCARD_START_ID = STATIC_START_ID
+MCARD_ASSOCIATION_START_ID = STATIC_START_ID
+
+MEMBERSHIP_COUNT = SERVICE_COUNT * MCARDS_PER_SERVICE
 
 
 class Files(str, Enum):
@@ -18,6 +25,8 @@ class Files(str, Enum):
     MEMBERSHIP_PLAN = "membership_plan.tsv"
     CHANNEL_WHITELIST = "channel_membership_plan_whitelist.tsv"
     SERVICE = "service.tsv"
+    MEMBERSHIP_CARD = "membership_card.tsv"
+    MCARD_ASSOCIATIONS = "membership_card_association.tsv"
 
 
 def tsv_path(file_name):
@@ -52,36 +61,70 @@ def create_tsv():
 
     whitelist_id = STATIC_START_ID
     whitelist_list = []
+    whitelist_mapping = {}
     for client_fixture in [CLIENT_ONE, CLIENT_TWO]:
         for plan in membership_plans:
             whitelist_id += 1
             plan_id = plan[0]
             whitelist_list.append(create_data.channel_whitelist(whitelist_id, client_fixture, plan_id))
+            whitelist_mapping.update({(client_fixture['id'], plan_id): whitelist_id})
 
     write_to_tsv(Files.CHANNEL_WHITELIST, whitelist_list)
 
     client_fixtures = [CLIENT_ONE, CLIENT_TWO]
     fixture_count = len(client_fixtures)
-    total_services_remaining = SERVICE_COUNT
-    print("creating services")
 
-    while total_services_remaining > 0:
-        services = []
-        batch_counter = BULK_SIZE
-        while batch_counter > 0 and total_services_remaining > 0:
-            service_id = SERVICE_COUNT - total_services_remaining
-            client_fixture = client_fixtures[service_id % fixture_count]
+    mcard_id = MCARD_START_ID
+    service_id = SERVICE_START_ID
+    mcard_association_id = MCARD_ASSOCIATION_START_ID
+
+    mcards = []
+    services = []
+    mcard_associations = []
+    total = 0
+    final_service_id = service_id + SERVICE_COUNT
+    while service_id < final_service_id:
+        if final_service_id - service_id < SERVICE_BATCH_SIZE:
+            batch_size = final_service_id - service_id
+        else:
+            batch_size = SERVICE_BATCH_SIZE
+
+        for _ in range(batch_size):
             services.append(
                 create_data.service(
-                    client_fixture,
+                    fixture=client_fixtures[service_id % fixture_count],
                     service_id=service_id,
-                    email=f"performanc{service_id}@test.locust"
+                    email=f"performance{service_id}@test.locust"
                 )
             )
-            batch_counter -= 1
-            total_services_remaining -= 1
+            service_id += 1
+
+            for _ in range(MCARDS_PER_SERVICE):
+                plan_id = mcard_id % len(MEMBERSHIP_PLAN_IDS) + STATIC_START_ID
+                mcards.append(
+                    create_data.membership_card(
+                        mcard_id=mcard_id,
+                        membership_plan_id=plan_id,
+                        card_number=f'63317491{mcard_id:010}'
+                    )
+                )
+
+                mcard_associations.append(
+                    create_data.membership_card_association(
+                        association_id=mcard_association_id,
+                        service_id=service_id,
+                        membership_card_id=mcard_id,
+                        plan_whitelist_id=whitelist_mapping[(client_fixtures[mcard_id % fixture_count]['id'], plan_id)]
+                    )
+                )
+                mcard_id += 1
+                mcard_association_id += 1
+
+        total += batch_size
 
         write_to_tsv(Files.SERVICE, services)
+        write_to_tsv(Files.MEMBERSHIP_CARD, mcards)
+        write_to_tsv(Files.MCARD_ASSOCIATIONS, mcard_associations)
 
     end = time.perf_counter()
     print(f"Elapsed time: {end - start}")

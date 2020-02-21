@@ -166,10 +166,10 @@ def membership_card(mcard_id='1', membership_plan_id='242', card_number='6331749
     return [
         mcard_id,
         membership_plan_id,
-        json.dumps({  # status
-            "state": "pending",
+        json.dumps({  # status has to be authorised for the pll links to be shown
+            "state": "authorised",
             "reason_codes": [
-                "X100"
+                "X300"
             ]
         }),
         json.dumps({  # card
@@ -206,7 +206,7 @@ def payment_card(payment_card_id, fingerprint, token):
     payment_card_id = str(payment_card_id)
     return [
         payment_card_id,
-        'ACTIVE',  # status
+        'ACTIVE',  # status has to be active for the pll links to be shown
         '2020-02-13 15:50:13.879026+00:00',  # status_updated
         fingerprint,
         token,
@@ -242,4 +242,11 @@ def payment_card_association(association_id, service_id, payment_card_id):
         association_id,
         payment_card_id,
         service_id
+    ]
+
+
+def payment_membership_association(payment_card_id, membership_card_id):
+    return [
+        payment_card_id,
+        membership_card_id
     ]

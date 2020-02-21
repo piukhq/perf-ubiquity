@@ -8,11 +8,11 @@ from data_population.fixtures import CLIENT_ONE, CLIENT_TWO, CLIENT_RESTRICTED, 
 
 TSV_PATH = f"{os.path.dirname(__file__)}/tsv"
 LOAD_START_ID = 2000000
-SERVICE_BATCH_SIZE = 1000
+SERVICE_BATCH_SIZE = 6
 CLIENT_FIXTURES = [CLIENT_ONE, CLIENT_TWO, CLIENT_RESTRICTED]
-SERVICE_COUNT = 180_000_000
+SERVICE_COUNT = 10
 PCARDS_PER_SERVICE = 2
-MCARDS_PER_SERVICE = 8
+MCARDS_PER_SERVICE = 3
 
 SERVICE_START_ID = STATIC_START_ID
 PCARD_START_ID = STATIC_START_ID
@@ -30,9 +30,10 @@ class Files(str, Enum):
     CHANNEL_WHITELIST = "channel_membership_plan_whitelist.tsv"
     SERVICE = "service.tsv"
     PAYMENT_CARD = "payment_card.tsv"
-    PCARD_ASSOCIATIONS = "payment_card_association.tsv"
+    PCARD_ASSOCIATION = "payment_card_association.tsv"
     MEMBERSHIP_CARD = "membership_card.tsv"
-    MCARD_ASSOCIATIONS = "membership_card_association.tsv"
+    MCARD_ASSOCIATION = "membership_card_association.tsv"
+    PAYMENT_MEMBERSHIP_ASSOCIATION = 'payment_membership_association.tsv'
 
 
 def tsv_path(file_name):
@@ -91,6 +92,7 @@ def create_tsv():
     mcards = []
     pcard_associations = []
     mcard_associations = []
+    payment_membership_associations = []
     total = 0
     final_service_id = service_id + SERVICE_COUNT
     while service_id < final_service_id:
@@ -149,13 +151,21 @@ def create_tsv():
                 mcard_id += 1
                 mcard_association_id += 1
 
+            payment_membership_associations.append(
+                create_data.payment_membership_association(
+                    payment_card_id=pcard_id - 1,
+                    membership_card_id=mcard_id - 1,
+                )
+            )
+
         total += batch_size
 
     write_to_tsv(Files.SERVICE, services)
     write_to_tsv(Files.PAYMENT_CARD, pcards)
-    write_to_tsv(Files.PCARD_ASSOCIATIONS, pcard_associations)
+    write_to_tsv(Files.PCARD_ASSOCIATION, pcard_associations)
     write_to_tsv(Files.MEMBERSHIP_CARD, mcards)
-    write_to_tsv(Files.MCARD_ASSOCIATIONS, mcard_associations)
+    write_to_tsv(Files.MCARD_ASSOCIATION, mcard_associations)
+    write_to_tsv(Files.PAYMENT_MEMBERSHIP_ASSOCIATION, payment_membership_associations)
     end = time.perf_counter()
     print(f"Elapsed time: {end - start}")
 

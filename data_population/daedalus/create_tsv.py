@@ -11,9 +11,13 @@ LOAD_START_ID = 2000000
 SERVICE_BATCH_SIZE = 1000
 CLIENT_FIXTURES = [CLIENT_ONE, CLIENT_TWO, CLIENT_RESTRICTED]
 SERVICE_COUNT = 180_000_000
+PCARDS_PER_SERVICE = 2
 MCARDS_PER_SERVICE = 8
 
 SERVICE_START_ID = STATIC_START_ID
+PCARD_START_ID = STATIC_START_ID
+PCARD_ASSOCIATION_START_ID = STATIC_START_ID
+
 MCARD_START_ID = STATIC_START_ID
 MCARD_ASSOCIATION_START_ID = STATIC_START_ID
 
@@ -25,8 +29,11 @@ class Files(str, Enum):
     MEMBERSHIP_PLAN = "membership_plan.tsv"
     CHANNEL_WHITELIST = "channel_membership_plan_whitelist.tsv"
     SERVICE = "service.tsv"
+    PAYMENT_CARD = "payment_card.tsv"
+    PCARD_ASSOCIATION = "payment_card_association.tsv"
     MEMBERSHIP_CARD = "membership_card.tsv"
-    MCARD_ASSOCIATIONS = "membership_card_association.tsv"
+    MCARD_ASSOCIATION = "membership_card_association.tsv"
+    PAYMENT_MEMBERSHIP_ASSOCIATION = 'payment_membership_association.tsv'
 
 
 def tsv_path(file_name):
@@ -38,6 +45,55 @@ def write_to_tsv(file_name, rows):
     with open(path, "a") as f:
         tsv_writer = csv.writer(f, delimiter="\t", quoting=csv.QUOTE_NONE, escapechar="", quotechar="")
         tsv_writer.writerows(rows)
+
+
+def _create_payment_cards(pcards, pcard_associations, service_id, pcard_id, pcard_association_id):
+    for _ in range(PCARDS_PER_SERVICE):
+        pcards.append(
+            create_data.payment_card(
+                payment_card_id=pcard_id,
+                fingerprint=f'fingerprint_{pcard_id}',
+                token=f'token_{pcard_id}'
+            )
+        )
+
+        pcard_associations.append(
+            create_data.payment_card_association(
+                association_id=pcard_association_id,
+                service_id=service_id,
+                payment_card_id=pcard_id
+            )
+        )
+        pcard_id += 1
+        pcard_association_id += 1
+
+    return pcard_id, pcard_association_id
+
+
+def _create_membership_cards(mcards, mcard_associations, service_id, mcard_id, mcard_association_id, whitelist_mapping,
+                             client_fixtures, fixture_count):
+    for _ in range(MCARDS_PER_SERVICE):
+        plan_id = mcard_id % len(MEMBERSHIP_PLAN_IDS) + STATIC_START_ID
+        mcards.append(
+            create_data.membership_card(
+                mcard_id=mcard_id,
+                membership_plan_id=plan_id,
+                card_number=f'63317491{mcard_id:010}'
+            )
+        )
+
+        mcard_associations.append(
+            create_data.membership_card_association(
+                association_id=mcard_association_id,
+                service_id=service_id,
+                membership_card_id=mcard_id,
+                plan_whitelist_id=whitelist_mapping[(client_fixtures[mcard_id % fixture_count]['id'], plan_id)]
+            )
+        )
+        mcard_id += 1
+        mcard_association_id += 1
+
+    return mcard_id, mcard_association_id
 
 
 def create_tsv():
@@ -73,14 +129,19 @@ def create_tsv():
 
     client_fixtures = [CLIENT_ONE, CLIENT_TWO]
     fixture_count = len(client_fixtures)
-
-    mcard_id = MCARD_START_ID
     service_id = SERVICE_START_ID
+
+    pcard_id = PCARD_START_ID
+    pcard_association_id = PCARD_ASSOCIATION_START_ID
+    mcard_id = MCARD_START_ID
     mcard_association_id = MCARD_ASSOCIATION_START_ID
 
-    mcards = []
     services = []
+    pcards = []
+    mcards = []
+    pcard_associations = []
     mcard_associations = []
+    payment_membership_associations = []
     total = 0
     final_service_id = service_id + SERVICE_COUNT
     while service_id < final_service_id:
@@ -99,33 +160,29 @@ def create_tsv():
             )
             service_id += 1
 
-            for _ in range(MCARDS_PER_SERVICE):
-                plan_id = mcard_id % len(MEMBERSHIP_PLAN_IDS) + STATIC_START_ID
-                mcards.append(
-                    create_data.membership_card(
-                        mcard_id=mcard_id,
-                        membership_plan_id=plan_id,
-                        card_number=f'63317491{mcard_id:010}'
-                    )
-                )
+            pcard_id, pcard_association_id = _create_payment_cards(
+                pcards, pcard_associations, service_id, pcard_id, pcard_association_id
+            )
+            mcard_id, mcard_association_id = _create_membership_cards(
+                mcards, mcard_associations, service_id, mcard_id, mcard_association_id, whitelist_mapping,
+                client_fixtures, fixture_count
+            )
 
-                mcard_associations.append(
-                    create_data.membership_card_association(
-                        association_id=mcard_association_id,
-                        service_id=service_id,
-                        membership_card_id=mcard_id,
-                        plan_whitelist_id=whitelist_mapping[(client_fixtures[mcard_id % fixture_count]['id'], plan_id)]
-                    )
+            payment_membership_associations.append(
+                create_data.payment_membership_association(
+                    payment_card_id=pcard_id - 1,
+                    membership_card_id=mcard_id - 1,
                 )
-                mcard_id += 1
-                mcard_association_id += 1
+            )
 
         total += batch_size
 
-        write_to_tsv(Files.SERVICE, services)
-        write_to_tsv(Files.MEMBERSHIP_CARD, mcards)
-        write_to_tsv(Files.MCARD_ASSOCIATIONS, mcard_associations)
-
+    write_to_tsv(Files.SERVICE, services)
+    write_to_tsv(Files.PAYMENT_CARD, pcards)
+    write_to_tsv(Files.PCARD_ASSOCIATION, pcard_associations)
+    write_to_tsv(Files.MEMBERSHIP_CARD, mcards)
+    write_to_tsv(Files.MCARD_ASSOCIATION, mcard_associations)
+    write_to_tsv(Files.PAYMENT_MEMBERSHIP_ASSOCIATION, payment_membership_associations)
     end = time.perf_counter()
     print(f"Elapsed time: {end - start}")
 

@@ -165,10 +165,10 @@ def membership_card(mcard_id='1', membership_plan_id='242', card_number='6331749
     return [
         mcard_id,
         membership_plan_id,
-        json.dumps({  # status
-            "state": "pending",
+        json.dumps({  # status has to be authorised for the pll links to be shown
+            "state": "authorised",
             "reason_codes": [
-                "X100"
+                "X300"
             ]
         }),
         json.dumps({  # card
@@ -201,23 +201,24 @@ def membership_card_association(association_id, service_id, membership_card_id, 
     ]
 
 
-def payment_card(payment_card_id='1', fingerprint='test_fingerprint', token='test_token'):
+def payment_card(payment_card_id, fingerprint, token):
+    payment_card_id = str(payment_card_id)
     return [
         payment_card_id,
-        'ACTIVE',  # status
+        'ACTIVE',  # status has to be active for the pll links to be shown
         '2020-02-13 15:50:13.879026+00:00',  # status_updated
         fingerprint,
         token,
         json.dumps(False),  # is_deleted
         json.dumps({  # card
-            "first_six_digits": "555555",
-            "last_four_digits": "4444",
+            "first_six_digits": f"4{payment_card_id[:5]}",
+            "last_four_digits": payment_card_id[:4],
             "month": 11,
             "year": 2022,
             "country": "UK",
             "currency_code": "GBP",
             "name_on_card": "Test Card",
-            "provider": "mastercard",
+            "provider": "visa",
             "type": "debit"
         }),
         json.dumps({  # account
@@ -231,8 +232,7 @@ def payment_card(payment_card_id='1', fingerprint='test_fingerprint', token='tes
             ]
         }),
         '[]',  # images
-        # hash is created in hermes using the salt in the vault, this can slow down things a lot.
-        # if it is not needed for lookups its better to just leave it empty
+        # hash left null to save time as it is not needed for performance testing for now.
     ]
 
 
@@ -241,4 +241,11 @@ def payment_card_association(association_id, service_id, payment_card_id):
         association_id,
         payment_card_id,
         service_id
+    ]
+
+
+def payment_membership_association(payment_card_id, membership_card_id):
+    return [
+        payment_card_id,
+        membership_card_id
     ]

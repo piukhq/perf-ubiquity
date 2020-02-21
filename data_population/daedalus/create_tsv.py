@@ -47,6 +47,55 @@ def write_to_tsv(file_name, rows):
         tsv_writer.writerows(rows)
 
 
+def _create_payment_cards(pcards, pcard_associations, service_id, pcard_id, pcard_association_id):
+    for _ in range(PCARDS_PER_SERVICE):
+        pcards.append(
+            create_data.payment_card(
+                payment_card_id=pcard_id,
+                fingerprint=f'fingerprint_{pcard_id}',
+                token=f'token_{pcard_id}'
+            )
+        )
+
+        pcard_associations.append(
+            create_data.payment_card_association(
+                association_id=pcard_association_id,
+                service_id=service_id,
+                payment_card_id=pcard_id
+            )
+        )
+        pcard_id += 1
+        pcard_association_id += 1
+
+    return pcard_id, pcard_association_id
+
+
+def _create_membership_cards(mcards, mcard_associations, service_id, mcard_id, mcard_association_id, whitelist_mapping,
+                             client_fixtures, fixture_count):
+    for _ in range(MCARDS_PER_SERVICE):
+        plan_id = mcard_id % len(MEMBERSHIP_PLAN_IDS) + STATIC_START_ID
+        mcards.append(
+            create_data.membership_card(
+                mcard_id=mcard_id,
+                membership_plan_id=plan_id,
+                card_number=f'63317491{mcard_id:010}'
+            )
+        )
+
+        mcard_associations.append(
+            create_data.membership_card_association(
+                association_id=mcard_association_id,
+                service_id=service_id,
+                membership_card_id=mcard_id,
+                plan_whitelist_id=whitelist_mapping[(client_fixtures[mcard_id % fixture_count]['id'], plan_id)]
+            )
+        )
+        mcard_id += 1
+        mcard_association_id += 1
+
+    return mcard_id, mcard_association_id
+
+
 def create_tsv():
     start = time.perf_counter()
     os.makedirs(TSV_PATH, exist_ok=True)
@@ -111,45 +160,13 @@ def create_tsv():
             )
             service_id += 1
 
-            for _ in range(PCARDS_PER_SERVICE):
-                pcards.append(
-                    create_data.payment_card(
-                        payment_card_id=pcard_id,
-                        fingerprint=f'fingerprint_{pcard_id}',
-                        token=f'token_{pcard_id}'
-                    )
-                )
-
-                pcard_associations.append(
-                    create_data.payment_card_association(
-                        association_id=pcard_association_id,
-                        service_id=service_id,
-                        payment_card_id=pcard_id
-                    )
-                )
-                pcard_id += 1
-                pcard_association_id += 1
-
-            for _ in range(MCARDS_PER_SERVICE):
-                plan_id = mcard_id % len(MEMBERSHIP_PLAN_IDS) + STATIC_START_ID
-                mcards.append(
-                    create_data.membership_card(
-                        mcard_id=mcard_id,
-                        membership_plan_id=plan_id,
-                        card_number=f'63317491{mcard_id:010}'
-                    )
-                )
-
-                mcard_associations.append(
-                    create_data.membership_card_association(
-                        association_id=mcard_association_id,
-                        service_id=service_id,
-                        membership_card_id=mcard_id,
-                        plan_whitelist_id=whitelist_mapping[(client_fixtures[mcard_id % fixture_count]['id'], plan_id)]
-                    )
-                )
-                mcard_id += 1
-                mcard_association_id += 1
+            pcard_id, pcard_association_id = _create_payment_cards(
+                pcards, pcard_associations, service_id, pcard_id, pcard_association_id
+            )
+            mcard_id, mcard_association_id = _create_membership_cards(
+                mcards, mcard_associations, service_id, mcard_id, mcard_association_id, whitelist_mapping,
+                client_fixtures, fixture_count
+            )
 
             payment_membership_associations.append(
                 create_data.payment_membership_association(

@@ -1,4 +1,5 @@
 import random
+import time
 from enum import Enum
 
 from locust import HttpLocust, TaskSequence, seq_task, constant, task
@@ -24,6 +25,8 @@ class UserBehavior(TaskSequence):
         self.restricted_prop_header = {}
         self.non_restricted_auth_headers = {}
         self.all_auth_headers = []
+        self.static_pcard_json = {}
+        self.static_pcard_id = None
         self.payment_cards = []
         self.membership_cards = []
         self.put_counter = 0
@@ -32,8 +35,27 @@ class UserBehavior(TaskSequence):
         self.client_secrets = {client: secret["jwt_secret"] for client, secret in channel_info.items()}
         super(UserBehavior, self).__init__(parent)
 
+    def setup(self):
+        self.consent = service.generate_random()
+        email = self.consent["consent"]["email"]
+        timestamp = self.consent["consent"]["timestamp"]
+        auth_header = service.generate_auth_header(email, timestamp, CLIENT_ONE)
+        pcard = payment_card.generate_unencrypted_static()
+        self.static_pcard_json = payment_card.encrypt(pcard)
+        self.client.post("/payment_cards", json=self.static_pcard_json, headers=auth_header, name=f"Setup requests")
+        first_six = pcard['card']['first_six_digits']
+        for _ in range(0, 120):
+            time.sleep(1)
+            resp = self.client.get("/payment_cards", headers=self.auth_header, name=f"Setup requests")
+            if resp.json()['card']['first_six_digits'] == first_six:
+                self.static_pcard_id = resp.json()['id']
+                break
+        else:
+            raise RuntimeError("Static payment card took longer than expected to decrypt on API response "
+                               "please increase wait time and try again")
+
     @seq_task(1)
-    def test_setup(self):
+    def test_setup_headers(self):
         self.payment_cards = []
         self.membership_cards = []
         self.consent = service.generate_random()
@@ -89,13 +111,14 @@ class UserBehavior(TaskSequence):
     @seq_task(8)
     @task(2)
     def post_payment_cards(self):
-        pcard_json = payment_card.generate_random()
+        pcard = payment_card.generate_unencrypted_random()
+        pcard_json = payment_card.encrypt(pcard)
         resp = self.client.post("/payment_cards", json=pcard_json, headers=self.single_prop_header,
                                 name=f"/payment_cards {LocustLabel.SINGLE_PROPERTY}")
         pcard_id = resp.json()["id"]
         self.payment_cards.append(pcard_id)
 
-        self.client.post("/payment_cards", json=pcard_json, headers=self.multi_prop_header,
+        self.client.post("/payment_cards", json=self.static_pcard_json, headers=self.multi_prop_header,
                          name=f"/payment_cards {LocustLabel.MULTI_PROPERTY}")
 
     @seq_task(9)
@@ -151,10 +174,9 @@ class UserBehavior(TaskSequence):
     def patch_payment_card_id_membership_card_id(self):
         pcard_id = self.payment_cards[0]
         mcard_id = self.membership_cards[0]
-        for auth_header in self.non_restricted_auth_headers.values():
-            self.client.patch(f"/payment_card/{pcard_id}/membership_card/{mcard_id}", headers=auth_header,
-                              name=f"/payment_card/<pcard_id>/membership_card/<mcard_id> "
-                                   f"{LocustLabel.SINGLE_PROPERTY}")
+        self.client.patch(f"/payment_card/{pcard_id}/membership_card/{mcard_id}", headers=self.single_prop_header,
+                          name=f"/payment_card/<pcard_id>/membership_card/<mcard_id> "
+                               f"{LocustLabel.SINGLE_PROPERTY}")
 
     @seq_task(8)
     def patch_payment_card_id_membership_card_id_restricted(self):
@@ -171,10 +193,8 @@ class UserBehavior(TaskSequence):
     def patch_membership_card_id_payment_card_id(self):
         mcard_id = self.membership_cards[1]
         pcard_id = self.payment_cards[1]
-        for label, auth_header in self.non_restricted_auth_headers.items():
-            self.client.patch(f"/membership_card/{mcard_id}/payment_card/{pcard_id}", headers=auth_header,
-                              name=f"/membership_card/<mcard_id>/payment_card/<pcard_id> "
-                                   f"{LocustLabel.SINGLE_PROPERTY}")
+        self.client.patch(f"/membership_card/{mcard_id}/payment_card/{pcard_id}", headers=self.single_prop_header,
+                          name=f"/membership_card/<mcard_id>/payment_card/<pcard_id> {LocustLabel.SINGLE_PROPERTY}")
 
     @seq_task(8)
     def patch_membership_card_id_payment_card_id_restricted(self):
@@ -281,17 +301,22 @@ class UserBehavior(TaskSequence):
 
     @seq_task(17)
     def delete_payment_card(self):
+        self.client.delete(f"/payment_card/{self.static_pcard_id}", headers=self.multi_prop_header,
+                           name=f"/payment_card/<card_id> {LocustLabel.MULTI_PROPERTY}")
+
         for pcard_id in self.payment_cards:
-            for label, auth_header in self.non_restricted_auth_headers.items():
-                self.client.delete(f"/payment_card/{pcard_id}", headers=auth_header,
-                                   name=f"/payment_card/<card_id> {label}")
+            self.client.delete(f"/payment_card/{pcard_id}", headers=self.single_prop_header,
+                               name=f"/payment_card/<card_id> {LocustLabel.SINGLE_PROPERTY}")
+
 
     @seq_task(18)
     def delete_membership_card(self):
         for mcard in self.membership_cards:
-            for label, auth_header in self.non_restricted_auth_headers.items():
-                self.client.delete(f"/membership_card/{mcard['id']}", headers=auth_header,
-                                   name=f"/membership_card/<card_id> {label}")
+            self.client.delete(f"/membership_card/{mcard['id']}", headers=self.multi_prop_header,
+                               name=f"/membership_card/<card_id> {LocustLabel.MULTI_PROPERTY}")
+
+            self.client.delete(f"/membership_card/{mcard['id']}", headers=self.single_prop_header,
+                               name=f"/membership_card/<card_id> {LocustLabel.SINGLE_PROPERTY}")
 
     @seq_task(19)
     def delete_service(self):

@@ -159,7 +159,6 @@ def create_tsv():
                     email=f"performance{service_id}@test.locust"
                 )
             )
-            service_id += 1
 
             pcard_id, pcard_association_id = _create_payment_cards(
                 pcards, pcard_associations, service_id, pcard_id, pcard_association_id
@@ -175,6 +174,7 @@ def create_tsv():
                     membership_card_id=mcard_id - 1,
                 )
             )
+            service_id += 1
 
         total += batch_size
 

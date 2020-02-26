@@ -72,8 +72,8 @@ def create_tsv():
     while remaining_membership_plans > 0:
         remaining_membership_plans -= 1
         plan_id = STATIC_START_ID + remaining_membership_plans
-        plan_name = f"performance plan {remaining_membership_plans}"
-        plan_slug = f"performance-plan-{remaining_membership_plans}"
+        plan_name = f"performance plan {plan_id}"
+        plan_slug = f"performance-plan-{plan_id}"
         membership_plans.append(create_data.membership_plan(plan_id, plan_name, plan_slug))
         plan_questions.append(create_data.card_no_question(plan_id, plan_id))
         plan_questions.append(create_data.postcode_question(plan_id + 1000, plan_id))

@@ -23,6 +23,30 @@ class PaymentProvider(IntEnum):
     VISA = "42"
 
 
+def generate_unencrypted_static():
+    return {
+        "card": {
+            "token": "9bd11390-b8e8-4627-baa0-c738645fb9b5",
+            "last_four_digits": 3733,  # amex bin
+            "first_six_digits": 466666,
+            "name_on_card": "performance test static",
+            "month": 1,
+            "year": 2059,
+            "fingerprint": "33df7b61-b908-4496-847c-c4bd280b26ef",
+        },
+        "account": {
+            "consents": [
+                {
+                    "latitude": 51.405372,
+                    "longitude": -0.678357,
+                    "timestamp": 1573658810,
+                    "type": 2,
+                }
+            ]
+        },
+    }
+
+
 def generate_unencrypted_random():
     random_four = str(random.randint(1000, 9999))
     card_bin = random.choice(list(PaymentProvider))
@@ -50,8 +74,7 @@ def generate_unencrypted_random():
     }
 
 
-def generate_random():
-    pcard = generate_unencrypted_random()
+def encrypt(pcard):
     rsa = RSACipher(VAULT_TOKEN, VAULT_URL, ClientBundleIDs.BARCLAYS)
     for field in FIELDS_TO_ENCRYPT:
         cred = pcard['card'].get(field)
@@ -64,27 +87,3 @@ def generate_random():
         pcard['card'][field] = encrypted_val
 
     return pcard
-
-
-def generate_static():
-    return {
-        "card": {
-            "token": "0d9eb69c-9739-4ed6-9751-c2a53082572f",
-            "last_four_digits": 1111,
-            "first_six_digits": 466666,
-            "name_on_card": "test",
-            "month": 1,
-            "year": 2059,
-            "fingerprint": "262154d2-7cdd-43dc-a285-397e35444292",
-        },
-        "account": {
-            "consents": [
-                {
-                    "latitude": 51.405372,
-                    "longitude": -0.678357,
-                    "timestamp": 1573658810,
-                    "type": 2,
-                }
-            ]
-        },
-    }

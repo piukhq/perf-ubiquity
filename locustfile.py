@@ -47,7 +47,7 @@ class UserBehavior(TaskSequence):
         first_six = pcard['card']['first_six_digits']
         for _ in range(0, 120):
             time.sleep(1)
-            resp = self.client.get("/payment_cards", headers=self.auth_header, name=f"Setup requests")
+            resp = self.client.get("/payment_cards", headers=auth_header, name=f"Setup requests")
             if resp.json()['card']['first_six_digits'] == first_six:
                 self.static_pcard_id = resp.json()['id']
                 break
@@ -98,7 +98,7 @@ class UserBehavior(TaskSequence):
     @seq_task(6)
     @task(2)
     def post_payment_cards_single_property(self):
-        pcard_json = payment_card.generate_random()
+        pcard_json = payment_card.generate_unencrypted_random()
         resp = self.client.post("/payment_cards", json=pcard_json, headers=self.single_prop_header,
                                 name=f"/payment_cards {LocustLabel.SINGLE_PROPERTY}")
         pcard = {

@@ -149,10 +149,10 @@ def service(fixture, service_id=1, email='performance@test.locust'):
         service_id,
         f"{email}:{fixture['bundle_id']}",
         fixture['id'],
-        {
+        json.dumps({
             "email": email,
             "timestamp": 1581597325
-        }
+        })
     ]
 
 

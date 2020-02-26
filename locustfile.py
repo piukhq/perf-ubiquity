@@ -41,13 +41,14 @@ class UserBehavior(TaskSequence):
         email = consent["consent"]["email"]
         timestamp = consent["consent"]["timestamp"]
         auth_header = service.generate_auth_header(email, timestamp, CLIENT_ONE)
+        self.client.post("/service", json=consent, headers=auth_header, name="Setup requests")
         pcard = payment_card.generate_unencrypted_static()
         self.static_pcard_json = payment_card.encrypt(pcard)
-        self.client.post("/payment_cards", json=self.static_pcard_json, headers=auth_header, name=f"Setup requests")
+        self.client.post("/payment_cards", json=self.static_pcard_json, headers=auth_header, name="Setup requests")
         first_six = pcard['card']['first_six_digits']
         for _ in range(0, 120):
             time.sleep(1)
-            resp = self.client.get("/payment_cards", headers=auth_header, name=f"Setup requests")
+            resp = self.client.get("/payment_cards", headers=auth_header, name="Setup requests")
             if resp.json()['card']['first_six_digits'] == first_six:
                 self.static_pcard_id = resp.json()['id']
                 break

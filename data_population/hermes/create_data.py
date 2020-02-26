@@ -1,6 +1,13 @@
 import uuid
 
 
+def category(category_id):
+    return [
+        category_id,  # id
+        "performance",  # name
+    ]
+
+
 def membership_plan(scheme_id, name, slug):
     return [
         scheme_id,  # id

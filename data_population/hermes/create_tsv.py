@@ -37,6 +37,7 @@ class Files(str, Enum):
     CLIENT_APP = ("user_clientapplication.tsv",)
     CLIENT_APP_BUNDLE = ("user_clientapplicationbundle.tsv",)
     SCHEME_WHITELIST = ("scheme_schemebundleassociation.tsv",)
+    CATEGORY = ("scheme_catagory.tsv",)
 
 
 def tsv_path(file_name):
@@ -59,6 +60,8 @@ def create_tsv():
         except FileNotFoundError:
             pass
 
+    categories = [create_data.category(x) for x in range(0, 2)]
+    write_to_tsv(Files.CATEGORY, categories)
     organisations = [create_data.organisation(client) for client in CLIENTS]
     write_to_tsv(Files.ORGANISATION, organisations)
     client_applications = [create_data.client_application(client) for client in CLIENTS]
@@ -72,8 +75,8 @@ def create_tsv():
     while remaining_membership_plans > 0:
         remaining_membership_plans -= 1
         plan_id = STATIC_START_ID + remaining_membership_plans
-        plan_name = f"performance plan {remaining_membership_plans}"
-        plan_slug = f"performance-plan-{remaining_membership_plans}"
+        plan_name = f"performance plan {plan_id}"
+        plan_slug = f"performance-plan-{plan_id}"
         membership_plans.append(create_data.membership_plan(plan_id, plan_name, plan_slug))
         plan_questions.append(create_data.card_no_question(plan_id, plan_id))
         plan_questions.append(create_data.postcode_question(plan_id + 1000, plan_id))

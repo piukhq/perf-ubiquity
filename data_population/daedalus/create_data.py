@@ -1,8 +1,8 @@
-import hashlib
 import json
+import uuid
 
 
-def membership_plan(plan_id, name):
+def membership_plan(plan_id, name, slug):
     return [
         plan_id,  # id
         json.dumps({
@@ -122,7 +122,8 @@ def membership_plan(plan_id, name):
             }
         ]),  # images
         json.dumps([{"description": "Placeholder Balance Description", "currency": "GBP", "suffix": ""}]),  # balances
-        json.dumps([{"value": "value", "column": "test"}])  # content
+        json.dumps([{"value": "value", "column": "test"}]),  # content
+        slug,
     ]
 
 
@@ -148,10 +149,10 @@ def service(fixture, service_id=1, email='performance@test.locust'):
         service_id,
         f"{email}:{fixture['bundle_id']}",
         fixture['id'],
-        {
+        json.dumps({
             "email": email,
             "timestamp": 1581597325
-        }
+        })
     ]
 
 
@@ -163,8 +164,8 @@ def membership_card(mcard_id='1', membership_plan_id='242', card_number='6331749
         }
     ], sort_keys=True)
     return [
-        mcard_id,
-        membership_plan_id,
+        mcard_id,  # id
+        membership_plan_id,  # membership_plan
         json.dumps({  # status has to be authorised for the pll links to be shown
             "state": "authorised",
             "reason_codes": [
@@ -185,9 +186,15 @@ def membership_card(mcard_id='1', membership_plan_id='242', card_number='6331749
             }
         ]),
         add_fields,
-        hashlib.md5(add_fields.encode()).hexdigest(),  # add_fields hash
         '[]',  # auth fields
-        ''  # auth fields hash
+        '2020-01-01 00:00:00',  # last status update
+        'card_number',  # membership_id
+        '[]',  # balances
+        '[]',  # vouchers
+        '[]',  # membership_transactions
+        '[]',  # account
+        uuid.uuid4(),  # add_fields_hash
+        ''  # auth_fields_hash
     ]
 
 
@@ -204,11 +211,10 @@ def membership_card_association(association_id, service_id, membership_card_id, 
 def payment_card(payment_card_id, fingerprint, token):
     payment_card_id = str(payment_card_id)
     return [
-        payment_card_id,
+        payment_card_id,  # id
         'ACTIVE',  # status has to be active for the pll links to be shown
         '2020-02-13 15:50:13.879026+00:00',  # status_updated
-        fingerprint,
-        token,
+        fingerprint,  # fingerprint
         json.dumps(False),  # is_deleted
         json.dumps({  # card
             "first_six_digits": f"4{payment_card_id[:5]}",
@@ -232,7 +238,8 @@ def payment_card(payment_card_id, fingerprint, token):
             ]
         }),
         '[]',  # images
-        # hash left null to save time as it is not needed for performance testing for now.
+        token,  # token
+        uuid.uuid4()  # hash
     ]
 
 

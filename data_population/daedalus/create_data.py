@@ -2,7 +2,7 @@ import hashlib
 import json
 
 
-def membership_plan(plan_id, name):
+def membership_plan(plan_id, name, slug):
     return [
         plan_id,  # id
         json.dumps({
@@ -122,7 +122,8 @@ def membership_plan(plan_id, name):
             }
         ]),  # images
         json.dumps([{"description": "Placeholder Balance Description", "currency": "GBP", "suffix": ""}]),  # balances
-        json.dumps([{"value": "value", "column": "test"}])  # content
+        json.dumps([{"value": "value", "column": "test"}]),  # content
+        slug,
     ]
 
 

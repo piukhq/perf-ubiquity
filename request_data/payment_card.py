@@ -26,6 +26,7 @@ class PaymentProvider(IntEnum):
 def generate_unencrypted_static():
     return {
         "card": {
+            "hash": str(uuid.uuid4()),
             "token": "9bd11390-b8e8-4627-baa0-c738645fb9b5",
             "last_four_digits": 3733,  # amex bin
             "first_six_digits": 466666,

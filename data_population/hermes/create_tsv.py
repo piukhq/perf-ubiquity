@@ -37,6 +37,7 @@ class Files(str, Enum):
     CLIENT_APP = ("user_clientapplication.tsv",)
     CLIENT_APP_BUNDLE = ("user_clientapplicationbundle.tsv",)
     SCHEME_WHITELIST = ("scheme_schemebundleassociation.tsv",)
+    CATEGORY = ("scheme_catagory.tsv",)
 
 
 def tsv_path(file_name):
@@ -59,6 +60,8 @@ def create_tsv():
         except FileNotFoundError:
             pass
 
+    categories = [create_data.category(x) for x in range(0, 2)]
+    write_to_tsv(Files.CATEGORY, categories)
     organisations = [create_data.organisation(client) for client in CLIENTS]
     write_to_tsv(Files.ORGANISATION, organisations)
     client_applications = [create_data.client_application(client) for client in CLIENTS]

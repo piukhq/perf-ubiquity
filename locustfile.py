@@ -85,9 +85,6 @@ class UserBehavior(TaskSequence):
         }
         self.payment_cards.append(pcard)
 
-        self.client.post("/payment_cards", json=pcard_json, headers=self.multi_prop_header,
-                         name=f"/payment_cards {LocustLabel.MULTI_PROPERTY}")
-
     @seq_task(7)
     @task(7)
     def post_membership_cards_single_property(self):

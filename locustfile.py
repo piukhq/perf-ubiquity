@@ -38,8 +38,8 @@ class UserBehavior(TaskSequence):
 
     def setup(self):
         consent = service.generate_random()
-        email = self.consent["consent"]["email"]
-        timestamp = self.consent["consent"]["timestamp"]
+        email = consent["consent"]["email"]
+        timestamp = consent["consent"]["timestamp"]
         auth_header = service.generate_auth_header(email, timestamp, CLIENT_ONE)
         self.client.post("/service", json=consent, headers=auth_header, name="Setup requests")
         pcard = payment_card.generate_unencrypted_static()

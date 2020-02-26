@@ -37,9 +37,9 @@ class UserBehavior(TaskSequence):
         super(UserBehavior, self).__init__(parent)
 
     def setup(self):
-        self.consent = service.generate_random()
-        email = self.consent["consent"]["email"]
-        timestamp = self.consent["consent"]["timestamp"]
+        consent = service.generate_random()
+        email = consent["consent"]["email"]
+        timestamp = consent["consent"]["timestamp"]
         auth_header = service.generate_auth_header(email, timestamp, CLIENT_ONE)
         pcard = payment_card.generate_unencrypted_static()
         self.static_pcard_json = payment_card.encrypt(pcard)

@@ -111,7 +111,8 @@ def create_tsv():
     membership_plans = []
     for plan_id in MEMBERSHIP_PLAN_IDS:
         plan_name = f"performance plan {plan_id}"
-        membership_plans.append(create_data.membership_plan(plan_id, plan_name))
+        plan_slug = f"performance-plan-{plan_id}"
+        membership_plans.append(create_data.membership_plan(plan_id, plan_name, plan_slug))
 
     write_to_tsv(Files.MEMBERSHIP_PLAN, membership_plans)
 

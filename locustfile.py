@@ -42,12 +42,13 @@ class UserBehavior(TaskSequence):
         timestamp = consent["consent"]["timestamp"]
         auth_header = service.generate_auth_header(email, timestamp, CLIENT_ONE)
         self.client.post("/service", json=consent, headers=auth_header, name="Setup requests")
-        pcard = payment_card.generate_unencrypted_static()
+        pcard = payment_card.generate_unencrypted_random()
         self.static_pcard_json = payment_card.encrypt(pcard)
         post_resp = self.client.post("/payment_cards", json=self.static_pcard_json, headers=auth_header,
                                      name="Setup requests")
+        post_resp.raise_for_status()
         pcard_id = post_resp.json()['id']
-        first_six = pcard['card']['first_six_digits']
+        first_six = str(pcard['card']['first_six_digits'])
         for _ in range(0, 120):
             time.sleep(1)
             resp = self.client.get(f"/payment_card/{pcard_id}", headers=auth_header, name="Setup requests")
@@ -101,7 +102,8 @@ class UserBehavior(TaskSequence):
     @seq_task(6)
     @task(2)
     def post_payment_cards_single_property(self):
-        pcard_json = payment_card.generate_unencrypted_random()
+        pcard = payment_card.generate_unencrypted_random()
+        pcard_json = payment_card.encrypt(pcard)
         resp = self.client.post("/payment_cards", json=pcard_json, headers=self.single_prop_header,
                                 name=f"/payment_cards {LocustLabel.SINGLE_PROPERTY}")
         pcard = {
@@ -148,7 +150,7 @@ class UserBehavior(TaskSequence):
                                headers=self.restricted_prop_header, catch_response=True,
                                name=f"/membership_card/<mcard_id>/payment_card/<pcard_id> "
                                     f"{LocustLabel.SINGLE_RESTRICTED_PROPERTY}") as response:
-            if response.status_code == codes.FORBIDDEN:
+            if response.status_code == codes.NOT_FOUND:
                 response.success()
 
     @seq_task(8)
@@ -164,7 +166,7 @@ class UserBehavior(TaskSequence):
                                headers=self.restricted_prop_header, catch_response=True,
                                name=f"/payment_card/<pcard_id>/membership_card/<mcard_id> "
                                     f"{LocustLabel.SINGLE_RESTRICTED_PROPERTY}") as response:
-            if response.status_code == codes.FORBIDDEN:
+            if response.status_code == codes.NOT_FOUND:
                 response.success()
 
     @seq_task(11)
@@ -197,7 +199,7 @@ class UserBehavior(TaskSequence):
                                headers=self.restricted_prop_header, catch_response=True,
                                name=f"/membership_card/<mcard_id>/payment_card/<pcard_id> "
                                     f"{LocustLabel.MULTI_RESTRICTED_PROPERTY}") as response:
-            if response.status_code == codes.FORBIDDEN:
+            if response.status_code == codes.NOT_FOUND:
                 response.success()
 
     @seq_task(14)
@@ -212,7 +214,7 @@ class UserBehavior(TaskSequence):
                                headers=self.restricted_prop_header, catch_response=True,
                                name=f"/payment_card/<pcard_id>/membership_card/<mcard_id> "
                                     f"{LocustLabel.MULTI_RESTRICTED_PROPERTY}") as response:
-            if response.status_code == codes.FORBIDDEN:
+            if response.status_code == codes.NOT_FOUND:
                 response.success()
 
     @seq_task(15)

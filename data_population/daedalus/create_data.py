@@ -256,3 +256,35 @@ def payment_membership_association(payment_card_id, membership_card_id):
         payment_card_id,
         membership_card_id
     ]
+
+
+def all_payment_schemes():
+    return [
+        [
+            "visa",
+            json.dumps([{
+                "id": 7,
+                "type": 0,
+                "url": "https://api.dev.gb.bink.com/content/dev-media/hermes/schemes/Visa-Payment_DWQzhta.png",
+                "description": "Visa Card Image",
+                "encoding": "png"
+            }])],
+        [
+            "mastercard",
+            json.dumps([{
+                "id": 6,
+                "type": 0,
+                "url": "https://api.dev.gb.bink.com/content/dev-media/hermes/schemes/Mastercard-Payment_1goHQYv.png",
+                "description": "Mastercard Card Image",
+                "encoding": "png"
+            }])],
+        [
+            "amex",
+            json.dumps([{
+                "id": 5,
+                "type": 0,
+                "url": "https://api.dev.gb.bink.com/content/dev-media/hermes/schemes/Amex-Payment.png",
+                "description": "American Express Card Image",
+                "encoding": "png"
+            }])]
+    ]

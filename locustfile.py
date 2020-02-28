@@ -30,6 +30,7 @@ class UserBehavior(TaskSequence):
         self.static_pcard_id = None
         self.payment_cards = []
         self.membership_cards = []
+        self.join_membership_cards = []
         self.put_counter = 0
         self.service_counter = 0
         channel_info = secrets.read_vault(CHANNEL_VAULT_PATH, VAULT_URL, VAULT_TOKEN)
@@ -63,6 +64,7 @@ class UserBehavior(TaskSequence):
     def test_setup_headers(self):
         self.payment_cards = []
         self.membership_cards = []
+        self.join_membership_cards = []
         self.consent = service.generate_random()
         email = self.consent["consent"]["email"]
         timestamp = self.consent["consent"]["timestamp"]
@@ -242,7 +244,7 @@ class UserBehavior(TaskSequence):
             'plan_id': plan_id,
             'json': mcard_json
         }
-        self.membership_cards.append(mcard)
+        self.join_membership_cards.append(mcard)
 
     @seq_task(17)
     def put_membership_card(self):
@@ -295,6 +297,10 @@ class UserBehavior(TaskSequence):
             self.client.delete(f"/membership_card/{mcard['id']}", headers=self.multi_prop_header,
                                name=f"/membership_card/<card_id> {LocustLabel.MULTI_PROPERTY}")
 
+            self.client.delete(f"/membership_card/{mcard['id']}", headers=self.single_prop_header,
+                               name=f"/membership_card/<card_id> {LocustLabel.SINGLE_PROPERTY}")
+
+        for mcard in self.join_membership_cards:
             self.client.delete(f"/membership_card/{mcard['id']}", headers=self.single_prop_header,
                                name=f"/membership_card/<card_id> {LocustLabel.SINGLE_PROPERTY}")
 

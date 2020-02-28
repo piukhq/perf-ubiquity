@@ -26,6 +26,7 @@ MEMBERSHIP_COUNT = SERVICE_COUNT * MCARDS_PER_SERVICE
 
 class Files(str, Enum):
     CHANNEL = "channel.tsv"
+    PAYMENT_SCHEME = "payment_scheme.tsv"
     MEMBERSHIP_PLAN = "membership_plan.tsv"
     CHANNEL_WHITELIST = "channel_membership_plan_whitelist.tsv"
     SERVICE = "service.tsv"
@@ -107,6 +108,9 @@ def create_tsv():
 
     channels = [create_data.channel(client) for client in CLIENT_FIXTURES]
     write_to_tsv(Files.CHANNEL, channels)
+
+    payment_schemes = create_data.all_payment_schemes()
+    write_to_tsv(Files.PAYMENT_SCHEME, payment_schemes)
 
     membership_plans = []
     for plan_id in MEMBERSHIP_PLAN_IDS:

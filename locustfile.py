@@ -257,13 +257,13 @@ class UserBehavior(TaskSequence):
             self.client.put(f"/membership_card/{mcard_id}", json=put_json, headers=self.single_prop_header,
                             name=f"/membership_card/<card_id> {LocustLabel.SINGLE_PROPERTY}")
 
-            mcard_id = self.membership_cards[1]
+            mcard_id = self.membership_cards[1]['id']
             self.client.put(f"/membership_card/{mcard_id}", json=put_json, headers=self.multi_prop_header,
                             name=f"/membership_card/<card_id> {LocustLabel.MULTI_PROPERTY}")
 
     @seq_task(18)
     def patch_membership_cards_id_add(self):
-        mcard_id = self.membership_cards[1]
+        mcard_id = self.membership_cards[1]['id']
         mcard_json = membership_card.random_patch_json()
         self.client.patch(f"/membership_card/{mcard_id}", json=mcard_json, headers=self.single_prop_header,
                           name=f"/membership_card/<mcard_id> {LocustLabel.SINGLE_PROPERTY}")
@@ -274,7 +274,7 @@ class UserBehavior(TaskSequence):
         for x in range(0, task_counter):
             # reset index if range > max number of membership cards
             converted_index = x % len(self.membership_cards)
-            mcard_id = self.membership_cards[converted_index]
+            mcard_id = self.membership_cards[converted_index]['id']
             mcard_json = membership_card.random_registration_json()
             self.client.patch(f"/membership_card/{mcard_id}", json=mcard_json, headers=self.single_prop_header,
                               name=f"/membership_card/<mcard_id> {LocustLabel.SINGLE_PROPERTY}")

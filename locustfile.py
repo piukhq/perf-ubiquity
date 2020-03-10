@@ -1,3 +1,4 @@
+import json
 import random
 import time
 from enum import Enum
@@ -6,9 +7,13 @@ from locust import HttpLocust, TaskSequence, seq_task, constant, task
 from requests import codes
 from shared_config_storage.vault import secrets
 
-from data_population.fixtures import CLIENT_ONE, CLIENT_TWO, CLIENT_RESTRICTED, MEMBERSHIP_PLAN_IDS
+from data_population.fixtures import (CLIENT_ONE, CLIENT_TWO, CLIENT_RESTRICTED, MEMBERSHIP_PLAN_IDS,
+                                      NON_RESTRICTED_CLIENTS)
 from request_data import service, membership_card, payment_card
-from settings import CHANNEL_VAULT_PATH, VAULT_URL, VAULT_TOKEN
+from settings import CHANNEL_VAULT_PATH, VAULT_URL, VAULT_TOKEN, LOCAL_SECRETS, LOCAL_SECRETS_PATH
+
+# Change this to specify how many channels the locust tests use
+TOTAL_CLIENTS = 12
 
 
 class LocustLabel(str, Enum):
@@ -33,7 +38,12 @@ class UserBehavior(TaskSequence):
         self.join_membership_cards = []
         self.put_counter = 0
         self.service_counter = 0
-        channel_info = secrets.read_vault(CHANNEL_VAULT_PATH, VAULT_URL, VAULT_TOKEN)
+        if not LOCAL_SECRETS:
+            channel_info = secrets.read_vault(CHANNEL_VAULT_PATH, VAULT_URL, VAULT_TOKEN)
+        else:
+            with open(LOCAL_SECRETS_PATH) as fp:
+                channel_info = json.load(fp)
+
         self.client_secrets = {client: secret["jwt_secret"] for client, secret in channel_info.items()}
         super(UserBehavior, self).__init__(parent)
 
@@ -41,7 +51,8 @@ class UserBehavior(TaskSequence):
         consent = service.generate_random()
         email = consent["consent"]["email"]
         timestamp = consent["consent"]["timestamp"]
-        auth_header = service.generate_auth_header(email, timestamp, CLIENT_ONE)
+        jwt_secret = self.client_secrets[CLIENT_ONE['bundle_id']]
+        auth_header = service.generate_auth_header(email, timestamp, CLIENT_ONE, jwt_secret)
         self.client.post("/service", json=consent, headers=auth_header, name="Setup requests")
         pcard = payment_card.generate_unencrypted_random()
         self.static_pcard_json = payment_card.encrypt(pcard)
@@ -68,9 +79,16 @@ class UserBehavior(TaskSequence):
         self.consent = service.generate_random()
         email = self.consent["consent"]["email"]
         timestamp = self.consent["consent"]["timestamp"]
-        self.single_prop_header = service.generate_auth_header(email, timestamp, CLIENT_ONE)
-        self.multi_prop_header = service.generate_auth_header(email, timestamp, CLIENT_TWO)
-        self.restricted_prop_header = service.generate_auth_header(email, timestamp, CLIENT_RESTRICTED)
+
+        single_prop_jwt_secret = self.client_secrets[CLIENT_ONE['bundle_id']]
+        self.single_prop_header = service.generate_auth_header(email, timestamp, CLIENT_ONE, single_prop_jwt_secret)
+        multi_prop_channel = random.choice(NON_RESTRICTED_CLIENTS[:TOTAL_CLIENTS - 1])
+        multi_prop_jwt_secret = self.client_secrets[multi_prop_channel['bundle_id']]
+        self.multi_prop_header = service.generate_auth_header(email, timestamp, CLIENT_TWO, multi_prop_jwt_secret)
+
+        restricted_jwt_secret = self.client_secrets[CLIENT_RESTRICTED['bundle_id']]
+        self.restricted_prop_header = service.generate_auth_header(email, timestamp, CLIENT_RESTRICTED,
+                                                                   restricted_jwt_secret)
         self.non_restricted_auth_headers = {
             LocustLabel.SINGLE_PROPERTY: self.single_prop_header,
             LocustLabel.MULTI_PROPERTY: self.multi_prop_header

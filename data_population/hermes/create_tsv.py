@@ -4,15 +4,14 @@ import time
 from enum import Enum
 
 from data_population.hermes import create_data
-from data_population.fixtures import CLIENT_ONE, CLIENT_TWO, CLIENT_RESTRICTED
+from data_population.fixtures import ALL_CLIENTS, NON_RESTRICTED_CLIENTS
 
 TSV_PATH = f"{os.path.dirname(__file__)}/tsv"
 LOAD_START_ID = 2000000
 STATIC_START_ID = 5000
 BULK_SIZE = 1000
 
-CLIENTS = [CLIENT_ONE, CLIENT_TWO, CLIENT_RESTRICTED]
-MEMBERSHIP_PLANS = 40
+MEMBERSHIP_PLANS = 100
 # USERS = 13017000
 # MCARDS = 88953620
 # PCARDS = 19525500
@@ -23,21 +22,29 @@ PCARDS = 200
 
 
 class Files(str, Enum):
-    USER = ("users.tsv",)
-    SCHEME = ("scheme_scheme.tsv",)
-    QUESTION = ("scheme_schemecredentialquestion.tsv",)
-    ANSWER = ("scheme_schemeaccountcredentialanswer.tsv",)
+    ORGANISATION = "user_organisation.tsv"
+    CLIENT_APP = "user_clientapplication.tsv"
+    CLIENT_APP_BUNDLE = "user_clientapplicationbundle.tsv"
+    CATEGORY = "scheme_catagory.tsv"
+    SCHEME = "scheme_scheme.tsv"
+    QUESTION = "scheme_schemecredentialquestion.tsv"
+    SCHEME_CONSENT = "scheme_schemeconsent.tsv"
+    THIRD_PARTY_CONSENT_LINK = "scheme_schemethirdpartyconsentlink.tsv"
+    SCHEME_IMAGE = "scheme_schemeimage.tsv"
+    SCHEME_WHITELIST = "scheme_schemebundleassociation.tsv"
+    # voucher schemes! alternate schemes to be PLR
+    # membership plan documents
+    # Payment scheme
+    # Payment images
+    # Provider status mapping
+    USER = "users.tsv"
+    CONSENT = ("ubiquity_serviceconsent.tsv",)
     SCHEME_ACCOUNT = ("scheme_schemeaccount.tsv",)
+    ANSWER = ("scheme_schemeaccountcredentialanswer.tsv",)
     PAYMENT_ACCOUNT = ("payment_card_paymentcardaccount.tsv",)
     PAYMENT_ACCOUNT_ENTRY = ("ubiquity_paymentcardaccountentry.tsv",)
     SCHEME_ACCOUNT_ENTRY = ("ubiquity_schemeaccountentry.tsv",)
     PAYMENT_SCHEME_ENTRY = ("ubiquity_paymentcardschemeentry.tsv",)
-    CONSENT = ("ubiquity_serviceconsent.tsv",)
-    ORGANISATION = ("user_organisation.tsv",)
-    CLIENT_APP = ("user_clientapplication.tsv",)
-    CLIENT_APP_BUNDLE = ("user_clientapplicationbundle.tsv",)
-    SCHEME_WHITELIST = ("scheme_schemebundleassociation.tsv",)
-    CATEGORY = ("scheme_catagory.tsv",)
 
 
 def tsv_path(file_name):
@@ -60,33 +67,45 @@ def create_tsv():
         except FileNotFoundError:
             pass
 
-    categories = [create_data.category(x) for x in range(0, 2)]
-    write_to_tsv(Files.CATEGORY, categories)
-    organisations = [create_data.organisation(client) for client in CLIENTS]
+    organisations = [create_data.organisation(client) for client in ALL_CLIENTS]
     write_to_tsv(Files.ORGANISATION, organisations)
-    client_applications = [create_data.client_application(client) for client in CLIENTS]
+    client_applications = [create_data.client_application(client) for client in ALL_CLIENTS]
     write_to_tsv(Files.CLIENT_APP, client_applications)
-    client_application_bundle = [create_data.client_application_bundle(client) for client in CLIENTS]
+    client_application_bundle = [create_data.client_application_bundle(client) for client in ALL_CLIENTS]
     write_to_tsv(Files.CLIENT_APP_BUNDLE, client_application_bundle)
 
-    remaining_membership_plans = MEMBERSHIP_PLANS
+    categories = [create_data.category()]
+    write_to_tsv(Files.CATEGORY, categories)
+
     membership_plans = []
     plan_questions = []
-    while remaining_membership_plans > 0:
-        remaining_membership_plans -= 1
-        plan_id = STATIC_START_ID + remaining_membership_plans
-        plan_name = f"performance plan {plan_id}"
-        plan_slug = f"performance-plan-{plan_id}"
-        membership_plans.append(create_data.membership_plan(plan_id, plan_name, plan_slug))
-        plan_questions.append(create_data.card_no_question(plan_id, plan_id))
-        plan_questions.append(create_data.postcode_question(plan_id + 1000, plan_id))
+    scheme_images = []
+    scheme_consents = []
+    third_party_consents = []
+    for count in range(0, MEMBERSHIP_PLANS):
+        static_id = STATIC_START_ID + count
+        plan_name = f"performance plan {static_id}"
+        plan_slug = f"performance-plan-{static_id}"
+        membership_plans.append(create_data.membership_plan(static_id, plan_name, plan_slug))
+        plan_questions.append(create_data.card_no_question(static_id, static_id))
+        postcode_question_id = STATIC_START_ID + MEMBERSHIP_PLANS + count
+        plan_questions.append(create_data.postcode_question(postcode_question_id, static_id))
+        scheme_images.append(create_data.scheme_image(static_id, static_id))
+
+        scheme_consent = create_data.consent(static_id, static_id)
+        scheme_consents.append(scheme_consent)
+        plan_third_party_consent_links = create_third_party_consent_links(static_id)
+        third_party_consents.extend(plan_third_party_consent_links)
 
     write_to_tsv(Files.SCHEME, membership_plans)
     write_to_tsv(Files.QUESTION, plan_questions)
+    write_to_tsv(Files.SCHEME_IMAGE, scheme_images)
+    write_to_tsv(Files.SCHEME_CONSENT, scheme_consents)
+    write_to_tsv(Files.THIRD_PARTY_CONSENT_LINK, third_party_consents)
 
     whitelist_id = STATIC_START_ID
     whitelist_list = []
-    for client_fixture in [CLIENT_ONE, CLIENT_TWO]:
+    for client_fixture in NON_RESTRICTED_CLIENTS:
         for plan in membership_plans:
             whitelist_id += 1
             plan_id = plan[0]
@@ -105,7 +124,7 @@ def create_tsv():
     #     payment_cards = []
     #     for _ in range(0, BULK_SIZE):
     #         remaining_services -= 1
-    #         user_id = START_ID + remaining_services
+    #         user_id = LOAD_START_ID + remaining_services
     #         # users.append(create_data.user(user_id))
     #         services.append(create_data.service(user_id))
     #         membership_cards.append(create_data.membership_card(user_id))
@@ -146,14 +165,17 @@ def create_tsv():
     #     write_to_tsv(Files.SCHEME_ACCOUNT_ENTRY, membership_card_service_links)
     #     write_to_tsv(Files.PAYMENT_SCHEME_ENTRY, pll_links)
     #     print("Bulk cycle complete.")
-
-    # questions = list()
-    # questions.append(create_data.card_no_question())
-    # questions.append(create_data.postcode_question())
-    # write_to_tsv(Files.QUESTION, questions)
-
+    #
+    #
     end = time.perf_counter()
     print(f"Elapsed time: {end - start}")
+
+
+def create_third_party_consent_links(static_id):
+    return [
+        create_data.third_party_consent_link(static_id, client['id'], static_id, static_id)
+        for client in ALL_CLIENTS
+    ]
 
 
 if __name__ == "__main__":

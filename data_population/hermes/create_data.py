@@ -1,9 +1,13 @@
 import uuid
 
+from data_population.fixtures import CONSENT_LABEL
 
-def category(category_id):
+PERFORMANCE_CATEGORY_ID = 5000
+
+
+def category():
     return [
-        category_id,  # id
+        PERFORMANCE_CATEGORY_ID,  # id
         "performance",  # name
     ]
 
@@ -19,7 +23,7 @@ def membership_plan(scheme_id, name, slug):
         2,  # tier
         "please scan",  # scan_message
         "pts",  # point_name
-        1,  # category_id
+        PERFORMANCE_CATEGORY_ID,  # category_id
         "https://www.iceland.co.uk/bonus-card/my-bonus-card/forgotten-password/",  # forgotten_password_url
         "identifier",  # identifier
         True,  # has_transactions
@@ -100,7 +104,7 @@ def postcode_question(question_id, scheme_id):
 
 
 def service(user_id):
-    return [user_id, "\\N", "\\N", "2019-03-07 12:42:15+00"]  # id, latitude, longitude, timestamp
+    return [user_id, "", "", "2020-03-09 12:42:15+00"]  # id, latitude, longitude, timestamp
 
 
 def membership_card(card_id, scheme_id):
@@ -168,7 +172,7 @@ def pll_link(user_id):
 
 
 def organisation(fixture):
-    return [fixture['id'], fixture['organisation_name'], fixture['organisation_t_and_c']]
+    return [fixture['id'], fixture['organisation_name'], "organisation terms and conditions"]
 
 
 def client_application(fixture):
@@ -181,3 +185,51 @@ def client_application_bundle(fixture):
 
 def scheme_whitelist(whitelist_id, fixture, scheme_id):
     return [whitelist_id, fixture['status'], fixture['id'], scheme_id]
+
+
+def consent(pk, scheme_id):
+    return [
+        pk,  # id
+        "Consent text",  # text
+        scheme_id,  # scheme id
+        True,  # is enabled
+        False,  # required
+        0,  # order
+        1,  # journey (link)
+        uuid.uuid4(),  # slug
+        True  # check box
+    ]
+
+
+def third_party_consent_link(pk, client_app_id, scheme_id, scheme_consent_id):
+    return [
+        pk,  # id
+        CONSENT_LABEL,  # client label
+        client_app_id,  # client application id
+        scheme_id,  # scheme id
+        scheme_consent_id,  # scheme consent id
+        False,  # add field
+        True,  # auth field
+        False,  # registration field
+        False  # enrol field
+    ]
+
+
+def scheme_image(pk, scheme_id):
+    return [
+        pk,  # id
+        0,  # image type code (hero)
+        "",  # size code
+        "https://performance.sandbox.gb.bink.com/content/dev-media/hermes/schemes/HarveyNichols_UPPT2Yx.png"  # image
+        "",  # strap line
+        "performance hero image",  # description
+        "",  # Url
+        "0",  # call to action
+        0,  # order
+        1,  # status (published)
+        "2020-01-01 00:00:00",  # start date
+        "3030-01-01 00:00:00",  # end date
+        0,  # reward tier
+        "",  # encoding
+        scheme_id  # scheme
+    ]

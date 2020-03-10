@@ -1,6 +1,7 @@
 import random
 import uuid
 
+from data_population.fixtures import CONSENT_LABEL
 from settings import fake
 from request_data.membership_plan import PlanIDs
 
@@ -9,7 +10,10 @@ def static_add_json():
     return {
         "account": {
             "add_fields": [{"column": "Card Number", "value": "9000000000000000016"}],
-            "authorise_fields": [{"column": "Postcode", "value": "rg5 5aa"}],
+            "authorise_fields": [
+                {"column": "Postcode", "value": "rg5 5aa"},
+                {"column": CONSENT_LABEL, "value": "true"}
+            ],
         },
         "membership_plan": PlanIDs.TEST_SCHEME_ID,
     }
@@ -19,7 +23,10 @@ def random_add_json(plan_id):
     return {
         "account": {
             "add_fields": [{"column": "Card Number", "value": str(uuid.uuid4())}],
-            "authorise_fields": [{"column": "Postcode", "value": fake.postcode()}],
+            "authorise_fields": [
+                {"column": "Postcode", "value": fake.postcode()},
+                {"column": CONSENT_LABEL, "value": "true"}
+            ],
         },
         "membership_plan": plan_id,
     }

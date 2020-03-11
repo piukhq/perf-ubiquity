@@ -26,3 +26,12 @@ def payment_card(card_id):
         token,  # psp_token
         "{}",  # consents
     ]
+
+
+def provider_status_mapping(pk, provider_code, bink_code, provider_id):
+    return [
+        pk,  # id
+        provider_code,  # provider status code
+        bink_code,  # bink status code
+        provider_id,  # provider id
+    ]

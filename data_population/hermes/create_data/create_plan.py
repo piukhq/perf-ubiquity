@@ -188,3 +188,15 @@ def scheme_content(pk, scheme_id):
         "performance test",  # value
         scheme_id,  # scheme id
     ]
+
+
+def membership_plan_documents(pk, scheme_id):
+    return [
+        pk,  # id
+        "Terms & conditions",  # name
+        "I accept the",  # description
+        "https://bink.com",  # url
+        "{ADD,REGISTRATION,ENROL}",  # display
+        True,  # checkbox
+        scheme_id,  # scheme id
+    ]

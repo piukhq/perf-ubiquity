@@ -5,6 +5,7 @@ from enum import Enum
 
 from data_population.hermes import create_data
 from data_population.fixtures import ALL_CLIENTS, NON_RESTRICTED_CLIENTS
+from data_population.hermes.create_data.membership_plan import create_all_third_party_consent_links
 
 TSV_PATH = f"{os.path.dirname(__file__)}/tsv"
 LOAD_START_ID = 2000000
@@ -27,6 +28,9 @@ class Files(str, Enum):
     CLIENT_APP_BUNDLE = "user_clientapplicationbundle.tsv"
     CATEGORY = "scheme_catagory.tsv"
     SCHEME = "scheme_scheme.tsv"
+    # Scheme balance details
+    # Scheme fees
+    # Scheme content
     QUESTION = "scheme_schemecredentialquestion.tsv"
     SCHEME_CONSENT = "scheme_schemeconsent.tsv"
     THIRD_PARTY_CONSENT_LINK = "scheme_schemethirdpartyconsentlink.tsv"
@@ -92,9 +96,9 @@ def create_tsv():
         plan_questions.append(create_data.postcode_question(postcode_question_id, static_id))
         scheme_images.append(create_data.scheme_image(static_id, static_id))
 
-        scheme_consent = create_data.consent(static_id, static_id)
+        scheme_consent = create_data.scheme_consent(static_id, static_id)
         scheme_consents.append(scheme_consent)
-        plan_third_party_consent_links = create_third_party_consent_links(static_id)
+        plan_third_party_consent_links = create_all_third_party_consent_links(static_id)
         third_party_consents.extend(plan_third_party_consent_links)
 
     write_to_tsv(Files.SCHEME, membership_plans)
@@ -109,7 +113,7 @@ def create_tsv():
         for plan in membership_plans:
             whitelist_id += 1
             plan_id = plan[0]
-            whitelist_list.append(create_data.scheme_whitelist(whitelist_id, client_fixture, plan_id))
+            whitelist_list.append(create_data.channel_scheme_whitelist(whitelist_id, client_fixture, plan_id))
 
     write_to_tsv(Files.SCHEME_WHITELIST, whitelist_list)
 
@@ -169,13 +173,6 @@ def create_tsv():
     #
     end = time.perf_counter()
     print(f"Elapsed time: {end - start}")
-
-
-def create_third_party_consent_links(static_id):
-    return [
-        create_data.third_party_consent_link(static_id, client['id'], static_id, static_id)
-        for client in ALL_CLIENTS
-    ]
 
 
 if __name__ == "__main__":

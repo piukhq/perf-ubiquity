@@ -28,9 +28,9 @@ class Files(str, Enum):
     CLIENT_APP_BUNDLE = "user_clientapplicationbundle.tsv"
     CATEGORY = "scheme_catagory.tsv"
     SCHEME = "scheme_scheme.tsv"
-    # Scheme balance details
-    # Scheme fees
-    # Scheme content
+    SCHEME_BALANCE_DETAILS ="scheme_schemebalancedetails.tsv"
+    SCHEME_FEE ="scheme_schemefee.tsv"
+    SCHEME_CONTENT ="scheme_schemecontent.tsv"
     QUESTION = "scheme_schemecredentialquestion.tsv"
     SCHEME_CONSENT = "scheme_schemeconsent.tsv"
     THIRD_PARTY_CONSENT_LINK = "scheme_schemethirdpartyconsentlink.tsv"
@@ -84,6 +84,8 @@ def create_tsv():
     membership_plans = []
     plan_questions = []
     scheme_images = []
+    scheme_balance_details = []
+    scheme_contents = []
     scheme_consents = []
     third_party_consents = []
     for count in range(0, MEMBERSHIP_PLANS):
@@ -95,7 +97,9 @@ def create_tsv():
         postcode_question_id = STATIC_START_ID + MEMBERSHIP_PLANS + count
         plan_questions.append(create_plan.postcode_question(postcode_question_id, static_id))
         scheme_images.append(create_plan.scheme_image(static_id, static_id))
-
+        scheme_balance_details.append(create_plan.scheme_balance_details(static_id, static_id))
+        scheme_contents.append(create_plan.scheme_content(static_id, static_id))
+        
         scheme_consent = create_plan.scheme_consent(static_id, static_id)
         scheme_consents.append(scheme_consent)
         plan_third_party_consent_links = create_plan.create_all_third_party_consent_links(static_id)
@@ -104,6 +108,8 @@ def create_tsv():
     write_to_tsv(Files.SCHEME, membership_plans)
     write_to_tsv(Files.QUESTION, plan_questions)
     write_to_tsv(Files.SCHEME_IMAGE, scheme_images)
+    write_to_tsv(Files.SCHEME_BALANCE_DETAILS, scheme_balance_details)
+    write_to_tsv(Files.SCHEME_CONTENT, scheme_contents)
     write_to_tsv(Files.SCHEME_CONSENT, scheme_consents)
     write_to_tsv(Files.THIRD_PARTY_CONSENT_LINK, third_party_consents)
 

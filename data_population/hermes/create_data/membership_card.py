@@ -18,7 +18,12 @@ def membership_card(card_id, scheme_id):
 
 
 def card_number_answer(answer_id, question_id):
-    return [answer_id, uuid.uuid4(), answer_id, question_id]  # id, answer, scheme_account_id, question_id
+    return [
+        answer_id,  # id
+        uuid.uuid4(),  # answer
+        answer_id,  # scheme_account_id
+        question_id  # question_id
+    ]
 
 
 def postcode_answer(answer_id, scheme_account_id, question_id):

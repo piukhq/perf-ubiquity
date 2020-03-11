@@ -3,8 +3,9 @@ import os
 import time
 from enum import Enum
 
-from data_population.hermes import create_data
 from data_population.fixtures import ALL_CLIENTS, NON_RESTRICTED_CLIENTS
+from data_population.hermes.create_data import create_channel, create_plan
+
 
 TSV_PATH = f"{os.path.dirname(__file__)}/tsv"
 LOAD_START_ID = 2000000
@@ -27,6 +28,9 @@ class Files(str, Enum):
     CLIENT_APP_BUNDLE = "user_clientapplicationbundle.tsv"
     CATEGORY = "scheme_catagory.tsv"
     SCHEME = "scheme_scheme.tsv"
+    # Scheme balance details
+    # Scheme fees
+    # Scheme content
     QUESTION = "scheme_schemecredentialquestion.tsv"
     SCHEME_CONSENT = "scheme_schemeconsent.tsv"
     THIRD_PARTY_CONSENT_LINK = "scheme_schemethirdpartyconsentlink.tsv"
@@ -67,14 +71,14 @@ def create_tsv():
         except FileNotFoundError:
             pass
 
-    organisations = [create_data.organisation(client) for client in ALL_CLIENTS]
+    organisations = [create_channel.organisation(client) for client in ALL_CLIENTS]
     write_to_tsv(Files.ORGANISATION, organisations)
-    client_applications = [create_data.client_application(client) for client in ALL_CLIENTS]
+    client_applications = [create_channel.client_application(client) for client in ALL_CLIENTS]
     write_to_tsv(Files.CLIENT_APP, client_applications)
-    client_application_bundle = [create_data.client_application_bundle(client) for client in ALL_CLIENTS]
+    client_application_bundle = [create_channel.client_application_bundle(client) for client in ALL_CLIENTS]
     write_to_tsv(Files.CLIENT_APP_BUNDLE, client_application_bundle)
 
-    categories = [create_data.category()]
+    categories = [create_plan.category()]
     write_to_tsv(Files.CATEGORY, categories)
 
     membership_plans = []
@@ -86,15 +90,15 @@ def create_tsv():
         static_id = STATIC_START_ID + count
         plan_name = f"performance plan {static_id}"
         plan_slug = f"performance-plan-{static_id}"
-        membership_plans.append(create_data.membership_plan(static_id, plan_name, plan_slug))
-        plan_questions.append(create_data.card_no_question(static_id, static_id))
+        membership_plans.append(create_plan.membership_plan(static_id, plan_name, plan_slug))
+        plan_questions.append(create_plan.card_no_question(static_id, static_id))
         postcode_question_id = STATIC_START_ID + MEMBERSHIP_PLANS + count
-        plan_questions.append(create_data.postcode_question(postcode_question_id, static_id))
-        scheme_images.append(create_data.scheme_image(static_id, static_id))
+        plan_questions.append(create_plan.postcode_question(postcode_question_id, static_id))
+        scheme_images.append(create_plan.scheme_image(static_id, static_id))
 
-        scheme_consent = create_data.consent(static_id, static_id)
+        scheme_consent = create_plan.scheme_consent(static_id, static_id)
         scheme_consents.append(scheme_consent)
-        plan_third_party_consent_links = create_third_party_consent_links(static_id)
+        plan_third_party_consent_links = create_plan.create_all_third_party_consent_links(static_id)
         third_party_consents.extend(plan_third_party_consent_links)
 
     write_to_tsv(Files.SCHEME, membership_plans)
@@ -109,7 +113,7 @@ def create_tsv():
         for plan in membership_plans:
             whitelist_id += 1
             plan_id = plan[0]
-            whitelist_list.append(create_data.scheme_whitelist(whitelist_id, client_fixture, plan_id))
+            whitelist_list.append(create_channel.channel_scheme_whitelist(whitelist_id, client_fixture, plan_id))
 
     write_to_tsv(Files.SCHEME_WHITELIST, whitelist_list)
 
@@ -169,13 +173,6 @@ def create_tsv():
     #
     end = time.perf_counter()
     print(f"Elapsed time: {end - start}")
-
-
-def create_third_party_consent_links(static_id):
-    return [
-        create_data.third_party_consent_link(static_id, client['id'], static_id, static_id)
-        for client in ALL_CLIENTS
-    ]
 
 
 if __name__ == "__main__":

@@ -5,7 +5,6 @@ from enum import Enum
 
 from data_population.hermes import create_data
 from data_population.fixtures import ALL_CLIENTS, NON_RESTRICTED_CLIENTS
-from data_population.hermes.create_data.membership_plan import create_all_third_party_consent_links
 
 TSV_PATH = f"{os.path.dirname(__file__)}/tsv"
 LOAD_START_ID = 2000000
@@ -98,7 +97,7 @@ def create_tsv():
 
         scheme_consent = create_data.scheme_consent(static_id, static_id)
         scheme_consents.append(scheme_consent)
-        plan_third_party_consent_links = create_all_third_party_consent_links(static_id)
+        plan_third_party_consent_links = create_data.create_all_third_party_consent_links(static_id)
         third_party_consents.extend(plan_third_party_consent_links)
 
     write_to_tsv(Files.SCHEME, membership_plans)

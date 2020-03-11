@@ -5,6 +5,7 @@ from data_population.hermes.create_data.membership_card import (membership_card,
                                                                 postcode_answer)  # noqa
 from data_population.hermes.create_data.membership_plan import (category, membership_plan, card_no_question,  # noqa
                                                                 postcode_question, scheme_consent,  # noqa
-                                                                third_party_consent_link, scheme_image)  # noqa
+                                                                third_party_consent_link, scheme_image,  # noqa
+                                                                create_all_third_party_consent_links)  # noqa
 from data_population.hermes.create_data.payment_card import payment_card  # noqa
 from data_population.hermes.create_data.service import service  # noqa

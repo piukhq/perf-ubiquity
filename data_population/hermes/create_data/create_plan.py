@@ -1,7 +1,6 @@
 import uuid
 
 from data_population.fixtures import CONSENT_LABEL, ALL_CLIENTS
-from data_population.hermes import create_data
 
 PERFORMANCE_CATEGORY_ID = 5000
 
@@ -107,34 +106,36 @@ def postcode_question(question_id, scheme_id):
 def scheme_consent(pk, scheme_id):
     return [
         pk,  # id
-        "Consent text",  # text
-        scheme_id,  # scheme id
+        True,  # check box
+        "performance consent test",  # text
         True,  # is enabled
         False,  # required
         0,  # order
         1,  # journey (link)
         uuid.uuid4(),  # slug
-        True  # check box
+        "2020-01-01 00:00:00",  # created on
+        "2020-01-01 00:00:00",  # modified on
+        scheme_id,  # scheme id
     ]
 
 
 def third_party_consent_link(pk, client_app_id, scheme_id, scheme_consent_id):
     return [
         pk,  # id
-        CONSENT_LABEL,  # client label
-        client_app_id,  # client application id
-        scheme_id,  # scheme id
-        scheme_consent_id,  # scheme consent id
+        CONSENT_LABEL,  # consent label
         False,  # add field
         True,  # auth field
         False,  # registration field
-        False  # enrol field
+        False,  # enrol field
+        client_app_id,  # client application id
+        scheme_consent_id,  # scheme consent id
+        scheme_id,  # scheme id
     ]
 
 
 def create_all_third_party_consent_links(static_id):
     return [
-        create_data.third_party_consent_link(static_id, client['id'], static_id, static_id)
+        third_party_consent_link(static_id, client['id'], static_id, static_id)
         for client in ALL_CLIENTS
     ]
 
@@ -144,7 +145,6 @@ def scheme_image(pk, scheme_id):
         pk,  # id
         0,  # image type code (hero)
         "",  # size code
-        "https://performance.sandbox.gb.bink.com/content/dev-media/hermes/schemes/HarveyNichols_UPPT2Yx.png"  # image
         "",  # strap line
         "performance hero image",  # description
         "",  # Url
@@ -153,7 +153,38 @@ def scheme_image(pk, scheme_id):
         1,  # status (published)
         "2020-01-01 00:00:00",  # start date
         "3030-01-01 00:00:00",  # end date
+        "2020-01-01 00:00:00",  # created
+        scheme_id,  # scheme
+        "https://performance.sandbox.gb.bink.com/content/dev-media/hermes/schemes/HarveyNichols_UPPT2Yx.png",  # image
         0,  # reward tier
         "",  # encoding
-        scheme_id  # scheme
+    ]
+
+
+def scheme_balance_details(pk, scheme_id):
+    return [
+        pk,  # id
+        "points",  # currency
+        "",  # prefix
+        "pts",  # suffix
+        "Placeholder Balance Description",  # description
+        scheme_id,  # scheme id
+    ]
+
+
+def scheme_fee(pk, scheme_id):
+    return [
+        pk,  # id
+        "example fee type",  # fee type
+        1.12,  # amount
+        scheme_id,  # scheme id
+    ]
+
+
+def scheme_content(pk, scheme_id):
+    return [
+        pk,  # id
+        "performance test",  # column
+        "performance test",  # value
+        scheme_id,  # scheme id
     ]

@@ -42,10 +42,10 @@ class Files(str, Enum):
     SCHEME_IMAGE = "scheme_schemeimage.tsv"
     SCHEME_WHITELIST = "scheme_schemebundleassociation.tsv"
     VOUCHER_SCHEME = "scheme_voucherscheme.tsv"
-    MEMBERSHIP_PLAN_DOCUMENTS = "ubiquity_membershipplandocument"
+    MEMBERSHIP_PLAN_DOCUMENTS = "ubiquity_membershipplandocument.tsv"
     PAYMENT_SCHEME = "payment_card_paymentcard.tsv"
     PAYMENT_CARD_IMAGE = "payment_card_paymentcardimage.tsv"
-    PROVIDER_STATUS_MAPPING = "payment_card_providerstatusmapping"
+    PROVIDER_STATUS_MAPPING = "payment_card_providerstatusmapping.tsv"
     USER = "users.tsv"
     CONSENT = "ubiquity_serviceconsent.tsv"
     SCHEME_ACCOUNT = "scheme_schemeaccount.tsv"
@@ -181,7 +181,7 @@ def create_load_data_tsv_files():
                         create_association.payment_card(remaining_pcards, remaining_pcards, service_pk)
                     )
             pll_links.append(
-                create_association.pll_link(remaining_pcards + 1, remaining_pcards + 1, remaining_mcards + 1)
+                create_association.pll_link(remaining_pcards, remaining_pcards + 1, remaining_mcards + 1)
             )
 
         write_to_tsv(Files.USER, users)
@@ -205,7 +205,7 @@ def create_load_data_tsv_files():
     while remaining_pcards > 0:
         payment_cards = []
         for _ in range(0, BULK_SIZE):
-            payment_cards -= 1
+            remaining_pcards -= 1
             if remaining_pcards > 0:
                 payment_cards.append(create_pcard.payment_card(remaining_pcards))
 

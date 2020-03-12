@@ -94,3 +94,5 @@ def payment_card(card_id):
         token,  # psp_token
         "{}",  # consents
     ]
+
+

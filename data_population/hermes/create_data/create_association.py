@@ -1,16 +1,23 @@
-def card_service_link(static_id):
+def pll_link(pk, pcard_id, mcard_id):
     return [
-        static_id,  # id
-        static_id,  # scheme_account_id
-        static_id,  # payment_card_account_id
-        static_id  # user_id
+        pk,  # id
+        True,  # active_link
+        pcard_id,  # payment_card_account_id
+        mcard_id  # scheme_account_id
     ]
 
 
-def pll_link(user_id):
+def scheme_account(pk, scheme_account_id, user_id):
     return [
-        user_id,  # id
-        True,  # active_link
-        user_id,  # payment_card_account_id
-        user_id  # scheme_account_id
+        pk,  # id
+        scheme_account_id,  # scheme_account_id
+        user_id,  # user_id
+    ]
+
+
+def payment_card(pk, payment_card_id, user_id):
+    return [
+        pk,  # id
+        payment_card_id,  # payment_card_account_id
+        user_id,  # user_id
     ]

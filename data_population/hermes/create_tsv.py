@@ -12,21 +12,24 @@ BULK_SIZE = 1000
 
 STATIC_START_ID = 50000
 
-MEMBERSHIP_PLANS = 100
-# USERS = 13017000
-# MCARDS = 88953620
-# PCARDS = 19525500
-USERS = 100
-MCARDS = 800
-PCARDS = 200
-TOTAL_TRANSACTIONS = 100
+MEMBERSHIP_PLANS = 40
+USERS = 13017000
+MCARDS = 88953620
+PCARDS = 19525500
+TOTAL_TRANSACTIONS = 889536200
+
+# MEMBERSHIP_PLANS = 100
+# USERS = 27494000
+# MCARDS = 188265840
+# PCARDS = 41241000
+# TOTAL_TRANSACTIONS = 1882658400
 
 
 class Files(str, Enum):
     ORGANISATION = "user_organisation.tsv"
     CLIENT_APP = "user_clientapplication.tsv"
     CLIENT_APP_BUNDLE = "user_clientapplicationbundle.tsv"
-    CATEGORY = "scheme_catagory.tsv"
+    CATEGORY = "scheme_category.tsv"
     SCHEME = "scheme_scheme.tsv"
     SCHEME_BALANCE_DETAILS = "scheme_schemebalancedetails.tsv"
     SCHEME_FEE = "scheme_schemefee.tsv"
@@ -50,7 +53,7 @@ class Files(str, Enum):
     SCHEME_ACCOUNT_ENTRY = ("ubiquity_schemeaccountentry.tsv",)
     PAYMENT_SCHEME_ENTRY = ("ubiquity_paymentcardschemeentry.tsv",)
     # transactions are stored in hades so need to be uploaded to the hades database
-    TRANSACTIONS = "transaction"
+    TRANSACTIONS = "transaction.tsv"
 
 
 def tsv_path(file_name):

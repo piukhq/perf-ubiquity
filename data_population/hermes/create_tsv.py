@@ -50,7 +50,7 @@ class Files(str, Enum):
     SCHEME_ACCOUNT_ENTRY = ("ubiquity_schemeaccountentry.tsv",)
     PAYMENT_SCHEME_ENTRY = ("ubiquity_paymentcardschemeentry.tsv",)
     # transactions are stored in hades so need to be uploaded to the hades database
-    TRANSACTIONS = "transaction"
+    TRANSACTIONS = "transaction.tsv"
 
 
 def tsv_path(file_name):

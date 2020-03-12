@@ -3,14 +3,17 @@ import os
 import time
 from enum import Enum
 
-from data_population.fixtures import (ALL_CLIENTS, NON_RESTRICTED_CLIENTS, ALL_PAYMENT_PROVIDER_STATUS_MAPPINGS,
-                                      STATIC_START_ID, MEMBERSHIP_PLANS)
-from data_population.hermes.create_data import create_channel, create_plan, create_pcard
+from data_population.fixtures import (ALL_CLIENTS, NON_RESTRICTED_CLIENTS, ALL_PAYMENT_PROVIDER_STATUS_MAPPINGS)
+from data_population.hermes.create_data import create_channel, create_plan, create_pcard, create_mcard
 
 
 TSV_PATH = f"{os.path.dirname(__file__)}/tsv"
 BULK_SIZE = 1000
 
+STATIC_START_ID = 50000
+
+MEMBERSHIP_PLANS = 100
+MEMBERSHIP_PLAN_IDS = [x for x in range(STATIC_START_ID, STATIC_START_ID + MEMBERSHIP_PLANS)]
 # USERS = 13017000
 # MCARDS = 88953620
 # PCARDS = 19525500
@@ -18,6 +21,8 @@ TOTAL_RECORDS = 100000
 USERS = 100
 MCARDS = 800
 PCARDS = 200
+
+TOTAL_TRANSACTIONS = 100
 
 
 class Files(str, Enum):
@@ -47,7 +52,8 @@ class Files(str, Enum):
     PAYMENT_ACCOUNT_ENTRY = ("ubiquity_paymentcardaccountentry.tsv",)
     SCHEME_ACCOUNT_ENTRY = ("ubiquity_schemeaccountentry.tsv",)
     PAYMENT_SCHEME_ENTRY = ("ubiquity_paymentcardschemeentry.tsv",)
-    # transactions
+    # transactions are stored in hades so need to be uploaded to the hades database
+    TRANSACTIONS = "transaction"
 
 
 def tsv_path(file_name):
@@ -188,6 +194,18 @@ def create_tsv():
     #     print("Bulk cycle complete.")
     #
     #
+    remaining_transactions = TOTAL_TRANSACTIONS
+    while remaining_transactions > 0:
+        transactions = []
+        for _ in range(0, BULK_SIZE):
+            if remaining_transactions <= 0:
+                break
+            remaining_transactions -= 1
+            pk = STATIC_START_ID + remaining_transactions
+            transactions.append(create_mcard.transaction(pk, pk))
+
+        write_to_tsv(Files.TRANSACTIONS, transactions)
+
     end = time.perf_counter()
     print(f"Elapsed time: {end - start}")
 

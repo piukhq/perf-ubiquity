@@ -35,6 +35,19 @@ PAYMENT_SCHEME_INFO = {
     },
 }
 
+ALL_PAYMENT_PROVIDER_STATUS_MAPPINGS = [
+    [9, "test", 3, 3],
+    [10, "BINK_UNKNOWN", 6, 3],
+    [12, "BINK_UNKNOWN", 6, 2],
+    [11, "duplicate test", 2, 2],
+    [15, "SERVER DOWN TEST", 5, 2],
+    [18, "not a provider test", 3, 2],
+    [19, "not a provider test", 3, 1],
+    [20, "BINK_UNKNOWN", 6, 1],
+    [21, "not a provider test 2", 3, 1],
+    [2, "record_count_mismatch", 5, 1],
+]
+
 
 CLIENT_ONE = {
     'bundle_id': 'performance.bundle.one',

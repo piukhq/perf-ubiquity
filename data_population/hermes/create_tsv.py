@@ -3,7 +3,7 @@ import os
 import time
 from enum import Enum
 
-from data_population.fixtures import ALL_CLIENTS, NON_RESTRICTED_CLIENTS
+from data_population.fixtures import ALL_CLIENTS, NON_RESTRICTED_CLIENTS, ALL_PAYMENT_PROVIDER_STATUS_MAPPINGS
 from data_population.hermes.create_data import create_channel, create_plan, create_pcard
 
 
@@ -87,6 +87,7 @@ def create_tsv():
     write_to_tsv(Files.PAYMENT_SCHEME, payment_schemes)
     payment_images = create_pcard.create_all_payment_card_images()
     write_to_tsv(Files.PAYMENT_CARD_IMAGE, payment_images)
+    write_to_tsv(Files.PROVIDER_STATUS_MAPPING, ALL_PAYMENT_PROVIDER_STATUS_MAPPINGS)
 
     membership_plans = []
     plan_questions = []

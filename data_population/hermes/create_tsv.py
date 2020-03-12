@@ -3,17 +3,14 @@ import os
 import time
 from enum import Enum
 
-from data_population.fixtures import ALL_CLIENTS, NON_RESTRICTED_CLIENTS, ALL_PAYMENT_PROVIDER_STATUS_MAPPINGS
+from data_population.fixtures import (ALL_CLIENTS, NON_RESTRICTED_CLIENTS, ALL_PAYMENT_PROVIDER_STATUS_MAPPINGS,
+                                      STATIC_START_ID, MEMBERSHIP_PLANS)
 from data_population.hermes.create_data import create_channel, create_plan, create_pcard
 
 
 TSV_PATH = f"{os.path.dirname(__file__)}/tsv"
-LOAD_START_ID = 2000000
-STATIC_START_ID = 5000
 BULK_SIZE = 1000
 
-TOTAL_CHANNELS = len(ALL_CLIENTS)
-MEMBERSHIP_PLANS = 100
 # USERS = 13017000
 # MCARDS = 88953620
 # PCARDS = 19525500
@@ -37,7 +34,7 @@ class Files(str, Enum):
     THIRD_PARTY_CONSENT_LINK = "scheme_schemethirdpartyconsentlink.tsv"
     SCHEME_IMAGE = "scheme_schemeimage.tsv"
     SCHEME_WHITELIST = "scheme_schemebundleassociation.tsv"
-    # voucher schemes! alternate schemes to be PLR
+    VOUCHER_SCHEME = "scheme_voucherscheme.tsv"
     MEMBERSHIP_PLAN_DOCUMENTS = "ubiquity_membershipplandocument"
     PAYMENT_SCHEME = "payment_card_paymentcard.tsv"
     PAYMENT_CARD_IMAGE = "payment_card_paymentcardimage.tsv"
@@ -97,6 +94,7 @@ def create_tsv():
     membership_plan_documents = []
     scheme_consents = []
     third_party_consents = []
+    voucher_schemes = []
     for count in range(0, MEMBERSHIP_PLANS):
         static_id = STATIC_START_ID + count
         plan_name = f"performance plan {static_id}"
@@ -113,6 +111,8 @@ def create_tsv():
         scheme_consents.append(scheme_consent)
         plan_third_party_consent_links = create_plan.create_all_third_party_consent_links(static_id)
         third_party_consents.extend(plan_third_party_consent_links)
+        if count == 0:
+            voucher_schemes.append(create_plan.voucher_scheme(static_id, static_id))
 
     write_to_tsv(Files.SCHEME, membership_plans)
     write_to_tsv(Files.QUESTION, plan_questions)
@@ -122,6 +122,7 @@ def create_tsv():
     write_to_tsv(Files.MEMBERSHIP_PLAN_DOCUMENTS, membership_plan_documents)
     write_to_tsv(Files.SCHEME_CONSENT, scheme_consents)
     write_to_tsv(Files.THIRD_PARTY_CONSENT_LINK, third_party_consents)
+    write_to_tsv(Files.VOUCHER_SCHEME, voucher_schemes)
 
     whitelist_id = STATIC_START_ID
     whitelist_list = []

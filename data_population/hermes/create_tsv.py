@@ -38,10 +38,10 @@ class Files(str, Enum):
     SCHEME_IMAGE = "scheme_schemeimage.tsv"
     SCHEME_WHITELIST = "scheme_schemebundleassociation.tsv"
     # voucher schemes! alternate schemes to be PLR
-    # membership plan documents
+    MEMBERSHIP_PLAN_DOCUMENTS = "ubiquity_membershipplandocument"
     PAYMENT_SCHEME = "payment_card_paymentcard.tsv"
     PAYMENT_CARD_IMAGE = "payment_card_paymentcardimage.tsv"
-    PAYMENT_PROVIDER_STATUS_MAPPING = "payment_card_providerstatusmapping.tsv"
+    PROVIDER_STATUS_MAPPING = "payment_card_providerstatusmapping"
     USER = "users.tsv"
     CONSENT = ("ubiquity_serviceconsent.tsv",)
     SCHEME_ACCOUNT = ("scheme_schemeaccount.tsv",)
@@ -93,6 +93,7 @@ def create_tsv():
     scheme_images = []
     scheme_balance_details = []
     scheme_contents = []
+    membership_plan_documents = []
     scheme_consents = []
     third_party_consents = []
     for count in range(0, MEMBERSHIP_PLANS):
@@ -106,7 +107,7 @@ def create_tsv():
         scheme_images.append(create_plan.scheme_image(static_id, static_id))
         scheme_balance_details.append(create_plan.scheme_balance_details(static_id, static_id))
         scheme_contents.append(create_plan.scheme_content(static_id, static_id))
-
+        membership_plan_documents.append(create_plan.membership_plan_documents(static_id, static_id))
         scheme_consent = create_plan.scheme_consent(static_id, static_id)
         scheme_consents.append(scheme_consent)
         plan_third_party_consent_links = create_plan.create_all_third_party_consent_links(static_id)
@@ -117,6 +118,7 @@ def create_tsv():
     write_to_tsv(Files.SCHEME_IMAGE, scheme_images)
     write_to_tsv(Files.SCHEME_BALANCE_DETAILS, scheme_balance_details)
     write_to_tsv(Files.SCHEME_CONTENT, scheme_contents)
+    write_to_tsv(Files.MEMBERSHIP_PLAN_DOCUMENTS, membership_plan_documents)
     write_to_tsv(Files.SCHEME_CONSENT, scheme_consents)
     write_to_tsv(Files.THIRD_PARTY_CONSENT_LINK, third_party_consents)
 

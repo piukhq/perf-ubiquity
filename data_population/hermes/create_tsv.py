@@ -11,14 +11,17 @@ from data_population.hermes.create_data import (create_channel, create_plan, cre
 TSV_PATH = f"{os.path.dirname(__file__)}/tsv"
 BULK_SIZE = 1000
 
-MEMBERSHIP_PLANS = 100
-# USERS = 13017000
-# MCARDS = 88953620
-# PCARDS = 19525500
-TOTAL_SERVICES = 100
-TOTAL_MCARDS = 800
-TOTAL_PCARDS = 200
-TOTAL_TRANSACTIONS = 100
+MEMBERSHIP_PLANS = 40
+TOTAL_USERS = 13017000
+TOTAL_MCARDS = 88953620
+TOTAL_PCARDS = 19525500
+TOTAL_TRANSACTIONS = 889536200
+
+# MEMBERSHIP_PLANS = 100
+# TOTAL_USERS = 27494000
+# TOTAL_MCARDS = 188265840
+# TOTAL_PCARDS = 41241000
+# TOTAL_TRANSACTIONS = 1882658400
 
 MCARDS_PER_SERVICE = 7
 PCARDS_PER_SERVICE = 2
@@ -28,7 +31,7 @@ class Files(str, Enum):
     ORGANISATION = "user_organisation.tsv"
     CLIENT_APP = "user_clientapplication.tsv"
     CLIENT_APP_BUNDLE = "user_clientapplicationbundle.tsv"
-    CATEGORY = "scheme_catagory.tsv"
+    CATEGORY = "scheme_category.tsv"
     SCHEME = "scheme_scheme.tsv"
     SCHEME_BALANCE_DETAILS = "scheme_schemebalancedetails.tsv"
     SCHEME_FEE = "scheme_schemefee.tsv"
@@ -146,16 +149,9 @@ def create_membership_plan_tsv_files():
 
 
 def create_load_data_tsv_files():
-    remaining_services = TOTAL_SERVICES
+    remaining_services = TOTAL_USERS
     remaining_mcards = TOTAL_MCARDS
     remaining_pcards = TOTAL_PCARDS
-    users = []
-    services = []
-    membership_cards = []
-    membership_card_associations = []
-    payment_cards = []
-    payment_card_associations = []
-
     while remaining_services > 0:
         users = []
         services = []

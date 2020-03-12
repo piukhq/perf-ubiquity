@@ -3,24 +3,23 @@ import os
 import time
 from enum import Enum
 
-from data_population.fixtures import ALL_CLIENTS, NON_RESTRICTED_CLIENTS, ALL_PAYMENT_PROVIDER_STATUS_MAPPINGS
-from data_population.hermes.create_data import create_channel, create_plan, create_pcard
+from data_population.fixtures import (ALL_CLIENTS, NON_RESTRICTED_CLIENTS, ALL_PAYMENT_PROVIDER_STATUS_MAPPINGS)
+from data_population.hermes.create_data import create_channel, create_plan, create_pcard, create_mcard
 
 
 TSV_PATH = f"{os.path.dirname(__file__)}/tsv"
-LOAD_START_ID = 2000000
-STATIC_START_ID = 5000
 BULK_SIZE = 1000
 
-TOTAL_CHANNELS = len(ALL_CLIENTS)
+STATIC_START_ID = 50000
+
 MEMBERSHIP_PLANS = 100
 # USERS = 13017000
 # MCARDS = 88953620
 # PCARDS = 19525500
-TOTAL_RECORDS = 100000
 USERS = 100
 MCARDS = 800
 PCARDS = 200
+TOTAL_TRANSACTIONS = 100
 
 
 class Files(str, Enum):
@@ -37,7 +36,7 @@ class Files(str, Enum):
     THIRD_PARTY_CONSENT_LINK = "scheme_schemethirdpartyconsentlink.tsv"
     SCHEME_IMAGE = "scheme_schemeimage.tsv"
     SCHEME_WHITELIST = "scheme_schemebundleassociation.tsv"
-    # voucher schemes! alternate schemes to be PLR
+    VOUCHER_SCHEME = "scheme_voucherscheme.tsv"
     MEMBERSHIP_PLAN_DOCUMENTS = "ubiquity_membershipplandocument"
     PAYMENT_SCHEME = "payment_card_paymentcard.tsv"
     PAYMENT_CARD_IMAGE = "payment_card_paymentcardimage.tsv"
@@ -50,7 +49,8 @@ class Files(str, Enum):
     PAYMENT_ACCOUNT_ENTRY = ("ubiquity_paymentcardaccountentry.tsv",)
     SCHEME_ACCOUNT_ENTRY = ("ubiquity_schemeaccountentry.tsv",)
     PAYMENT_SCHEME_ENTRY = ("ubiquity_paymentcardschemeentry.tsv",)
-    # transactions
+    # transactions are stored in hades so need to be uploaded to the hades database
+    TRANSACTIONS = "transaction"
 
 
 def tsv_path(file_name):
@@ -64,8 +64,7 @@ def write_to_tsv(file_name, rows):
         tsv_writer.writerows(rows)
 
 
-def create_tsv():
-    start = time.perf_counter()
+def delete_old_tsv_files():
     os.makedirs(TSV_PATH, exist_ok=True)
     for file in Files:
         try:
@@ -73,6 +72,8 @@ def create_tsv():
         except FileNotFoundError:
             pass
 
+
+def create_channel_tsv_files():
     organisations = [create_channel.organisation(client) for client in ALL_CLIENTS]
     write_to_tsv(Files.ORGANISATION, organisations)
     client_applications = [create_channel.client_application(client) for client in ALL_CLIENTS]
@@ -80,14 +81,18 @@ def create_tsv():
     client_application_bundle = [create_channel.client_application_bundle(client) for client in ALL_CLIENTS]
     write_to_tsv(Files.CLIENT_APP_BUNDLE, client_application_bundle)
 
-    categories = [create_plan.category()]
-    write_to_tsv(Files.CATEGORY, categories)
 
+def create_payment_scheme_tsv_files():
     payment_schemes = create_pcard.create_all_payment_schemes()
     write_to_tsv(Files.PAYMENT_SCHEME, payment_schemes)
     payment_images = create_pcard.create_all_payment_card_images()
     write_to_tsv(Files.PAYMENT_CARD_IMAGE, payment_images)
     write_to_tsv(Files.PROVIDER_STATUS_MAPPING, ALL_PAYMENT_PROVIDER_STATUS_MAPPINGS)
+
+
+def create_membership_plan_tsv_files():
+    categories = [create_plan.category()]
+    write_to_tsv(Files.CATEGORY, categories)
 
     membership_plans = []
     plan_questions = []
@@ -97,6 +102,7 @@ def create_tsv():
     membership_plan_documents = []
     scheme_consents = []
     third_party_consents = []
+    voucher_schemes = []
     for count in range(0, MEMBERSHIP_PLANS):
         static_id = STATIC_START_ID + count
         plan_name = f"performance plan {static_id}"
@@ -113,6 +119,8 @@ def create_tsv():
         scheme_consents.append(scheme_consent)
         plan_third_party_consent_links = create_plan.create_all_third_party_consent_links(static_id)
         third_party_consents.extend(plan_third_party_consent_links)
+        if count == 0:
+            voucher_schemes.append(create_plan.voucher_scheme(static_id, static_id))
 
     write_to_tsv(Files.SCHEME, membership_plans)
     write_to_tsv(Files.QUESTION, plan_questions)
@@ -122,6 +130,7 @@ def create_tsv():
     write_to_tsv(Files.MEMBERSHIP_PLAN_DOCUMENTS, membership_plan_documents)
     write_to_tsv(Files.SCHEME_CONSENT, scheme_consents)
     write_to_tsv(Files.THIRD_PARTY_CONSENT_LINK, third_party_consents)
+    write_to_tsv(Files.VOUCHER_SCHEME, voucher_schemes)
 
     whitelist_id = STATIC_START_ID
     whitelist_list = []
@@ -133,6 +142,9 @@ def create_tsv():
 
     write_to_tsv(Files.SCHEME_WHITELIST, whitelist_list)
 
+
+def create_load_data_tsv_files():
+    pass
     # remaining_services = TOTAL_RECORDS
     # remaining_links = TOTAL_RECORDS
     # remaining_card_no = TOTAL_RECORDS
@@ -185,11 +197,29 @@ def create_tsv():
     #     write_to_tsv(Files.SCHEME_ACCOUNT_ENTRY, membership_card_service_links)
     #     write_to_tsv(Files.PAYMENT_SCHEME_ENTRY, pll_links)
     #     print("Bulk cycle complete.")
-    #
-    #
-    end = time.perf_counter()
-    print(f"Elapsed time: {end - start}")
+
+
+def create_transaction_tsv_files():
+    remaining_transactions = TOTAL_TRANSACTIONS
+    while remaining_transactions > 0:
+        transactions = []
+        for _ in range(0, BULK_SIZE):
+            if remaining_transactions <= 0:
+                break
+            remaining_transactions -= 1
+            pk = STATIC_START_ID + remaining_transactions
+            transactions.append(create_mcard.transaction(pk, pk))
+
+        write_to_tsv(Files.TRANSACTIONS, transactions)
 
 
 if __name__ == "__main__":
-    create_tsv()
+    start = time.perf_counter()
+    delete_old_tsv_files()
+    create_channel_tsv_files()
+    create_payment_scheme_tsv_files()
+    create_membership_plan_tsv_files()
+    create_load_data_tsv_files()
+    create_transaction_tsv_files()
+    end = time.perf_counter()
+    print(f"Elapsed time: {end - start}")

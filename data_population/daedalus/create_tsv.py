@@ -4,7 +4,7 @@ import time
 from enum import Enum
 
 from data_population.daedalus import create_data
-from data_population.fixtures import CLIENT_ONE, CLIENT_TWO, CLIENT_RESTRICTED, STATIC_START_ID, MEMBERSHIP_PLAN_IDS
+from data_population.fixtures import CLIENT_ONE, CLIENT_TWO, CLIENT_RESTRICTED
 
 TSV_PATH = f"{os.path.dirname(__file__)}/tsv"
 LOAD_START_ID = 2000000
@@ -14,12 +14,14 @@ SERVICE_COUNT = 180_000_000
 PCARDS_PER_SERVICE = 2
 MCARDS_PER_SERVICE = 8
 
-SERVICE_START_ID = STATIC_START_ID
-PCARD_START_ID = STATIC_START_ID
-PCARD_ASSOCIATION_START_ID = STATIC_START_ID
+MEMBERSHIP_PLANS = 100
 
-MCARD_START_ID = STATIC_START_ID
-MCARD_ASSOCIATION_START_ID = STATIC_START_ID
+SERVICE_START_ID = LOAD_START_ID
+PCARD_START_ID = LOAD_START_ID
+PCARD_ASSOCIATION_START_ID = LOAD_START_ID
+
+MCARD_START_ID = LOAD_START_ID
+MCARD_ASSOCIATION_START_ID = LOAD_START_ID
 
 MEMBERSHIP_COUNT = SERVICE_COUNT * MCARDS_PER_SERVICE
 
@@ -74,7 +76,7 @@ def _create_payment_cards(pcards, pcard_associations, service_id, pcard_id, pcar
 def _create_membership_cards(mcards, mcard_associations, service_id, mcard_id, mcard_association_id, whitelist_mapping,
                              client_fixtures, fixture_count):
     for _ in range(MCARDS_PER_SERVICE):
-        plan_id = mcard_id % len(MEMBERSHIP_PLAN_IDS) + STATIC_START_ID
+        plan_id = mcard_id % MEMBERSHIP_PLANS + LOAD_START_ID
         mcards.append(
             create_data.membership_card(
                 mcard_id=mcard_id,
@@ -113,14 +115,14 @@ def create_tsv():
     write_to_tsv(Files.PAYMENT_SCHEME, payment_schemes)
 
     membership_plans = []
-    for plan_id in MEMBERSHIP_PLAN_IDS:
+    for plan_id in range(0, MEMBERSHIP_PLANS):
         plan_name = f"performance plan {plan_id}"
         plan_slug = f"performance-plan-{plan_id}"
         membership_plans.append(create_data.membership_plan(plan_id, plan_name, plan_slug))
 
     write_to_tsv(Files.MEMBERSHIP_PLAN, membership_plans)
 
-    whitelist_id = STATIC_START_ID
+    whitelist_id = LOAD_START_ID
     whitelist_list = []
     whitelist_mapping = {}
     for client_fixture in [CLIENT_ONE, CLIENT_TWO]:

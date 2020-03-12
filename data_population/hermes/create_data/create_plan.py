@@ -204,3 +204,31 @@ def membership_plan_documents(pk, scheme_id):
         True,  # checkbox
         scheme_id,  # scheme id
     ]
+
+
+def voucher_scheme(pk, scheme_id):
+    return [
+        pk,  # id
+        "GBP",  # earn_currency
+        "£",  # earn_prefix
+        "",  # earn_suffix
+        "accumulator",  # earn_type
+        "GBP",  # burn_currency
+        "£",  # burn_prefix
+        "",  # burn_suffix
+        "voucher",  # burn_type
+        "",  # burn_value
+        4,  # barcode_type
+        "{{earn_target_remaining}} left to go!",  # headline_inprogress
+        "Voucher expired",  # headline_expired
+        "Voucher redeemed",  # headline_redeemed
+        "{{earn_prefix}}{{earn_value}}{{earn_suffix}} voucher earned!",  # headline_issued
+        "For joining FatFace",  # subtext
+        3,  # expiry_months
+        scheme_id,  # scheme_id
+        "body text expired",  # body_text_expired
+        "body text in-progress",  # body_text_inprogress
+        "body text issued",  # body_text_issued
+        "body text redeemed",  # body_text_redeemed
+        "https://bink.com",  # terms_and_conditions_url
+    ]

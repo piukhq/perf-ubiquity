@@ -13,15 +13,12 @@ BULK_SIZE = 1000
 STATIC_START_ID = 50000
 
 MEMBERSHIP_PLANS = 100
-MEMBERSHIP_PLAN_IDS = [x for x in range(STATIC_START_ID, STATIC_START_ID + MEMBERSHIP_PLANS)]
 # USERS = 13017000
 # MCARDS = 88953620
 # PCARDS = 19525500
-TOTAL_RECORDS = 100000
 USERS = 100
 MCARDS = 800
 PCARDS = 200
-
 TOTAL_TRANSACTIONS = 100
 
 
@@ -67,8 +64,7 @@ def write_to_tsv(file_name, rows):
         tsv_writer.writerows(rows)
 
 
-def create_tsv():
-    start = time.perf_counter()
+def delete_old_tsv_files():
     os.makedirs(TSV_PATH, exist_ok=True)
     for file in Files:
         try:
@@ -76,6 +72,8 @@ def create_tsv():
         except FileNotFoundError:
             pass
 
+
+def create_channel_tsv_files():
     organisations = [create_channel.organisation(client) for client in ALL_CLIENTS]
     write_to_tsv(Files.ORGANISATION, organisations)
     client_applications = [create_channel.client_application(client) for client in ALL_CLIENTS]
@@ -83,14 +81,18 @@ def create_tsv():
     client_application_bundle = [create_channel.client_application_bundle(client) for client in ALL_CLIENTS]
     write_to_tsv(Files.CLIENT_APP_BUNDLE, client_application_bundle)
 
-    categories = [create_plan.category()]
-    write_to_tsv(Files.CATEGORY, categories)
 
+def create_payment_scheme_tsv_files():
     payment_schemes = create_pcard.create_all_payment_schemes()
     write_to_tsv(Files.PAYMENT_SCHEME, payment_schemes)
     payment_images = create_pcard.create_all_payment_card_images()
     write_to_tsv(Files.PAYMENT_CARD_IMAGE, payment_images)
     write_to_tsv(Files.PROVIDER_STATUS_MAPPING, ALL_PAYMENT_PROVIDER_STATUS_MAPPINGS)
+
+
+def create_membership_plan_tsv_files():
+    categories = [create_plan.category()]
+    write_to_tsv(Files.CATEGORY, categories)
 
     membership_plans = []
     plan_questions = []
@@ -140,6 +142,9 @@ def create_tsv():
 
     write_to_tsv(Files.SCHEME_WHITELIST, whitelist_list)
 
+
+def create_load_data_tsv_files():
+    pass
     # remaining_services = TOTAL_RECORDS
     # remaining_links = TOTAL_RECORDS
     # remaining_card_no = TOTAL_RECORDS
@@ -192,8 +197,9 @@ def create_tsv():
     #     write_to_tsv(Files.SCHEME_ACCOUNT_ENTRY, membership_card_service_links)
     #     write_to_tsv(Files.PAYMENT_SCHEME_ENTRY, pll_links)
     #     print("Bulk cycle complete.")
-    #
-    #
+
+
+def create_transaction_tsv_files():
     remaining_transactions = TOTAL_TRANSACTIONS
     while remaining_transactions > 0:
         transactions = []
@@ -206,9 +212,14 @@ def create_tsv():
 
         write_to_tsv(Files.TRANSACTIONS, transactions)
 
-    end = time.perf_counter()
-    print(f"Elapsed time: {end - start}")
-
 
 if __name__ == "__main__":
-    create_tsv()
+    start = time.perf_counter()
+    delete_old_tsv_files()
+    create_channel_tsv_files()
+    create_payment_scheme_tsv_files()
+    create_membership_plan_tsv_files()
+    create_load_data_tsv_files()
+    create_transaction_tsv_files()
+    end = time.perf_counter()
+    print(f"Elapsed time: {end - start}")

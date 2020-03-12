@@ -5,6 +5,36 @@ MEMBERSHIP_PLAN_IDS = [x for x in range(STATIC_START_ID, STATIC_START_ID + MEMBE
 
 CONSENT_LABEL = "performance consent"
 
+PAYMENT_SCHEME_INFO = {
+    "amex": {
+        "pk": 1,
+        "name": "American Express",
+        "url": "https://www.americanexpress.com",
+        "input_label": "12345566788",
+        "system": "amex",
+        "token_method": 0,
+        "image": "schemes/Amex-Payment.png",
+    },
+    "mastercard": {
+        "pk": 2,
+        "name": "Mastercard",
+        "url": "http://www.mastercard.co.uk/",
+        "input_label": "Long Card Number",
+        "system": "mastercard",
+        "token_method": 0,
+        "image": "schemes/Mastercard-Payment_1goHQYv.png",
+    },
+    "visa": {
+        "pk": 3,
+        "name": "Visa",
+        "url": "http://www.visa.com",
+        "input_label": "Long Card Number",
+        "system": "visa",
+        "token_method": 2,
+        "image": "schemes/Visa-Payment_DWQzhta.png",
+    },
+}
+
 
 CLIENT_ONE = {
     'bundle_id': 'performance.bundle.one',

@@ -4,7 +4,7 @@ import time
 from enum import Enum
 
 from data_population.fixtures import ALL_CLIENTS, NON_RESTRICTED_CLIENTS
-from data_population.hermes.create_data import create_channel, create_plan
+from data_population.hermes.create_data import create_channel, create_plan, create_pcard
 
 
 TSV_PATH = f"{os.path.dirname(__file__)}/tsv"
@@ -12,6 +12,7 @@ LOAD_START_ID = 2000000
 STATIC_START_ID = 5000
 BULK_SIZE = 1000
 
+TOTAL_CHANNELS = len(ALL_CLIENTS)
 MEMBERSHIP_PLANS = 100
 # USERS = 13017000
 # MCARDS = 88953620
@@ -38,9 +39,9 @@ class Files(str, Enum):
     SCHEME_WHITELIST = "scheme_schemebundleassociation.tsv"
     # voucher schemes! alternate schemes to be PLR
     # membership plan documents
-    # Payment scheme
-    # Payment images
-    # Provider status mapping
+    PAYMENT_SCHEME = "payment_card_paymentcard.tsv"
+    PAYMENT_CARD_IMAGE = "payment_card_paymentcardimage.tsv"
+    PAYMENT_PROVIDER_STATUS_MAPPING = "payment_card_providerstatusmapping.tsv"
     USER = "users.tsv"
     CONSENT = ("ubiquity_serviceconsent.tsv",)
     SCHEME_ACCOUNT = ("scheme_schemeaccount.tsv",)
@@ -49,6 +50,7 @@ class Files(str, Enum):
     PAYMENT_ACCOUNT_ENTRY = ("ubiquity_paymentcardaccountentry.tsv",)
     SCHEME_ACCOUNT_ENTRY = ("ubiquity_schemeaccountentry.tsv",)
     PAYMENT_SCHEME_ENTRY = ("ubiquity_paymentcardschemeentry.tsv",)
+    # transactions
 
 
 def tsv_path(file_name):
@@ -80,6 +82,11 @@ def create_tsv():
 
     categories = [create_plan.category()]
     write_to_tsv(Files.CATEGORY, categories)
+
+    payment_schemes = create_pcard.create_all_payment_schemes()
+    write_to_tsv(Files.PAYMENT_SCHEME, payment_schemes)
+    payment_images = create_pcard.create_all_payment_card_images()
+    write_to_tsv(Files.PAYMENT_CARD_IMAGE, payment_images)
 
     membership_plans = []
     plan_questions = []

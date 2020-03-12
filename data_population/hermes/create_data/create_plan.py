@@ -134,10 +134,14 @@ def third_party_consent_link(pk, client_app_id, scheme_id, scheme_consent_id):
 
 
 def create_all_third_party_consent_links(static_id):
-    return [
-        third_party_consent_link(static_id, client['id'], static_id, static_id)
-        for client in ALL_CLIENTS
-    ]
+    third_party_consent_links = []
+    for count in range(0, len(ALL_CLIENTS)):
+        pk = static_id + count
+        client = ALL_CLIENTS[count]
+        consent_link = third_party_consent_link(pk, client['id'], static_id, static_id)
+        third_party_consent_links.append(consent_link)
+
+    return third_party_consent_links
 
 
 def scheme_image(pk, scheme_id):
@@ -155,7 +159,7 @@ def scheme_image(pk, scheme_id):
         "3030-01-01 00:00:00",  # end date
         "2020-01-01 00:00:00",  # created
         scheme_id,  # scheme
-        "https://performance.sandbox.gb.bink.com/content/dev-media/hermes/schemes/HarveyNichols_UPPT2Yx.png",  # image
+        "schemes/HarveyNichols_UPPT2Yx.png",  # image
         0,  # reward tier
         "",  # encoding
     ]
@@ -186,5 +190,17 @@ def scheme_content(pk, scheme_id):
         pk,  # id
         "performance test",  # column
         "performance test",  # value
+        scheme_id,  # scheme id
+    ]
+
+
+def membership_plan_documents(pk, scheme_id):
+    return [
+        pk,  # id
+        "Terms & conditions",  # name
+        "I accept the",  # description
+        "https://bink.com",  # url
+        "{ADD,REGISTRATION,ENROL}",  # display
+        True,  # checkbox
         scheme_id,  # scheme id
     ]

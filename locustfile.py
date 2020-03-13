@@ -102,17 +102,20 @@ class UserBehavior(TaskSequence):
                              name=f"/service {LocustLabel.SINGLE_PROPERTY}")
 
     @seq_task(3)
+    @task(2)
     def get_service(self):
         for auth_header in self.all_auth_headers:
             self.client.get("/service", headers=auth_header, name=f"/service {LocustLabel.SINGLE_PROPERTY}")
 
     @seq_task(4)
+    @task(2)
     def get_membership_plans(self):
         for locust_label, auth_header in self.non_restricted_auth_headers.items():
             self.client.get("/membership_plans", headers=auth_header,
                             name=f"/membership_plans {LocustLabel.SINGLE_PROPERTY}")
 
     @seq_task(5)
+    @task(8)
     def get_membership_plan_id(self):
         plan_id = random.choice(range(1, MEMBERSHIP_PLANS))
         for auth_header in self.non_restricted_auth_headers.values():
@@ -133,7 +136,7 @@ class UserBehavior(TaskSequence):
         self.payment_cards.append(pcard)
 
     @seq_task(7)
-    @task(7)
+    @task(8)
     def post_membership_cards_single_property(self):
         plan_id = random.choice(range(1, MEMBERSHIP_PLANS))
         mcard_json = membership_card.random_add_json(plan_id)
@@ -153,6 +156,7 @@ class UserBehavior(TaskSequence):
         self.membership_cards.append(mcard)
 
     @seq_task(8)
+    @task(3)
     def get_membership_card_single_property(self):
         for mcard in self.membership_cards:
             self.client.get(f"/membership_card/{mcard['id']}", headers=self.single_prop_header,
@@ -173,7 +177,6 @@ class UserBehavior(TaskSequence):
             if response.status_code == codes.NOT_FOUND:
                 response.success()
 
-    @seq_task(8)
     @seq_task(10)
     def patch_payment_card_id_membership_card_id_single_property(self):
         pcard_id = self.payment_cards[1]['id']
@@ -238,7 +241,8 @@ class UserBehavior(TaskSequence):
                 response.success()
 
     @seq_task(15)
-    def get_membership_cards_multiple_property(self):
+    @task(3)
+    def get_membership_card_multiple_property(self):
         for mcard in self.membership_cards:
             self.client.get(f"/membership_card/{mcard['id']}", headers=self.multi_prop_header,
                             name=f"/membership_card/<card_id> {LocustLabel.MULTI_PROPERTY}")
@@ -298,12 +302,14 @@ class UserBehavior(TaskSequence):
                               name=f"/membership_card/<mcard_id> {LocustLabel.SINGLE_PROPERTY}")
 
     @seq_task(20)
+    @task(19)
     def get_payment_cards(self):
         for auth_header in self.non_restricted_auth_headers.values():
             self.client.get("/payment_cards", headers=auth_header,
                             name=f"/payment_cards {LocustLabel.SINGLE_PROPERTY}")
 
     @seq_task(21)
+    @task(19)
     def get_membership_cards(self):
         for auth_header in self.non_restricted_auth_headers.values():
             self.client.get("/membership_cards", headers=auth_header,
@@ -311,25 +317,21 @@ class UserBehavior(TaskSequence):
 
     @seq_task(22)
     def delete_membership_card(self):
-        for mcard in self.membership_cards:
-            self.client.delete(f"/membership_card/{mcard['id']}", headers=self.multi_prop_header,
-                               name=f"/membership_card/<card_id> {LocustLabel.MULTI_PROPERTY}")
+        mcard = self.membership_cards[0]
+        self.client.delete(f"/membership_card/{mcard['id']}", headers=self.multi_prop_header,
+                           name=f"/membership_card/<card_id> {LocustLabel.MULTI_PROPERTY}")
 
-            self.client.delete(f"/membership_card/{mcard['id']}", headers=self.single_prop_header,
-                               name=f"/membership_card/<card_id> {LocustLabel.SINGLE_PROPERTY}")
-
-        for mcard in self.join_membership_cards:
-            self.client.delete(f"/membership_card/{mcard['id']}", headers=self.single_prop_header,
-                               name=f"/membership_card/<card_id> {LocustLabel.SINGLE_PROPERTY}")
+        self.client.delete(f"/membership_card/{mcard['id']}", headers=self.single_prop_header,
+                           name=f"/membership_card/<card_id> {LocustLabel.SINGLE_PROPERTY}")
 
     @seq_task(23)
     def delete_payment_card(self):
         self.client.delete(f"/payment_card/{self.static_pcard_id}", headers=self.multi_prop_header,
                            name=f"/payment_card/<card_id> {LocustLabel.MULTI_PROPERTY}")
 
-        for pcard in self.payment_cards:
-            self.client.delete(f"/payment_card/{pcard['id']}", headers=self.single_prop_header,
-                               name=f"/payment_card/<card_id> {LocustLabel.SINGLE_PROPERTY}")
+        pcard = self.payment_cards[0]
+        self.client.delete(f"/payment_card/{pcard['id']}", headers=self.single_prop_header,
+                           name=f"/payment_card/<card_id> {LocustLabel.SINGLE_PROPERTY}")
 
     @seq_task(24)
     def delete_service(self):

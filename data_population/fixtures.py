@@ -52,6 +52,7 @@ CLIENT_ONE = {
     'organisation_name': 'performance test one',
     'status': 0,
     'whitelist_status': 'ACTIVE',
+    "secret": "testsecret",
 }
 
 
@@ -63,6 +64,7 @@ CLIENT_TWO = {
     'organisation_name': 'performance test two',
     'status': 0,
     'whitelist_status': 'ACTIVE',
+    "secret": "testsecret",
 }
 
 
@@ -74,6 +76,7 @@ CLIENT_THREE = {
     'organisation_name': 'performance test three',
     'status': 0,
     'whitelist_status': 'ACTIVE',
+    "secret": "testsecret",
 }
 
 
@@ -85,6 +88,7 @@ CLIENT_FOUR = {
     'organisation_name': 'performance test four',
     'status': 0,
     'whitelist_status': 'ACTIVE',
+    "secret": "testsecret",
 }
 
 
@@ -96,6 +100,7 @@ CLIENT_FIVE = {
     'organisation_name': 'performance test five',
     'status': 0,
     'whitelist_status': 'ACTIVE',
+    "secret": "testsecret",
 }
 
 
@@ -107,6 +112,7 @@ CLIENT_SIX = {
     'organisation_name': 'performance test six',
     'status': 0,
     'whitelist_status': 'ACTIVE',
+    "secret": "testsecret",
 }
 
 
@@ -118,6 +124,7 @@ CLIENT_SEVEN = {
     'organisation_name': 'performance test seven',
     'status': 0,
     'whitelist_status': 'ACTIVE',
+    "secret": "testsecret",
 }
 
 
@@ -129,6 +136,7 @@ CLIENT_EIGHT = {
     'organisation_name': 'performance test eight',
     'status': 0,
     'whitelist_status': 'ACTIVE',
+    "secret": "testsecret",
 }
 
 
@@ -140,6 +148,7 @@ CLIENT_NINE = {
     'organisation_name': 'performance test nine',
     'status': 0,
     'whitelist_status': 'ACTIVE',
+    "secret": "testsecret",
 }
 
 
@@ -151,6 +160,7 @@ CLIENT_TEN = {
     'organisation_name': 'performance test ten',
     'status': 0,
     'whitelist_status': 'ACTIVE',
+    "secret": "testsecret",
 }
 
 
@@ -162,16 +172,18 @@ CLIENT_ELEVEN = {
     'organisation_name': 'performance test eleven',
     'status': 0,
     'whitelist_status': 'ACTIVE',
+    "secret": "testsecret",
 }
 
 CLIENT_RESTRICTED = {
     "bundle_id": "performance.bundle.restricted",
     "client_id": "performance_restricted",
     "client_name": "performance restricted",
-    "id": 5052,
+    "id": 5061,
     "organisation_name": "performance test restricted",
     "status": 2,
     "whitelist_status": "INACTIVE",
+    "secret": "testsecret",
 }
 
 NON_RESTRICTED_CLIENTS = [

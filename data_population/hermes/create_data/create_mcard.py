@@ -11,18 +11,18 @@ def membership_card(card_id, scheme_id):
         "2019-03-15 05:55:28.532571+00",  # updated
         scheme_id,  # scheme_id
         True,  # is_deleted
-        "\\N",  # link_date
-        "\\N",  # join_date
+        "NULL",  # link_date
+        "NULL",  # join_date
         json.dumps([{
             "value": 0.0,
             "points": 380.01,
-            "balance": None,
+            "balance": "NULL",
             "is_stale": False,
-            "user_set": "",
+            "user_set": "NULL",
             "scheme_id": 194,
             "updated_at": 1584012379,
             "reward_tier": 1,
-            "value_label": "",
+            "value_label": "NULL",
             "points_label": "380",
             "scheme_account_id": card_id
         }]),  # balances
@@ -30,11 +30,11 @@ def membership_card(card_id, scheme_id):
     ]
 
 
-def card_number_answer(answer_id, question_id):
+def card_number_answer(answer_id, scheme_account_id, question_id):
     return [
         answer_id,  # id
         uuid.uuid4(),  # answer
-        answer_id,  # scheme_account_id
+        scheme_account_id,  # scheme_account_id
         question_id  # question_id
     ]
 
@@ -57,7 +57,7 @@ def transaction(pk, scheme_account_id):
         "performance transaction description",  # description
         "performanceland",  # location
         3.0,  # points
-        "",  # value
+        "NULL",  # value
         uuid.uuid4(),  # hash
-        "",  # user_set
+        "NULL",  # user_set
     ]

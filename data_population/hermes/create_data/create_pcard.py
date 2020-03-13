@@ -38,21 +38,21 @@ def create_all_payment_schemes():
 def payment_card_image(pk, image, payment_scheme_id):
     return [
         pk,  # id
-        0,  # image type code (hero)
-        "",  # size code
+        0,  # image_type_code (hero)
+        "",  # size_code
         image,  # image
-        "",  # strap line
+        "",  # strap_line
         "performance payment image",  # description
-        "",  # Url
-        "0",  # call to action
+        "NULL",  # url
+        "0",  # call_to_action
         0,  # order
         1,  # status (published)
-        "2020-01-01 00:00:00",  # start date
-        "3030-01-01 00:00:00",  # end date
+        "2020-01-01 00:00:00",  # start_date
+        "3030-01-01 00:00:00",  # end_date
         "2020-01-01 00:00:00",  # created
         payment_scheme_id,  # scheme
-        0,  # reward tier
-        "",  # encoding
+        0,  # reward_tier
+        "NULL",  # encoding
     ]
 
 
@@ -74,8 +74,8 @@ def payment_card(card_id):
     return [
         card_id,  # id
         "performance test",  # name_on_card
-        "\\N",  # start_month
-        "\\N",  # start_year
+        "NULL",  # start_month
+        "NULL",  # start_year
         1,  # expiry_month
         2222,  # expiry_year
         1,  # status

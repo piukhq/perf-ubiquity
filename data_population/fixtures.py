@@ -179,7 +179,7 @@ CLIENT_RESTRICTED = {
     "bundle_id": "performance.bundle.restricted",
     "client_id": "performance_restricted",
     "client_name": "performance restricted",
-    "id": 5052,
+    "id": 5061,
     "organisation_name": "performance test restricted",
     "status": 2,
     "whitelist_status": "INACTIVE",

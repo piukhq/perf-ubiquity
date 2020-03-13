@@ -9,13 +9,19 @@ from data_population.hermes.create_data import (create_channel, create_plan, cre
                                                 create_service, create_association)
 
 TSV_PATH = f"{os.path.dirname(__file__)}/tsv"
-BULK_SIZE = 1000
+BULK_SIZE = 10000
 
 MEMBERSHIP_PLANS = 40
-TOTAL_USERS = 13017000
-TOTAL_MCARDS = 88953620
-TOTAL_PCARDS = 19525500
-TOTAL_TRANSACTIONS = 889536200
+TOTAL_USERS = 100000
+TOTAL_MCARDS = 400000
+TOTAL_PCARDS = 200000
+TOTAL_TRANSACTIONS = 1000000
+
+# MEMBERSHIP_PLANS = 40
+# TOTAL_USERS = 13017000
+# TOTAL_MCARDS = 88953620
+# TOTAL_PCARDS = 19525500
+# TOTAL_TRANSACTIONS = 884849448
 
 # MEMBERSHIP_PLANS = 100
 # TOTAL_USERS = 27494000
@@ -34,11 +40,11 @@ class Files(str, Enum):
     CATEGORY = "scheme_category.tsv"
     SCHEME = "scheme_scheme.tsv"
     SCHEME_BALANCE_DETAILS = "scheme_schemebalancedetails.tsv"
-    SCHEME_FEE = "scheme_schemefee.tsv"
+    # SCHEME_FEE = "scheme_schemefee.tsv"  # No schemes have fees setup yet
     SCHEME_CONTENT = "scheme_schemecontent.tsv"
     QUESTION = "scheme_schemecredentialquestion.tsv"
-    SCHEME_CONSENT = "scheme_schemeconsent.tsv"
-    THIRD_PARTY_CONSENT_LINK = "scheme_schemethirdpartyconsentlink.tsv"
+    SCHEME_CONSENT = "scheme_consent.tsv"
+    THIRD_PARTY_CONSENT_LINK = "scheme_thirdpartyconsentlink.tsv"
     SCHEME_IMAGE = "scheme_schemeimage.tsv"
     SCHEME_WHITELIST = "scheme_schemebundleassociation.tsv"
     VOUCHER_SCHEME = "scheme_voucherscheme.tsv"
@@ -46,7 +52,7 @@ class Files(str, Enum):
     PAYMENT_SCHEME = "payment_card_paymentcard.tsv"
     PAYMENT_CARD_IMAGE = "payment_card_paymentcardimage.tsv"
     PROVIDER_STATUS_MAPPING = "payment_card_providerstatusmapping.tsv"
-    USER = "users.tsv"
+    USER = "user.tsv"
     CONSENT = "ubiquity_serviceconsent.tsv"
     SCHEME_ACCOUNT = "scheme_schemeaccount.tsv"
     ANSWER = "scheme_schemeaccountcredentialanswer.tsv"
@@ -66,7 +72,7 @@ def tsv_path(file_name):
 def write_to_tsv(file_name, rows):
     path = tsv_path(file_name)
     with open(path, "a") as f:
-        tsv_writer = csv.writer(f, delimiter="\t")
+        tsv_writer = csv.writer(f, delimiter="\t", quoting=csv.QUOTE_NONE, escapechar="", quotechar="")
         tsv_writer.writerows(rows)
 
 
@@ -109,7 +115,7 @@ def create_membership_plan_tsv_files():
     scheme_consents = []
     third_party_consents = []
     voucher_schemes = []
-    for count in range(0, MEMBERSHIP_PLANS):
+    for count in range(1, MEMBERSHIP_PLANS + 1):
         plan_name = f"performance plan {count}"
         plan_slug = f"performance-plan-{count}"
         membership_plans.append(create_plan.membership_plan(count, plan_name, plan_slug))
@@ -122,9 +128,12 @@ def create_membership_plan_tsv_files():
         membership_plan_documents.append(create_plan.membership_plan_documents(count, count))
         scheme_consent = create_plan.scheme_consent(count, count)
         scheme_consents.append(scheme_consent)
-        plan_third_party_consent_links = create_plan.create_all_third_party_consent_links(count)
+        total_channels = len(ALL_CLIENTS)
+        plan_third_party_consent_links = create_plan.create_all_third_party_consent_links(
+            total_channels * count, count
+        )
         third_party_consents.extend(plan_third_party_consent_links)
-        if count == 0:
+        if count == 1:
             voucher_schemes.append(create_plan.voucher_scheme(count, count))
 
     write_to_tsv(Files.SCHEME, membership_plans)
@@ -148,7 +157,7 @@ def create_membership_plan_tsv_files():
     write_to_tsv(Files.SCHEME_WHITELIST, whitelist_list)
 
 
-def create_load_data_tsv_files():
+def create_service_mcard_and_pcard_tsv_files():
     remaining_services = TOTAL_USERS
     remaining_mcards = TOTAL_MCARDS
     remaining_pcards = TOTAL_PCARDS
@@ -160,26 +169,30 @@ def create_load_data_tsv_files():
         payment_cards = []
         payment_card_associations = []
         pll_links = []
-        for _ in range(0, BULK_SIZE):
-            remaining_services -= 1
+        for _ in range(1, BULK_SIZE + 1):
+            if remaining_services <= 0:
+                break
             service_pk = remaining_services
             users.append(create_service.user(service_pk))
             services.append(create_service.service(service_pk))
-            for _ in range(0, MCARDS_PER_SERVICE):
+            remaining_services -= 1
+            for _ in range(1, MCARDS_PER_SERVICE + 1):
+                if remaining_mcards <= 0:
+                    break
+                scheme_id = random.randint(1, MEMBERSHIP_PLANS)
+                membership_cards.append(create_mcard.membership_card(remaining_mcards, scheme_id))
+                membership_card_associations.append(
+                    create_association.scheme_account(remaining_mcards, remaining_mcards, service_pk)
+                )
                 remaining_mcards -= 1
-                if remaining_mcards > 0:
-                    scheme_id = random.randint(0, MEMBERSHIP_PLANS)
-                    membership_cards.append(create_mcard.membership_card(remaining_mcards, scheme_id))
-                    membership_card_associations.append(
-                        create_association.scheme_account(remaining_mcards, remaining_mcards, service_pk)
-                    )
-            for _ in range(0, PCARDS_PER_SERVICE):
+            for _ in range(1, PCARDS_PER_SERVICE + 1):
+                if remaining_pcards <= 0:
+                    break
+                payment_cards.append(create_pcard.payment_card(remaining_pcards))
+                payment_card_associations.append(
+                    create_association.payment_card(remaining_pcards, remaining_pcards, service_pk)
+                )
                 remaining_pcards -= 1
-                if remaining_pcards > 0:
-                    payment_cards.append(create_pcard.payment_card(remaining_pcards))
-                    payment_card_associations.append(
-                        create_association.payment_card(remaining_pcards, remaining_pcards, service_pk)
-                    )
             pll_links.append(
                 create_association.pll_link(remaining_pcards, remaining_pcards + 1, remaining_mcards + 1)
             )
@@ -190,37 +203,46 @@ def create_load_data_tsv_files():
         write_to_tsv(Files.SCHEME_ACCOUNT_ENTRY, membership_card_associations)
         write_to_tsv(Files.PAYMENT_ACCOUNT, payment_cards)
         write_to_tsv(Files.PAYMENT_ACCOUNT_ENTRY, payment_card_associations)
-        write_to_tsv(Files.PAYMENT_MEMBERSHIP_ENTRY, membership_card_associations)
+        write_to_tsv(Files.PAYMENT_MEMBERSHIP_ENTRY, pll_links)
+        create_remaining_mcards_and_pcards(remaining_mcards, remaining_pcards)
 
+
+def create_remaining_mcards_and_pcards(remaining_mcards, remaining_pcards):
     while remaining_mcards > 0:
         membership_cards = []
         for _ in range(0, BULK_SIZE):
+            if remaining_mcards <= 0:
+                break
+            scheme_id = random.randint(1, MEMBERSHIP_PLANS)
+            membership_cards.append(create_mcard.membership_card(remaining_mcards, scheme_id))
             remaining_mcards -= 1
-            if remaining_mcards > 0:
-                scheme_id = random.randint(0, MEMBERSHIP_PLANS)
-                membership_cards.append(create_mcard.membership_card(remaining_mcards, scheme_id))
 
         write_to_tsv(Files.SCHEME_ACCOUNT, membership_cards)
 
     while remaining_pcards > 0:
         payment_cards = []
         for _ in range(0, BULK_SIZE):
+            if remaining_pcards <= 0:
+                break
+            payment_cards.append(create_pcard.payment_card(remaining_pcards))
             remaining_pcards -= 1
-            if remaining_pcards > 0:
-                payment_cards.append(create_pcard.payment_card(remaining_pcards))
 
+
+def create_membership_card_answers():
     add_answers = []
     auth_answers = []
     remaining_answers = TOTAL_MCARDS
     while remaining_answers > 0:
         for _ in range(0, BULK_SIZE):
-            remaining_answers -= 1
+            if remaining_answers <= 0:
+                break
             add_answer_pk = remaining_answers
-            add_question_pk = random.randint(0, MEMBERSHIP_PLANS)
+            add_question_pk = random.randint(1, MEMBERSHIP_PLANS)
             add_answers.append(create_mcard.card_number_answer(add_answer_pk, remaining_answers, add_question_pk))
             auth_answer_pk = TOTAL_MCARDS + remaining_answers
             auth_question_pk = add_question_pk + 1
             auth_answers.append(create_mcard.postcode_answer(auth_answer_pk, remaining_answers, auth_question_pk))
+            remaining_answers -= 1
 
         write_to_tsv(Files.ANSWER, add_answers)
         write_to_tsv(Files.ANSWER, auth_answers)
@@ -240,12 +262,25 @@ def create_transaction_tsv_files():
 
 
 if __name__ == "__main__":
+    print(f"Start timestamp: {time.time()}")
     start = time.perf_counter()
+    print("Deleting old tsv files...")
     delete_old_tsv_files()
+    print(f"Completed deletion. Elapsed time: {time.perf_counter() - start}")
+    print("Creating channel tsv files...")
     create_channel_tsv_files()
+    print(f"Completed channels. Elapsed time: {time.perf_counter() - start}")
+    print("Creating payment scheme tsv files...")
     create_payment_scheme_tsv_files()
+    print(f"Completed payment schemes. Elapsed time: {time.perf_counter() - start}")
+    print("Creating membership plan tsv files...")
     create_membership_plan_tsv_files()
-    create_load_data_tsv_files()
+    print(f"Completed membership plans. Elapsed time: {time.perf_counter() - start}")
+    print("Creating membership and payment card tsv files...")
+    create_service_mcard_and_pcard_tsv_files()
+    create_membership_card_answers()
+    print(f"Completed membership and payment cards. Elapsed time: {time.perf_counter() - start}")
+    print("Creating hades transaction tsv files...")
     create_transaction_tsv_files()
     end = time.perf_counter()
-    print(f"Elapsed time: {end - start}")
+    print(f"Completed tsv generation. Elapsed time: {end - start}")

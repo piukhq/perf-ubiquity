@@ -70,7 +70,7 @@ def card_no_question(question_id, scheme_id=105):
         False,  # one_question_link
         3,  # options
         0,  # answer_type
-        "\\N",  # choice
+        "NULL",  # choice
         "description",  # description
         "(.*)",  # validation
         True,  # add_field
@@ -93,7 +93,7 @@ def postcode_question(question_id, scheme_id):
         False,  # one_question_link
         3,  # options
         0,  # answer_type
-        "\\N",  # choice
+        "NULL",  # choice
         "description",  # description
         "(.*)",  # validation
         False,  # add_field
@@ -133,12 +133,12 @@ def third_party_consent_link(pk, client_app_id, scheme_id, scheme_consent_id):
     ]
 
 
-def create_all_third_party_consent_links(static_id):
+def create_all_third_party_consent_links(static_id, consent_id):
     third_party_consent_links = []
     for count in range(0, len(ALL_CLIENTS)):
         pk = static_id + count
         client = ALL_CLIENTS[count]
-        consent_link = third_party_consent_link(pk, client['id'], static_id, static_id)
+        consent_link = third_party_consent_link(pk, client['client_id'], consent_id, consent_id)
         third_party_consent_links.append(consent_link)
 
     return third_party_consent_links
@@ -147,21 +147,21 @@ def create_all_third_party_consent_links(static_id):
 def scheme_image(pk, scheme_id):
     return [
         pk,  # id
-        0,  # image type code (hero)
-        "",  # size code
-        "",  # strap line
+        0,  # image_type_code (hero)
+        "",  # size_code
+        "",  # strap_line
         "performance hero image",  # description
-        "",  # Url
-        "0",  # call to action
+        "NULL",  # url
+        "0",  # call_to_action
         0,  # order
         1,  # status (published)
-        "2020-01-01 00:00:00",  # start date
-        "3030-01-01 00:00:00",  # end date
+        "2020-01-01 00:00:00",  # start_date
+        "3030-01-01 00:00:00",  # end_date
         "2020-01-01 00:00:00",  # created
         scheme_id,  # scheme
         "schemes/HarveyNichols_UPPT2Yx.png",  # image
         0,  # reward tier
-        "",  # encoding
+        "NULL",  # encoding
     ]
 
 
@@ -217,7 +217,7 @@ def voucher_scheme(pk, scheme_id):
         "£",  # burn_prefix
         "",  # burn_suffix
         "voucher",  # burn_type
-        "",  # burn_value
+        "NULL",  # burn_value
         4,  # barcode_type
         "{{earn_target_remaining}} left to go!",  # headline_inprogress
         "Voucher expired",  # headline_expired

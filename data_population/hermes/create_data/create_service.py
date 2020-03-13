@@ -11,17 +11,17 @@ def user(user_id):
     return [
         user_id,  # id
         user_uuid,  # password
-        "",  # last_login
+        "NULL",  # last_login
         False,  # is_superuser
         user_email,  # email
         True,  # is_active
         "2020-03-09 12:42:15+00",  # date_joined
         False,  # is_staff
         user_uuid,  # uid
-        "",  # facebook
-        "",  # twitter
-        "",  # reset_token
-        "",  # marketing_code_id
+        "NULL",  # facebook
+        "NULL",  # twitter
+        "NULL",  # reset_token
+        "NULL",  # marketing_code_id
         client['client_id'],  # client_id
         "abcdefgh",  # salt
         user_email,  # external_id
@@ -32,7 +32,7 @@ def user(user_id):
 def service(user_id):
     return [
         user_id,  # id
-        "",  # latitude
-        "",  # longitude
+        "NULL",  # latitude
+        "NULL",  # longitude
         "2020-03-09 12:42:15+00"  # timestamp
     ]

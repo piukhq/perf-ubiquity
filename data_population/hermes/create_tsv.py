@@ -11,7 +11,7 @@ from data_population.hermes.create_data import (create_channel, create_plan, cre
 TSV_PATH = f"{os.path.dirname(__file__)}/tsv"
 BULK_SIZE = 10000
 
-MEMBERSHIP_PLANS = 40
+MEMBERSHIP_PLANS = 100
 TOTAL_USERS = 100000
 TOTAL_MCARDS = 400000
 TOTAL_PCARDS = 200000
@@ -49,6 +49,7 @@ class Files(str, Enum):
     SCHEME_WHITELIST = "scheme_schemebundleassociation.tsv"
     VOUCHER_SCHEME = "scheme_voucherscheme.tsv"
     MEMBERSHIP_PLAN_DOCUMENTS = "ubiquity_membershipplandocument.tsv"
+    PAYMENT_CARD_ISSUER = "payment_card_issuer.tsv"
     PAYMENT_SCHEME = "payment_card_paymentcard.tsv"
     PAYMENT_CARD_IMAGE = "payment_card_paymentcardimage.tsv"
     PROVIDER_STATUS_MAPPING = "payment_card_providerstatusmapping.tsv"
@@ -95,6 +96,8 @@ def create_channel_tsv_files():
 
 
 def create_payment_scheme_tsv_files():
+    issuer = create_pcard.payment_card_issuer()
+    write_to_tsv(Files.PAYMENT_CARD_ISSUER, [issuer])
     payment_schemes = create_pcard.create_all_payment_schemes()
     write_to_tsv(Files.PAYMENT_SCHEME, payment_schemes)
     payment_images = create_pcard.create_all_payment_card_images()
@@ -229,10 +232,10 @@ def create_remaining_mcards_and_pcards(remaining_mcards, remaining_pcards):
 
 
 def create_membership_card_answers():
-    add_answers = []
-    auth_answers = []
     remaining_answers = TOTAL_MCARDS
     while remaining_answers > 0:
+        add_answers = []
+        auth_answers = []
         for _ in range(0, BULK_SIZE):
             if remaining_answers <= 0:
                 break

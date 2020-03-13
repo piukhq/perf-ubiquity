@@ -114,7 +114,7 @@ class UserBehavior(TaskSequence):
 
     @seq_task(5)
     def get_membership_plan_id(self):
-        plan_id = random.choice(range(0, MEMBERSHIP_PLANS))
+        plan_id = random.choice(range(1, MEMBERSHIP_PLANS))
         for auth_header in self.non_restricted_auth_headers.values():
             self.client.get(f"/membership_plan/{plan_id}", headers=auth_header,
                             name=f"/membership_plan/<plan_id> {LocustLabel.SINGLE_PROPERTY}")
@@ -135,7 +135,7 @@ class UserBehavior(TaskSequence):
     @seq_task(7)
     @task(7)
     def post_membership_cards_single_property(self):
-        plan_id = random.choice(range(0, MEMBERSHIP_PLANS))
+        plan_id = random.choice(range(1, MEMBERSHIP_PLANS))
         mcard_json = membership_card.random_add_json(plan_id)
         with self.client.post("/membership_cards", json=mcard_json, headers=self.restricted_prop_header,
                               name=f"/membership_cards {LocustLabel.SINGLE_RESTRICTED_PROPERTY}",
@@ -245,8 +245,8 @@ class UserBehavior(TaskSequence):
 
     @seq_task(16)
     def post_membership_cards_join(self):
-        plan_id = random.choice(range(0, MEMBERSHIP_PLANS))
-        mcard_json = membership_card.random_join_json(range(0, MEMBERSHIP_PLANS))
+        plan_id = random.choice(range(1, MEMBERSHIP_PLANS))
+        mcard_json = membership_card.random_join_json(range(1, MEMBERSHIP_PLANS))
 
         with self.client.post("/membership_cards", json=mcard_json, headers=self.restricted_prop_header,
                               name=f"/membership_cards {LocustLabel.SINGLE_RESTRICTED_PROPERTY}",

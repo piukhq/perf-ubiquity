@@ -4,9 +4,10 @@ import random
 import time
 from enum import Enum
 
-from data_population.fixtures import ALL_CLIENTS, NON_RESTRICTED_CLIENTS, ALL_PAYMENT_PROVIDER_STATUS_MAPPINGS
-from data_population.hermes.create_data import (create_channel, create_plan, create_pcard, create_mcard,
-                                                create_service, create_association)
+from data_population.fixtures.client import ALL_CLIENTS, NON_RESTRICTED_CLIENTS
+from data_population.fixtures.payment_scheme import ALL_PAYMENT_PROVIDER_STATUS_MAPPINGS
+from data_population.create_data import (create_association, create_mcard, create_pcard, create_channel, create_plan,
+                                         create_service)
 
 TSV_PATH = f"{os.path.dirname(__file__)}/tsv"
 BULK_SIZE = 10000
@@ -33,41 +34,42 @@ MCARDS_PER_SERVICE = 7
 PCARDS_PER_SERVICE = 2
 
 
-class Files(str, Enum):
-    ORGANISATION = "user_organisation.tsv"
-    CLIENT_APP = "user_clientapplication.tsv"
-    CLIENT_APP_BUNDLE = "user_clientapplicationbundle.tsv"
-    CATEGORY = "scheme_category.tsv"
-    SCHEME = "scheme_scheme.tsv"
-    SCHEME_BALANCE_DETAILS = "scheme_schemebalancedetails.tsv"
-    # SCHEME_FEE = "scheme_schemefee.tsv"  # No schemes have fees setup yet
-    SCHEME_CONTENT = "scheme_schemecontent.tsv"
-    QUESTION = "scheme_schemecredentialquestion.tsv"
-    SCHEME_CONSENT = "scheme_consent.tsv"
-    THIRD_PARTY_CONSENT_LINK = "scheme_thirdpartyconsentlink.tsv"
-    SCHEME_IMAGE = "scheme_schemeimage.tsv"
-    SCHEME_WHITELIST = "scheme_schemebundleassociation.tsv"
-    VOUCHER_SCHEME = "scheme_voucherscheme.tsv"
-    MEMBERSHIP_PLAN_DOCUMENTS = "ubiquity_membershipplandocument.tsv"
-    PAYMENT_CARD_ISSUER = "payment_card_issuer.tsv"
-    PAYMENT_SCHEME = "payment_card_paymentcard.tsv"
-    PAYMENT_CARD_IMAGE = "payment_card_paymentcardimage.tsv"
-    PROVIDER_STATUS_MAPPING = "payment_card_providerstatusmapping.tsv"
-    USER = "user.tsv"
-    CONSENT = "ubiquity_serviceconsent.tsv"
-    SCHEME_ACCOUNT = "scheme_schemeaccount.tsv"
-    ANSWER = "scheme_schemeaccountcredentialanswer.tsv"
-    PAYMENT_ACCOUNT = "payment_card_paymentcardaccount.tsv"
-    PAYMENT_ACCOUNT_ENTRY = "ubiquity_paymentcardaccountentry.tsv"
-    SCHEME_ACCOUNT_ENTRY = "ubiquity_schemeaccountentry.tsv"
-    PAYMENT_SCHEME_ENTRY = "ubiquity_paymentcardaccountentry.tsv"
-    PAYMENT_MEMBERSHIP_ENTRY = "ubiquity_paymentcardschemeentry.tsv"
-    # transactions are stored in hades so need to be uploaded to the hades database
-    TRANSACTIONS = "transaction.tsv"
+class HermesTables(str, Enum):
+    ORGANISATION = "user_organisation"
+    CLIENT_APP = "user_clientapplication"
+    CLIENT_APP_BUNDLE = "user_clientapplicationbundle"
+    USER = "user"
+    CONSENT = "ubiquity_serviceconsent"
+    CATEGORY = "scheme_category"
+    SCHEME = "scheme_scheme"
+    SCHEME_BALANCE_DETAILS = "scheme_schemebalancedetails"
+    # SCHEME_FEE = "scheme_schemefee"  # No schemes have fees setup yet
+    SCHEME_CONTENT = "scheme_schemecontent"
+    QUESTION = "scheme_schemecredentialquestion"
+    SCHEME_CONSENT = "scheme_consent"
+    THIRD_PARTY_CONSENT_LINK = "scheme_thirdpartyconsentlink"
+    SCHEME_IMAGE = "scheme_schemeimage"
+    SCHEME_WHITELIST = "scheme_schemebundleassociation"
+    VOUCHER_SCHEME = "scheme_voucherscheme"
+    MEMBERSHIP_PLAN_DOCUMENTS = "ubiquity_membershipplandocument"
+    PAYMENT_CARD_ISSUER = "payment_card_issuer"
+    PAYMENT_SCHEME = "payment_card_paymentcard"
+    PAYMENT_CARD_IMAGE = "payment_card_paymentcardimage"
+    PROVIDER_STATUS_MAPPING = "payment_card_providerstatusmapping"
+    SCHEME_ACCOUNT = "scheme_schemeaccount"
+    ANSWER = "scheme_schemeaccountcredentialanswer"
+    PAYMENT_ACCOUNT = "payment_card_paymentcardaccount"
+    PAYMENT_ACCOUNT_ENTRY = "ubiquity_paymentcardaccountentry"
+    SCHEME_ACCOUNT_ENTRY = "ubiquity_schemeaccountentry"
+    PAYMENT_MEMBERSHIP_ENTRY = "ubiquity_paymentcardschemeentry"
 
 
-def tsv_path(file_name):
-    return f"{TSV_PATH}/{file_name}"
+class HadesTables(str, Enum):
+    TRANSACTIONS = "transaction"
+
+
+def tsv_path(table_name):
+    return f"{TSV_PATH}/{table_name}.tsv"
 
 
 def write_to_tsv(file_name, rows):
@@ -79,35 +81,35 @@ def write_to_tsv(file_name, rows):
 
 def delete_old_tsv_files():
     os.makedirs(TSV_PATH, exist_ok=True)
-    for file in Files:
+    for table in HermesTables:
         try:
-            os.remove(tsv_path(file))
+            os.remove(tsv_path(table))
         except FileNotFoundError:
             pass
 
 
 def create_channel_tsv_files():
     organisations = [create_channel.organisation(client) for client in ALL_CLIENTS]
-    write_to_tsv(Files.ORGANISATION, organisations)
+    write_to_tsv(HermesTables.ORGANISATION, organisations)
     client_applications = [create_channel.client_application(client) for client in ALL_CLIENTS]
-    write_to_tsv(Files.CLIENT_APP, client_applications)
+    write_to_tsv(HermesTables.CLIENT_APP, client_applications)
     client_application_bundle = [create_channel.client_application_bundle(client) for client in ALL_CLIENTS]
-    write_to_tsv(Files.CLIENT_APP_BUNDLE, client_application_bundle)
+    write_to_tsv(HermesTables.CLIENT_APP_BUNDLE, client_application_bundle)
 
 
 def create_payment_scheme_tsv_files():
     issuer = create_pcard.payment_card_issuer()
-    write_to_tsv(Files.PAYMENT_CARD_ISSUER, [issuer])
+    write_to_tsv(HermesTables.PAYMENT_CARD_ISSUER, [issuer])
     payment_schemes = create_pcard.create_all_payment_schemes()
-    write_to_tsv(Files.PAYMENT_SCHEME, payment_schemes)
+    write_to_tsv(HermesTables.PAYMENT_SCHEME, payment_schemes)
     payment_images = create_pcard.create_all_payment_card_images()
-    write_to_tsv(Files.PAYMENT_CARD_IMAGE, payment_images)
-    write_to_tsv(Files.PROVIDER_STATUS_MAPPING, ALL_PAYMENT_PROVIDER_STATUS_MAPPINGS)
+    write_to_tsv(HermesTables.PAYMENT_CARD_IMAGE, payment_images)
+    write_to_tsv(HermesTables.PROVIDER_STATUS_MAPPING, ALL_PAYMENT_PROVIDER_STATUS_MAPPINGS)
 
 
 def create_membership_plan_tsv_files():
     categories = [create_plan.category()]
-    write_to_tsv(Files.CATEGORY, categories)
+    write_to_tsv(HermesTables.CATEGORY, categories)
 
     membership_plans = []
     plan_questions = []
@@ -139,15 +141,15 @@ def create_membership_plan_tsv_files():
         if count == 1:
             voucher_schemes.append(create_plan.voucher_scheme(count, count))
 
-    write_to_tsv(Files.SCHEME, membership_plans)
-    write_to_tsv(Files.QUESTION, plan_questions)
-    write_to_tsv(Files.SCHEME_IMAGE, scheme_images)
-    write_to_tsv(Files.SCHEME_BALANCE_DETAILS, scheme_balance_details)
-    write_to_tsv(Files.SCHEME_CONTENT, scheme_contents)
-    write_to_tsv(Files.MEMBERSHIP_PLAN_DOCUMENTS, membership_plan_documents)
-    write_to_tsv(Files.SCHEME_CONSENT, scheme_consents)
-    write_to_tsv(Files.THIRD_PARTY_CONSENT_LINK, third_party_consents)
-    write_to_tsv(Files.VOUCHER_SCHEME, voucher_schemes)
+    write_to_tsv(HermesTables.SCHEME, membership_plans)
+    write_to_tsv(HermesTables.QUESTION, plan_questions)
+    write_to_tsv(HermesTables.SCHEME_IMAGE, scheme_images)
+    write_to_tsv(HermesTables.SCHEME_BALANCE_DETAILS, scheme_balance_details)
+    write_to_tsv(HermesTables.SCHEME_CONTENT, scheme_contents)
+    write_to_tsv(HermesTables.MEMBERSHIP_PLAN_DOCUMENTS, membership_plan_documents)
+    write_to_tsv(HermesTables.SCHEME_CONSENT, scheme_consents)
+    write_to_tsv(HermesTables.THIRD_PARTY_CONSENT_LINK, third_party_consents)
+    write_to_tsv(HermesTables.VOUCHER_SCHEME, voucher_schemes)
 
     whitelist_list = []
     whitelist_id = 0
@@ -157,7 +159,7 @@ def create_membership_plan_tsv_files():
             plan_id = plan[0]
             whitelist_list.append(create_channel.channel_scheme_whitelist(whitelist_id, client_fixture, plan_id))
 
-    write_to_tsv(Files.SCHEME_WHITELIST, whitelist_list)
+    write_to_tsv(HermesTables.SCHEME_WHITELIST, whitelist_list)
 
 
 def create_service_mcard_and_pcard_tsv_files():
@@ -200,13 +202,13 @@ def create_service_mcard_and_pcard_tsv_files():
                 create_association.pll_link(remaining_pcards, remaining_pcards + 1, remaining_mcards + 1)
             )
 
-        write_to_tsv(Files.USER, users)
-        write_to_tsv(Files.CONSENT, services)
-        write_to_tsv(Files.SCHEME_ACCOUNT, membership_cards)
-        write_to_tsv(Files.SCHEME_ACCOUNT_ENTRY, membership_card_associations)
-        write_to_tsv(Files.PAYMENT_ACCOUNT, payment_cards)
-        write_to_tsv(Files.PAYMENT_ACCOUNT_ENTRY, payment_card_associations)
-        write_to_tsv(Files.PAYMENT_MEMBERSHIP_ENTRY, pll_links)
+        write_to_tsv(HermesTables.USER, users)
+        write_to_tsv(HermesTables.CONSENT, services)
+        write_to_tsv(HermesTables.SCHEME_ACCOUNT, membership_cards)
+        write_to_tsv(HermesTables.SCHEME_ACCOUNT_ENTRY, membership_card_associations)
+        write_to_tsv(HermesTables.PAYMENT_ACCOUNT, payment_cards)
+        write_to_tsv(HermesTables.PAYMENT_ACCOUNT_ENTRY, payment_card_associations)
+        write_to_tsv(HermesTables.PAYMENT_MEMBERSHIP_ENTRY, pll_links)
         create_remaining_mcards_and_pcards(remaining_mcards, remaining_pcards)
 
 
@@ -220,7 +222,7 @@ def create_remaining_mcards_and_pcards(remaining_mcards, remaining_pcards):
             membership_cards.append(create_mcard.membership_card(remaining_mcards, scheme_id))
             remaining_mcards -= 1
 
-        write_to_tsv(Files.SCHEME_ACCOUNT, membership_cards)
+        write_to_tsv(HermesTables.SCHEME_ACCOUNT, membership_cards)
 
     while remaining_pcards > 0:
         payment_cards = []
@@ -247,8 +249,8 @@ def create_membership_card_answers():
             auth_answers.append(create_mcard.postcode_answer(auth_answer_pk, remaining_answers, auth_question_pk))
             remaining_answers -= 1
 
-        write_to_tsv(Files.ANSWER, add_answers)
-        write_to_tsv(Files.ANSWER, auth_answers)
+        write_to_tsv(HermesTables.ANSWER, add_answers)
+        write_to_tsv(HermesTables.ANSWER, auth_answers)
 
 
 def create_transaction_tsv_files():
@@ -261,7 +263,7 @@ def create_transaction_tsv_files():
             remaining_transactions -= 1
             transactions.append(create_mcard.transaction(remaining_transactions, remaining_transactions))
 
-        write_to_tsv(Files.TRANSACTIONS, transactions)
+        write_to_tsv(HadesTables.TRANSACTIONS, transactions)
 
 
 if __name__ == "__main__":

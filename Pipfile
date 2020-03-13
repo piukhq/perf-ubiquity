@@ -13,6 +13,7 @@ faker = "*"
 pyjwt = "*"
 shared-config-storage = {git = "ssh://git@git.bink.com/libs/shared-config-storage.git",version = "*"}
 requests = "*"
+psycopg2 = "*"
 
 [requires]
 python_version = "3.7"

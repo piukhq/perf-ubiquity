@@ -7,8 +7,8 @@ from locust import HttpLocust, TaskSequence, seq_task, constant, task
 from requests import codes
 from shared_config_storage.vault import secrets
 
-from data_population.fixtures import CLIENT_ONE, CLIENT_TWO, CLIENT_RESTRICTED, NON_RESTRICTED_CLIENTS
-from data_population.hermes.create_tsv import MEMBERSHIP_PLANS
+from data_population.fixtures.client import CLIENT_ONE, CLIENT_TWO, CLIENT_RESTRICTED, NON_RESTRICTED_CLIENTS
+from data_population.create_tsv import MEMBERSHIP_PLANS
 from request_data import service, membership_card, payment_card
 from settings import CHANNEL_VAULT_PATH, VAULT_URL, VAULT_TOKEN, LOCAL_SECRETS, LOCAL_SECRETS_PATH
 

@@ -3,6 +3,14 @@ import uuid
 from data_population.fixtures import PAYMENT_SCHEME_INFO
 
 
+def payment_card_issuer():
+    return [
+        1,  # id
+        "performance",  # name
+        "performance/image.jpg"  # image
+    ]
+
+
 def payment_scheme(pk, name, slug, url, input_label, system, token_method):
     return [
         pk,  # id

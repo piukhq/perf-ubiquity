@@ -16,6 +16,7 @@ psql -h 127.0.0.1 -p 5432 --user "postgres" -d hermes -c "\copy scheme_schemeima
 psql -h 127.0.0.1 -p 5432 --user "postgres" -d hermes -c "\copy scheme_schemebundleassociation FROM '$TSV_FOLDER/scheme_schemebundleassociation.tsv' DELIMITER E'\t' NULL AS 'NULL'"
 psql -h 127.0.0.1 -p 5432 --user "postgres" -d hermes -c "\copy scheme_voucherscheme FROM '$TSV_FOLDER/scheme_voucherscheme.tsv' DELIMITER E'\t' NULL AS 'NULL'"
 psql -h 127.0.0.1 -p 5432 --user "postgres" -d hermes -c "\copy ubiquity_membershipplandocument FROM '$TSV_FOLDER/ubiquity_membershipplandocument.tsv' DELIMITER E'\t' NULL AS 'NULL'"
+psql -h 127.0.0.1 -p 5432 --user "postgres" -d hermes -c "\copy payment_card_issuer FROM '$TSV_FOLDER/payment_card_issuer.tsv' DELIMITER E'\t' NULL AS 'NULL'"
 psql -h 127.0.0.1 -p 5432 --user "postgres" -d hermes -c "\copy payment_card_paymentcard FROM '$TSV_FOLDER/payment_card_paymentcard.tsv' DELIMITER E'\t' NULL AS 'NULL'"
 psql -h 127.0.0.1 -p 5432 --user "postgres" -d hermes -c "\copy payment_card_paymentcardimage FROM '$TSV_FOLDER/payment_card_paymentcardimage.tsv' DELIMITER E'\t' NULL AS 'NULL'"
 psql -h 127.0.0.1 -p 5432 --user "postgres" -d hermes -c "\copy payment_card_providerstatusmapping FROM '$TSV_FOLDER/payment_card_providerstatusmapping.tsv' DELIMITER E'\t' NULL AS 'NULL'"

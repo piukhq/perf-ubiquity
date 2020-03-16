@@ -5,7 +5,7 @@ from enum import IntEnum
 
 from shared_config_storage.credentials.encryption import RSACipher
 
-from request_data.membership_plan import ClientBundleIDs
+from data_population.fixtures.client import CLIENT_ONE
 from settings import fake, VAULT_URL, VAULT_TOKEN
 
 FIELDS_TO_ENCRYPT = (
@@ -76,7 +76,7 @@ def generate_unencrypted_random():
 
 
 def encrypt(pcard):
-    rsa = RSACipher(VAULT_TOKEN, VAULT_URL, ClientBundleIDs.BARCLAYS)
+    rsa = RSACipher(VAULT_TOKEN, VAULT_URL, CLIENT_ONE)
     for field in FIELDS_TO_ENCRYPT:
         cred = pcard['card'].get(field)
         if not cred:

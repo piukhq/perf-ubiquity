@@ -1,3 +1,9 @@
+JWT_SECRET = "testsecret"
+ENCRYPTION_TEST_KEYS = {
+    "private_key": "replace me with private key",
+    "public_key": "replace me with public key"
+}
+
 CLIENT_ONE = {
     'bundle_id': 'performance.bundle.one',
     'client_id': 'performance_one',
@@ -6,7 +12,7 @@ CLIENT_ONE = {
     'organisation_name': 'performance test one',
     'status': 0,
     'whitelist_status': 'ACTIVE',
-    "secret": "testsecret",
+    "secret": JWT_SECRET,
 }
 
 
@@ -18,7 +24,7 @@ CLIENT_TWO = {
     'organisation_name': 'performance test two',
     'status': 0,
     'whitelist_status': 'ACTIVE',
-    "secret": "testsecret",
+    "secret": JWT_SECRET,
 }
 
 
@@ -30,7 +36,7 @@ CLIENT_THREE = {
     'organisation_name': 'performance test three',
     'status': 0,
     'whitelist_status': 'ACTIVE',
-    "secret": "testsecret",
+    "secret": JWT_SECRET,
 }
 
 
@@ -42,7 +48,7 @@ CLIENT_FOUR = {
     'organisation_name': 'performance test four',
     'status': 0,
     'whitelist_status': 'ACTIVE',
-    "secret": "testsecret",
+    "secret": JWT_SECRET,
 }
 
 
@@ -54,7 +60,7 @@ CLIENT_FIVE = {
     'organisation_name': 'performance test five',
     'status': 0,
     'whitelist_status': 'ACTIVE',
-    "secret": "testsecret",
+    "secret": JWT_SECRET,
 }
 
 
@@ -66,7 +72,7 @@ CLIENT_SIX = {
     'organisation_name': 'performance test six',
     'status': 0,
     'whitelist_status': 'ACTIVE',
-    "secret": "testsecret",
+    "secret": JWT_SECRET,
 }
 
 
@@ -78,7 +84,7 @@ CLIENT_SEVEN = {
     'organisation_name': 'performance test seven',
     'status': 0,
     'whitelist_status': 'ACTIVE',
-    "secret": "testsecret",
+    "secret": JWT_SECRET,
 }
 
 
@@ -90,7 +96,7 @@ CLIENT_EIGHT = {
     'organisation_name': 'performance test eight',
     'status': 0,
     'whitelist_status': 'ACTIVE',
-    "secret": "testsecret",
+    "secret": JWT_SECRET,
 }
 
 
@@ -102,7 +108,7 @@ CLIENT_NINE = {
     'organisation_name': 'performance test nine',
     'status': 0,
     'whitelist_status': 'ACTIVE',
-    "secret": "testsecret",
+    "secret": JWT_SECRET,
 }
 
 
@@ -114,7 +120,7 @@ CLIENT_TEN = {
     'organisation_name': 'performance test ten',
     'status': 0,
     'whitelist_status': 'ACTIVE',
-    "secret": "testsecret",
+    "secret": JWT_SECRET,
 }
 
 
@@ -126,7 +132,7 @@ CLIENT_ELEVEN = {
     'organisation_name': 'performance test eleven',
     'status': 0,
     'whitelist_status': 'ACTIVE',
-    "secret": "testsecret",
+    "secret": JWT_SECRET,
 }
 
 CLIENT_RESTRICTED = {
@@ -137,7 +143,7 @@ CLIENT_RESTRICTED = {
     "organisation_name": "performance test restricted",
     "status": 2,
     "whitelist_status": "INACTIVE",
-    "secret": "testsecret",
+    "secret": JWT_SECRET,
 }
 
 NON_RESTRICTED_CLIENTS = [

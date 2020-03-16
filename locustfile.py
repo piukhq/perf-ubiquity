@@ -7,7 +7,7 @@ from locust import HttpLocust, TaskSequence, seq_task, constant, task
 from requests import codes
 from shared_config_storage.vault import secrets
 
-from data_population.fixtures.client import CLIENT_ONE, CLIENT_TWO, CLIENT_RESTRICTED, NON_RESTRICTED_CLIENTS
+from data_population.fixtures.client import CLIENT_ONE, CLIENT_RESTRICTED, NON_RESTRICTED_CLIENTS
 from data_population.create_tsv import MEMBERSHIP_PLANS
 from request_data import service, membership_card, payment_card
 from settings import CHANNEL_VAULT_PATH, VAULT_URL, VAULT_TOKEN, LOCAL_SECRETS, LOCAL_SECRETS_PATH
@@ -84,7 +84,8 @@ class UserBehavior(TaskSequence):
         self.single_prop_header = service.generate_auth_header(email, timestamp, CLIENT_ONE, single_prop_jwt_secret)
         multi_prop_channel = random.choice(NON_RESTRICTED_CLIENTS[:TOTAL_CLIENTS - 1])
         multi_prop_jwt_secret = self.client_secrets[multi_prop_channel['bundle_id']]
-        self.multi_prop_header = service.generate_auth_header(email, timestamp, CLIENT_TWO, multi_prop_jwt_secret)
+        self.multi_prop_header = service.generate_auth_header(email, timestamp, multi_prop_channel,
+                                                              multi_prop_jwt_secret)
 
         restricted_jwt_secret = self.client_secrets[CLIENT_RESTRICTED['bundle_id']]
         self.restricted_prop_header = service.generate_auth_header(email, timestamp, CLIENT_RESTRICTED,

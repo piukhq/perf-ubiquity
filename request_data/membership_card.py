@@ -3,7 +3,6 @@ import uuid
 
 from data_population.fixtures.membership_plan import CONSENT_LABEL
 from settings import fake
-from request_data.membership_plan import PlanIDs
 
 
 def static_add_json():
@@ -15,7 +14,7 @@ def static_add_json():
                 {"column": CONSENT_LABEL, "value": "true"}
             ],
         },
-        "membership_plan": PlanIDs.TEST_SCHEME_ID,
+        "membership_plan": 1,
     }
 
 

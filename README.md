@@ -1,42 +1,53 @@
-# DB Setup:
+TODO:
+* Finish readme with below topics:
+  * setting up local secrets
 
-#### Initial setup
-* If using a new database:
-  * Create the database in postgres if it doesn't exist: 
-  `psql -h 127.0.0.1 -p 5432 --user postgres -c "CREATE DATABASE hermes"`
-* If using an existing database:
-  * Take a back-up which we will restore to after the test is complete: 
-  `pg_dump -h 127.0.0.1 -p 5432 --user postgres hermes > hermes.bak`
+# Running Performance Tests:
+### On Sandbox:
+* Make sure your kube config is pointing towards the performance sandbox:
+  * Context: `uksouth-sandbox`
+  * Namespace: `performance`
+* Port forward to sandbox locust web ui:
+  * `kubectl port-forward <locust master pod name> 8089`
+* Open up web ui by going to below link:
+  * `localhost:8089`
+* Enter required users and push `Start swarming`
+  * `Total users`: How many users you want running the test at once
+  * `Hate rate`: How many users are spun up per second until it reaches 
+                 total users
 
-#### Data population
-* Run tsv generation scrips: `pipenv run python db/hermes/create_tsv.py`
-* Import each of the tsv files into the postgres database
+### Local: 
+* Run locust web ui pointing at sandbox:
+  * `pipenv run locust --host=https://performance.sandbox.k8s.uksouth.bink.sh/ubiquity`
+* Open up web ui by going to below link:
+  * `localhost:8089`
+* Enter required users and push `Start swarming`
+  * `Total users`: How many users you want running the test at once
+  * `Hate rate`: How many users are spun up per second until it reaches 
+                 total users
 
-#### Performance testing:
-* Connect to locust:
-  * Local:
-    * `pipenv install`
-    * `pipenv run locust --host=http://127.0.0.1:8081/ubiquity`
-  * Deployed:
-    * Port forward locust pod: `kubectl port-forward <pod name> 8089`
-* Open locust web ui: `https://localhost:8089`
-* Enter total number of users and hatch rate and click "Start swarming"
-  * Hatch rate is how many users spawn per second until total number of users is reached
- 
-#### Post performance test
-* After running performance test, use the initial backup to restore
-  the database: `psql -h 127.0.0.1 -p 5432 --user postgres hermes < hermes.bak`
+# Environment Setup:
+### Database Population:
+* Set the correct fixture totals in `data_population/create_tsv.py`
+* Run the data population script:
+  * `pipenv run data_population/create_tsv.py`
+* Make sure your kube config is pointing towards the performance sandbox:
+  * Context: `uksouth-sandbox`
+  * Namespace: `performance`
+* Setup `.env` with sandbox db connection details
+* Port forward to the sandbox db:
+  * `kubectl port-forward <hermes api pod name> 5432`
+* Upload the created data to the db (WARNING: this will start 
+  by deleting all data in the environment):
+  * `pipenv run data_population/upload_tsv.py`
 
-# TODO
-* Finish PUT and PATCH endpoints 
-* Fix script running bug
-* Finish readme on how to import tsv files
-* Add test performance scripts to allowed schemes for endpoints
-* Set up midas performance-test slug agent to always return balance
-* Get CI changes from infrastructure to build
-* Have error scenarios (try adding a fully restricted test 
-  scheme (added by data population script)) tested + adding 
-  already existed cards
-
-## Environment variables:
-* JWT_SECRET - Secret used in authentication token generation
+### Vault Setup:
+This only has to happen once per environment, unless you want to change 
+the performance client secrets in an existing environment.
+* Copy the vault secrets from 1password (`Performance Vault Secrets`)
+* Paste these secrets to replace the examples in `data_population/fixtures/client.py`
+* Port forward to the vault:
+  * `kubectl port-forward vault-0 8200` 
+* Make sure your `.env` has the `VAULT_URL` and `VAULT_TOKEN` env vars populated
+* Run the vault setup script:
+  * `pipenv run data_population/vault_setup.py`

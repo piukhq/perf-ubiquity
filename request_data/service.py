@@ -13,7 +13,11 @@ def generate_auth_header(user_email, iat, client_fixture, secret):
         "user_id": user_email,
     }
     token = jwt.encode(claims, secret, algorithm="HS512").decode("UTF-8")
-    return {"Authorization": f"Bearer {token}"}
+
+    return {
+        "Authorization": f"Bearer {token}",
+        "Accept": "application/json;v=1.2"
+    }
 
 
 def generate_random():

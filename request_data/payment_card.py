@@ -76,7 +76,8 @@ def generate_unencrypted_random():
 
 
 def encrypt(pcard):
-    rsa = RSACipher(VAULT_TOKEN, VAULT_URL, CLIENT_ONE)
+    key_path = CLIENT_ONE['bundle_id']
+    rsa = RSACipher(VAULT_TOKEN, VAULT_URL, key_path)
     for field in FIELDS_TO_ENCRYPT:
         cred = pcard['card'].get(field)
         if not cred:

@@ -1,7 +1,7 @@
 import random
 import uuid
 
-from data_population.fixtures import CONSENT_LABEL
+from data_population.fixtures.membership_plan import CONSENT_LABEL
 from settings import fake
 from request_data.membership_plan import PlanIDs
 

@@ -1,6 +1,7 @@
 import uuid
 
-from data_population.fixtures import CONSENT_LABEL, ALL_CLIENTS
+from data_population.fixtures.client import ALL_CLIENTS
+from data_population.fixtures.membership_plan import CONSENT_LABEL
 
 PERFORMANCE_CATEGORY_ID = 5000
 

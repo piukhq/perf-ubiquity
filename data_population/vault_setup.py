@@ -1,6 +1,6 @@
 import requests
 
-from data_population.fixtures import ALL_CLIENTS
+from data_population.fixtures.client import ALL_CLIENTS
 from request_data.membership_plan import ClientBundleIDs
 from settings import VAULT_TOKEN, VAULT_URL, CHANNEL_VAULT_PATH
 

@@ -1,6 +1,6 @@
 import uuid
 
-from data_population.fixtures import PAYMENT_SCHEME_INFO
+from data_population.fixtures.payment_scheme import PAYMENT_SCHEME_INFO
 
 
 def payment_card_issuer():

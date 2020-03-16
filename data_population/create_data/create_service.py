@@ -1,7 +1,7 @@
 import random
 import uuid
 
-from data_population.fixtures import ALL_CLIENTS
+from data_population.fixtures.client import ALL_CLIENTS
 
 
 def user(user_id):

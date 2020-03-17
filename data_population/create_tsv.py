@@ -79,9 +79,9 @@ def write_to_tsv(file_name, rows):
         tsv_writer.writerows(rows)
 
 
-def delete_old_tsv_files():
+def delete_old_tsv_files(table_enum):
     os.makedirs(TSV_PATH, exist_ok=True)
-    for table in HermesTables:
+    for table in table_enum:
         try:
             os.remove(tsv_path(table))
         except FileNotFoundError:
@@ -98,8 +98,9 @@ def create_channel_tsv_files():
 
 
 def create_payment_scheme_tsv_files():
-    issuer = create_pcard.payment_card_issuer()
-    write_to_tsv(HermesTables.PAYMENT_CARD_ISSUER, [issuer])
+    issuer_names = ["Barclays", "Performance"]
+    issuers = [create_pcard.issuer(pk, name) for pk, name in enumerate(issuer_names, 1)]
+    write_to_tsv(HermesTables.PAYMENT_CARD_ISSUER, issuers)
     payment_schemes = create_pcard.create_all_payment_schemes()
     write_to_tsv(HermesTables.PAYMENT_SCHEME, payment_schemes)
     payment_images = create_pcard.create_all_payment_card_images()
@@ -260,8 +261,8 @@ def create_transaction_tsv_files():
         for _ in range(0, BULK_SIZE):
             if remaining_transactions <= 0:
                 break
-            remaining_transactions -= 1
             transactions.append(create_mcard.transaction(remaining_transactions, remaining_transactions))
+            remaining_transactions -= 1
 
         write_to_tsv(HadesTables.TRANSACTIONS, transactions)
 
@@ -270,7 +271,8 @@ if __name__ == "__main__":
     print(f"Start timestamp: {time.time()}")
     start = time.perf_counter()
     print("Deleting old tsv files...")
-    delete_old_tsv_files()
+    delete_old_tsv_files(HermesTables)
+    delete_old_tsv_files(HadesTables)
     print(f"Completed deletion. Elapsed time: {time.perf_counter() - start}")
     print("Creating channel tsv files...")
     create_channel_tsv_files()

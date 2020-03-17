@@ -10,6 +10,7 @@ from shared_config_storage.vault import secrets
 from data_population.fixtures.client import CLIENT_ONE, CLIENT_RESTRICTED, NON_RESTRICTED_CLIENTS
 from data_population.create_tsv import MEMBERSHIP_PLANS
 from request_data import service, membership_card, payment_card
+from request_data.hermes import post_scheme_account_status
 from settings import CHANNEL_VAULT_PATH, VAULT_URL, VAULT_TOKEN, LOCAL_SECRETS, LOCAL_SECRETS_PATH
 
 # Change this to specify how many channels the locust tests use
@@ -296,12 +297,15 @@ class UserBehavior(TaskSequence):
 
     @seq_task(19)
     def patch_membership_cards_id_ghost(self):
+        status = membership_card.PRE_REGISTERED_CARD_STATUS
         task_counter = 2
         for x in range(0, task_counter):
             # reset index if range > max number of membership cards
             converted_index = x % len(self.membership_cards)
             mcard_id = self.membership_cards[converted_index]['id']
             mcard_json = membership_card.random_registration_json()
+
+            post_scheme_account_status(status, mcard_id)
             self.client.patch(f"/membership_card/{mcard_id}", json=mcard_json, headers=self.single_prop_header,
                               name=f"/membership_card/<mcard_id> {LocustLabel.SINGLE_PROPERTY}")
 

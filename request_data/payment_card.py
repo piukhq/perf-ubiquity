@@ -1,5 +1,4 @@
 import random
-import time
 import uuid
 from enum import IntEnum
 
@@ -25,7 +24,7 @@ class PaymentProvider(IntEnum):
 def generate_unencrypted_static():
     return {
         "card": {
-            "hash": str(uuid.uuid4()),
+            "hash": "8cfecd65-73a5-4e78-b8a7-ccffb33a8762",
             "token": "9bd11390-b8e8-4627-baa0-c738645fb9b5",
             "last_four_digits": 3733,  # amex bin
             "first_six_digits": 466666,
@@ -35,14 +34,7 @@ def generate_unencrypted_static():
             "fingerprint": "33df7b61-b908-4496-847c-c4bd280b26ef",
         },
         "account": {
-            "consents": [
-                {
-                    "latitude": 51.405372,
-                    "longitude": -0.678357,
-                    "timestamp": 1573658810,
-                    "type": 2,
-                }
-            ]
+            "consents": []
         },
     }
 
@@ -62,14 +54,7 @@ def generate_unencrypted_random():
             "fingerprint": str(uuid.uuid4()),
         },
         "account": {
-            "consents": [
-                {
-                    "latitude": 51.405372,
-                    "longitude": -0.678357,
-                    "timestamp": int(time.time()),
-                    "type": 2,
-                }
-            ]
+            "consents": []
         },
     }
 

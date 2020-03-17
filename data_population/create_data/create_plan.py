@@ -58,7 +58,7 @@ def membership_plan(scheme_id, name, slug):
     ]
 
 
-def card_no_question(question_id, scheme_id=105):
+def card_no_question(question_id, scheme_id):
     return [
         question_id,  # id
         "Card Number",  # label
@@ -69,7 +69,7 @@ def card_no_question(question_id, scheme_id=105):
         False,  # scan_question
         False,  # third_party_identifier
         False,  # one_question_link
-        3,  # options
+        2,  # options
         0,  # answer_type
         "NULL",  # choice
         "description",  # description
@@ -77,7 +77,7 @@ def card_no_question(question_id, scheme_id=105):
         True,  # add_field
         False,  # auth_field
         True,  # enrol_field
-        True,  # register_field
+        False,  # register_field
     ]
 
 

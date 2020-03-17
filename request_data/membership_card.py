@@ -5,6 +5,9 @@ from data_population.fixtures.membership_plan import CONSENT_LABEL
 from settings import fake
 
 
+PRE_REGISTERED_CARD_STATUS = 406
+
+
 def static_add_json():
     return {
         "account": {
@@ -55,7 +58,6 @@ def random_registration_json():
     return {
         "account": {
             "registration_fields": [
-                {"column": "Card Number", "value": str(uuid.uuid4())},
                 {"column": "Postcode", "value": fake.postcode()}
             ]
         }

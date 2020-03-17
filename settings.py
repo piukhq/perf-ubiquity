@@ -18,3 +18,6 @@ DB_HOST = env_var("DB_HOST", "127.0.0.1")
 DB_PORT = env_var("DB_PORT", "5432")
 HERMES_DB = env_var("HERMES_DB", "hermes")
 HADES_DB = env_var("HADES_DB", "hades")
+
+HERMES_URL = env_var("HERMES_URL")
+SERVICE_API_KEY = "F616CE5C88744DD52DB628FAD8B3D"

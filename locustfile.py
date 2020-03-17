@@ -44,18 +44,21 @@ class UserBehavior(TaskSequence):
             with open(LOCAL_SECRETS_PATH) as fp:
                 channel_info = json.load(fp)
 
-        self.client_secrets = {client: secret["jwt_secret"] for client, secret in channel_info.items()}
+        self.client_secrets = channel_info
+        self.pub_key = None
         super(UserBehavior, self).__init__(parent)
 
     def setup(self):
+        setup_client_secrets = self.client_secrets[CLIENT_ONE['bundle_id']]
+        self.pub_key = setup_client_secrets['public_key']
         consent = service.generate_random()
         email = consent["consent"]["email"]
         timestamp = consent["consent"]["timestamp"]
-        jwt_secret = self.client_secrets[CLIENT_ONE['bundle_id']]
+        jwt_secret = setup_client_secrets['jwt_secret']
         auth_header = service.generate_auth_header(email, timestamp, CLIENT_ONE, jwt_secret)
         self.client.post("/service", json=consent, headers=auth_header, name="Setup requests")
         pcard = payment_card.generate_unencrypted_random()
-        self.static_pcard_json = payment_card.encrypt(pcard)
+        self.static_pcard_json = payment_card.encrypt(pcard, self.pub_key)
         post_resp = self.client.post("/payment_cards", json=self.static_pcard_json, headers=auth_header,
                                      name="Setup requests")
         post_resp.raise_for_status()
@@ -80,14 +83,14 @@ class UserBehavior(TaskSequence):
         email = self.consent["consent"]["email"]
         timestamp = self.consent["consent"]["timestamp"]
 
-        single_prop_jwt_secret = self.client_secrets[CLIENT_ONE['bundle_id']]
+        single_prop_jwt_secret = self.client_secrets[CLIENT_ONE['bundle_id']]['jwt_secret']
         self.single_prop_header = service.generate_auth_header(email, timestamp, CLIENT_ONE, single_prop_jwt_secret)
         multi_prop_channel = random.choice(NON_RESTRICTED_CLIENTS[:TOTAL_CLIENTS - 1])
-        multi_prop_jwt_secret = self.client_secrets[multi_prop_channel['bundle_id']]
+        multi_prop_jwt_secret = self.client_secrets[multi_prop_channel['bundle_id']]['jwt_secret']
         self.multi_prop_header = service.generate_auth_header(email, timestamp, multi_prop_channel,
                                                               multi_prop_jwt_secret)
 
-        restricted_jwt_secret = self.client_secrets[CLIENT_RESTRICTED['bundle_id']]
+        restricted_jwt_secret = self.client_secrets[CLIENT_RESTRICTED['bundle_id']]['jwt_secret']
         self.restricted_prop_header = service.generate_auth_header(email, timestamp, CLIENT_RESTRICTED,
                                                                    restricted_jwt_secret)
         self.non_restricted_auth_headers = {
@@ -127,7 +130,7 @@ class UserBehavior(TaskSequence):
     @task(2)
     def post_payment_cards_single_property(self):
         pcard = payment_card.generate_unencrypted_random()
-        pcard_json = payment_card.encrypt(pcard)
+        pcard_json = payment_card.encrypt(pcard, self.pub_key)
         resp = self.client.post("/payment_cards", json=pcard_json, headers=self.single_prop_header,
                                 name=f"/payment_cards {LocustLabel.SINGLE_PROPERTY}")
         pcard = {

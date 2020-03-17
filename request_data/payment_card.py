@@ -75,15 +75,13 @@ def generate_unencrypted_random():
     }
 
 
-def encrypt(pcard):
-    key_path = CLIENT_ONE['bundle_id']
-    rsa = RSACipher(VAULT_TOKEN, VAULT_URL, key_path)
+def encrypt(pcard, pub_key):
     for field in FIELDS_TO_ENCRYPT:
         cred = pcard['card'].get(field)
         if not cred:
             raise ValueError(f"Missing credential {field}")
         try:
-            encrypted_val = rsa.encrypt(cred)
+            encrypted_val = RSACipher().encrypt(cred, pub_key=pub_key)
         except Exception as e:
             raise ValueError(f"Value: {cred}") from e
         pcard['card'][field] = encrypted_val

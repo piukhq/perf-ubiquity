@@ -39,9 +39,9 @@
         },
         "configargparse": {
             "hashes": [
-                "sha256:bf378245bc9cdc403a527e5b7406b991680c2a530e7e81af747880b54eb57133"
+                "sha256:7971cdb14328baaada0f140832925de83ecee93ac5e67e587e3476fac283ad51"
             ],
-            "version": "==1.0"
+            "version": "==1.1"
         },
         "faker": {
             "hashes": [

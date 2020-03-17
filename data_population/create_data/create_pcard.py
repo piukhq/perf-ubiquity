@@ -3,10 +3,10 @@ import uuid
 from data_population.fixtures.payment_scheme import PAYMENT_SCHEME_INFO
 
 
-def payment_card_issuer():
+def issuer(pk, name):
     return [
-        1,  # id
-        "performance",  # name
+        pk,  # id
+        name,  # name
         "performance/image.jpg"  # image
     ]
 

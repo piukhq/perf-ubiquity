@@ -5,8 +5,7 @@ from enum import IntEnum
 
 from shared_config_storage.credentials.encryption import RSACipher
 
-from data_population.fixtures.client import CLIENT_ONE
-from settings import fake, VAULT_URL, VAULT_TOKEN
+from settings import fake
 
 FIELDS_TO_ENCRYPT = (
     'first_six_digits',

@@ -13,8 +13,8 @@ TSV_PATH = f"{os.path.dirname(__file__)}/tsv"
 BULK_SIZE = 10000
 
 MEMBERSHIP_PLANS = 100
-TOTAL_USERS = 100000
-TOTAL_MCARDS = 400000
+TOTAL_USERS = 50000
+TOTAL_MCARDS = 500000
 TOTAL_PCARDS = 200000
 TOTAL_TRANSACTIONS = 1000000
 
@@ -210,10 +210,13 @@ def create_service_mcard_and_pcard_tsv_files():
         write_to_tsv(HermesTables.PAYMENT_ACCOUNT, payment_cards)
         write_to_tsv(HermesTables.PAYMENT_ACCOUNT_ENTRY, payment_card_associations)
         write_to_tsv(HermesTables.PAYMENT_MEMBERSHIP_ENTRY, pll_links)
-        create_remaining_mcards_and_pcards(remaining_mcards, remaining_pcards)
+
+    create_remaining_mcards_and_pcards(remaining_mcards, remaining_pcards)
 
 
 def create_remaining_mcards_and_pcards(remaining_mcards, remaining_pcards):
+    print(f"All wallets created. Creating overflow mcards {remaining_mcards} "
+          f"and pcards: {remaining_pcards}")
     while remaining_mcards > 0:
         membership_cards = []
         for _ in range(0, BULK_SIZE):
@@ -283,10 +286,12 @@ if __name__ == "__main__":
     print("Creating membership plan tsv files...")
     create_membership_plan_tsv_files()
     print(f"Completed membership plans. Elapsed time: {time.perf_counter() - start}")
-    print("Creating membership and payment card tsv files...")
+    print("Creating service, mcard and pcard tsv files...")
     create_service_mcard_and_pcard_tsv_files()
+    print(f"Completed services, mcards and pcards. Elapsed time: {time.perf_counter() - start}")
+    print("Creating mcard answer tsv files...")
     create_membership_card_answers()
-    print(f"Completed membership and payment cards. Elapsed time: {time.perf_counter() - start}")
+    print(f"Completed mcard answers. Elapsed time: {time.perf_counter() - start}")
     print("Creating hades transaction tsv files...")
     create_transaction_tsv_files()
     end = time.perf_counter()

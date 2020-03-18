@@ -1,8 +1,18 @@
+import logging
+
 from faker import Faker
 
 from environment import env_var, read_env
 
 read_env()
+
+LOG_LEVEL = env_var("LOG_LEVEL", "DEBUG").upper()
+logging.basicConfig(
+    level=LOG_LEVEL,
+    format='%(asctime)s :: %(name)s :: %(levelname)s :: %(message)s'
+)
+logging.getLogger("faker").setLevel(logging.WARNING)
+
 fake = Faker("en_GB")
 
 TSV_PATH = env_var("TSV_PATH", "tsv")

@@ -1,7 +1,11 @@
+import logging
 import psycopg2
+import time
 
 from data_population.create_tsv import HermesTables, HadesTables, tsv_path
 from settings import DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, HERMES_DB, HADES_DB
+
+logger = logging.getLogger("upload-tsv")
 
 NO_SEQ_TABLES = [HermesTables.CLIENT_APP, HermesTables.CONSENT]
 
@@ -49,14 +53,22 @@ def truncate_and_populate_tables(db_name, tables):
     connection_info = postgres_connection(db_name)
     with psycopg2.connect(**connection_info) as connection:
         with connection.cursor() as cursor:
+            logger.debug(f"Truncating tables defined in `{tables}`")
             for table in tables:
                 truncate_table(cursor, table)
 
             for table in tables:
+                logger.debug(f"Populating table: {table}...")
                 upload_tsv(cursor, table)
                 update_seq(cursor, table)
 
 
-if __name__ == "__main__":
+def upload_tsv_files():
+    start = time.perf_counter()
     truncate_and_populate_tables(HERMES_DB, HermesTables)
     truncate_and_populate_tables(HADES_DB, HadesTables)
+    logger.debug(f"Completed upload. Elapsed time: {time.perf_counter() - start}")
+
+
+if __name__ == "__main__":
+    upload_tsv_files()

@@ -7,6 +7,7 @@ verify_ssl = true
 flake8 = "*"
 
 [packages]
+ubiquity-performance = {editable = true,path = "."}
 locustio = "*"
 geventhttpclient-wheels = "*"
 faker = "*"
@@ -15,6 +16,7 @@ shared-config-storage = {git = "ssh://git@git.bink.com/libs/shared-config-storag
 requests = "*"
 psycopg2 = "*"
 urllib3 = "*"
+click = "*"
 
 [requires]
 python_version = "3.7"

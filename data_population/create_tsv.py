@@ -1,4 +1,5 @@
 import csv
+import logging
 import os
 import random
 import time
@@ -10,19 +11,21 @@ from data_population.create_data import (create_association, create_mcard, creat
                                          create_service)
 from settings import TSV_PATH
 
+logger = logging.getLogger("create-tsv")
+
 BULK_SIZE = 10000
 
-MEMBERSHIP_PLANS = 100
-TOTAL_USERS = 50000
-TOTAL_MCARDS = 500000
-TOTAL_PCARDS = 200000
-TOTAL_TRANSACTIONS = 1000000
+# MEMBERSHIP_PLANS = 100
+# TOTAL_USERS = 500
+# TOTAL_MCARDS = 5000
+# TOTAL_PCARDS = 2000
+# TOTAL_TRANSACTIONS = 10000
 
-# MEMBERSHIP_PLANS = 40
-# TOTAL_USERS = 13017000
-# TOTAL_MCARDS = 88953620
-# TOTAL_PCARDS = 19525500
-# TOTAL_TRANSACTIONS = 889536200
+MEMBERSHIP_PLANS = 40
+TOTAL_USERS = 13017000
+TOTAL_MCARDS = 88953620
+TOTAL_PCARDS = 19525500
+TOTAL_TRANSACTIONS = 889536200
 
 # MEMBERSHIP_PLANS = 100
 # TOTAL_USERS = 27494000
@@ -215,8 +218,8 @@ def create_service_mcard_and_pcard_tsv_files():
 
 
 def create_remaining_mcards_and_pcards(remaining_mcards, remaining_pcards):
-    print(f"All wallets created. Creating overflow mcards {remaining_mcards} "
-          f"and pcards: {remaining_pcards}")
+    logger.debug(f"All wallets created. Creating overflow mcards {remaining_mcards} "
+                 f"and pcards: {remaining_pcards}")
     while remaining_mcards > 0:
         membership_cards = []
         for _ in range(0, BULK_SIZE):
@@ -270,29 +273,31 @@ def create_transaction_tsv_files():
         write_to_tsv(HadesTables.TRANSACTIONS, transactions)
 
 
-if __name__ == "__main__":
-    print(f"Start timestamp: {time.time()}")
+def create_tsv_files():
     start = time.perf_counter()
-    print("Deleting old tsv files...")
+    logger.debug("Deleting old tsv files...")
     delete_old_tsv_files(HermesTables)
     delete_old_tsv_files(HadesTables)
-    print(f"Completed deletion. Elapsed time: {time.perf_counter() - start}")
-    print("Creating channel tsv files...")
+    logger.debug(f"Completed deletion. Elapsed time: {time.perf_counter() - start}")
+    logger.debug("Creating channel tsv files...")
     create_channel_tsv_files()
-    print(f"Completed channels. Elapsed time: {time.perf_counter() - start}")
-    print("Creating payment scheme tsv files...")
+    logger.debug(f"Completed channels. Elapsed time: {time.perf_counter() - start}")
+    logger.debug("Creating payment scheme tsv files...")
     create_payment_scheme_tsv_files()
-    print(f"Completed payment schemes. Elapsed time: {time.perf_counter() - start}")
-    print("Creating membership plan tsv files...")
+    logger.debug(f"Completed payment schemes. Elapsed time: {time.perf_counter() - start}")
+    logger.debug("Creating membership plan tsv files...")
     create_membership_plan_tsv_files()
-    print(f"Completed membership plans. Elapsed time: {time.perf_counter() - start}")
-    print("Creating service, mcard and pcard tsv files...")
+    logger.debug(f"Completed membership plans. Elapsed time: {time.perf_counter() - start}")
+    logger.debug("Creating service, mcard and pcard tsv files...")
     create_service_mcard_and_pcard_tsv_files()
-    print(f"Completed services, mcards and pcards. Elapsed time: {time.perf_counter() - start}")
-    print("Creating mcard answer tsv files...")
+    logger.debug(f"Completed services, mcards and pcards. Elapsed time: {time.perf_counter() - start}")
+    logger.debug("Creating mcard answer tsv files...")
     create_membership_card_answers()
-    print(f"Completed mcard answers. Elapsed time: {time.perf_counter() - start}")
-    print("Creating hades transaction tsv files...")
+    logger.debug(f"Completed mcard answers. Elapsed time: {time.perf_counter() - start}")
+    logger.debug("Creating hades transaction tsv files...")
     create_transaction_tsv_files()
-    end = time.perf_counter()
-    print(f"Completed tsv generation. Elapsed time: {end - start}")
+    logger.debug(f"Completed tsv generation. Elapsed time: {time.perf_counter() - start}")
+
+
+if __name__ == "__main__":
+    create_tsv_files()

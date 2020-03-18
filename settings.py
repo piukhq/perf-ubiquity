@@ -5,6 +5,8 @@ from environment import env_var, read_env
 read_env()
 fake = Faker("en_GB")
 
+TSV_PATH = env_var("TSV_PATH", "tsv")
+
 LOCAL_SECRETS = env_var("LOCAL_SECRETS", "False")
 LOCAL_SECRETS_PATH = env_var("LOCAL_SECRETS_PATH", "local_secrets.json")
 

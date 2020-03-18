@@ -8,8 +8,8 @@ from data_population.fixtures.client import ALL_CLIENTS, NON_RESTRICTED_CLIENTS
 from data_population.fixtures.payment_scheme import ALL_PAYMENT_PROVIDER_STATUS_MAPPINGS
 from data_population.create_data import (create_association, create_mcard, create_pcard, create_channel, create_plan,
                                          create_service)
+from settings import TSV_PATH
 
-TSV_PATH = f"{os.path.dirname(__file__)}/tsv"
 BULK_SIZE = 10000
 
 MEMBERSHIP_PLANS = 100

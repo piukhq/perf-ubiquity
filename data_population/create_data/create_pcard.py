@@ -92,7 +92,7 @@ def payment_card(card_id):
         "2019-03-15 05:55:28.532571+00",  # updated
         1,  # issuer_id
         1,  # payment_card_id
-        str(uuid.uuid4()),  # token
+        token,  # token
         "UK",  # country
         "GBP",  # currency code
         "3333",  # pan_end
@@ -101,4 +101,5 @@ def payment_card(card_id):
         token,  # fingerprint
         token,  # psp_token
         "{}",  # consents
+        token,  # hash
     ]

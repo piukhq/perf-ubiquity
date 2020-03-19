@@ -63,12 +63,18 @@ def truncate_and_populate_tables(db_name, tables):
                 update_seq(cursor, table)
 
 
-def upload_tsv_files():
+def upload_all_tsv_files():
     start = time.perf_counter()
     truncate_and_populate_tables(HERMES_DB, HermesTables)
     truncate_and_populate_tables(HADES_DB, HadesTables)
     logger.debug(f"Completed upload. Elapsed time: {time.perf_counter() - start}")
 
 
+def upload_single_tsv_file(db_name, table_name):
+    start = time.perf_counter()
+    truncate_and_populate_tables(db_name, [table_name])
+    logger.debug(f"Completed upload. Elapsed time: {time.perf_counter() - start}")
+
+
 if __name__ == "__main__":
-    upload_tsv_files()
+    upload_all_tsv_files()

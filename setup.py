@@ -7,7 +7,8 @@ setup(
     entry_points={
         "console_scripts": (
             "populate-db=cli.commands:populate_db",
-            "upload-tsv=cli.commands:upload_tsv",
+            "upload-all=cli.commands:upload_tsv_files",
+            "upload-single=cli.commands:upload_tsv_file",
         )
     },
 )

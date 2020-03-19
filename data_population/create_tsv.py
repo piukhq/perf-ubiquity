@@ -202,9 +202,11 @@ def create_service_mcard_and_pcard_tsv_files():
                     create_association.payment_card(remaining_pcards, remaining_pcards, service_pk)
                 )
                 remaining_pcards -= 1
-            pll_links.append(
-                create_association.pll_link(remaining_pcards, remaining_pcards + 1, remaining_mcards + 1)
-            )
+
+            if remaining_mcards and remaining_pcards:
+                pll_links.append(
+                    create_association.pll_link(remaining_pcards + 1, remaining_pcards + 1, remaining_mcards + 1)
+                )
 
         write_to_tsv(HermesTables.USER, users)
         write_to_tsv(HermesTables.CONSENT, services)

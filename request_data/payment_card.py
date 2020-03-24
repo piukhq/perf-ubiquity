@@ -47,7 +47,7 @@ def generate_unencrypted_random():
             "hash": str(uuid.uuid4()),
             "token": str(uuid.uuid4()),
             "last_four_digits": random_four,
-            "first_six_digits": int(f"{card_bin}{random_four}"),
+            "first_six_digits": f"{card_bin}{random_four}",
             "name_on_card": fake.name(),
             "month": 1,
             "year": 2059,

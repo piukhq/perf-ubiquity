@@ -16,8 +16,8 @@ FIELDS_TO_ENCRYPT = (
 
 
 class PaymentProvider(str, Enum):
-    AMEX = "37"
-    MASTERCARD = "55"
+    # AMEX = "37"
+    # MASTERCARD = "55"
     VISA = "42"
 
 

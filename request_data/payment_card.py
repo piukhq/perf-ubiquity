@@ -1,6 +1,6 @@
 import random
 import uuid
-from enum import IntEnum
+from enum import Enum
 
 from shared_config_storage.credentials.encryption import RSACipher
 
@@ -15,7 +15,7 @@ FIELDS_TO_ENCRYPT = (
 )
 
 
-class PaymentProvider(IntEnum):
+class PaymentProvider(str, Enum):
     AMEX = "37"
     MASTERCARD = "55"
     VISA = "42"

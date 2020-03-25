@@ -116,6 +116,12 @@ class UserBehavior(TaskSequence):
         pcard_json = payment_card.encrypt(pcard, self.pub_key)
         resp = self.client.post("/payment_cards", json=pcard_json, headers=self.single_prop_header,
                                 name=f"/payment_cards {LocustLabel.SINGLE_PROPERTY}")
+
+        if resp.status_code == codes.BAD_REQUEST:
+            raise ValueError(f"HTTP 400 response on post payment card request. "
+                             f"response json: {resp.json()}, "
+                             f"request json: {pcard_json}")
+
         pcard_id = resp.json()['id']
         pcard = {
             'id': pcard_id,

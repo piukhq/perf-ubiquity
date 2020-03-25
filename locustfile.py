@@ -59,12 +59,12 @@ class UserBehavior(TaskSequence):
         auth_header = service.generate_auth_header(email, timestamp, CLIENT_ONE, jwt_secret)
         self.client.post("/service", json=consent, headers=auth_header, name="Setup requests")
         pcard = payment_card.generate_unencrypted_random()
+        first_six = str(pcard['card']['first_six_digits'])
         self.static_pcard_json = payment_card.encrypt(pcard, self.pub_key)
         post_resp = self.client.post("/payment_cards", json=self.static_pcard_json, headers=auth_header,
                                      name="Setup requests")
         post_resp.raise_for_status()
         pcard_id = post_resp.json()['id']
-        first_six = str(pcard['card']['first_six_digits'])
         for _ in range(0, 120):
             time.sleep(1)
             resp = self.client.get(f"/payment_card/{pcard_id}", headers=auth_header, name="Setup requests")

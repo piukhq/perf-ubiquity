@@ -15,6 +15,7 @@ from settings import CHANNEL_VAULT_PATH, VAULT_URL, VAULT_TOKEN, LOCAL_SECRETS, 
 
 # Change this to specify how many channels the locust tests use
 TOTAL_CLIENTS = 12
+PCARD_DECRYPT_WAIT_TIME = 120
 
 
 class LocustLabel(str, Enum):
@@ -22,6 +23,16 @@ class LocustLabel(str, Enum):
     MULTI_PROPERTY = "- Multi property"
     SINGLE_RESTRICTED_PROPERTY = "- Single restricted property"
     MULTI_RESTRICTED_PROPERTY = "- Multi restricted property"
+
+
+def load_secrets():
+    if LOCAL_SECRETS:
+        with open(LOCAL_SECRETS_PATH) as fp:
+            channel_info = json.load(fp)
+    else:
+        channel_info = secrets.read_vault(CHANNEL_VAULT_PATH, VAULT_URL, VAULT_TOKEN)
+
+    return channel_info
 
 
 class UserBehavior(TaskSequence):
@@ -32,51 +43,21 @@ class UserBehavior(TaskSequence):
         self.restricted_prop_header = {}
         self.non_restricted_auth_headers = {}
         self.all_auth_headers = []
-        self.static_pcard_json = {}
-        self.static_pcard_id = None
         self.payment_cards = []
         self.membership_cards = []
         self.join_membership_cards = []
         self.put_counter = 0
         self.service_counter = 0
-        if not LOCAL_SECRETS:
-            channel_info = secrets.read_vault(CHANNEL_VAULT_PATH, VAULT_URL, VAULT_TOKEN)
-        else:
-            with open(LOCAL_SECRETS_PATH) as fp:
-                channel_info = json.load(fp)
-
-        self.client_secrets = channel_info
-        self.pub_key = None
+        self.client_secrets = load_secrets()
+        self.pub_key = self.client_secrets[CLIENT_ONE['bundle_id']]['public_key']
         super(UserBehavior, self).__init__(parent)
 
-    def setup(self):
-        setup_client_secrets = self.client_secrets[CLIENT_ONE['bundle_id']]
-        self.pub_key = setup_client_secrets['public_key']
-        consent = service.generate_random()
-        email = consent["consent"]["email"]
-        timestamp = consent["consent"]["timestamp"]
-        jwt_secret = setup_client_secrets['jwt_secret']
-        auth_header = service.generate_auth_header(email, timestamp, CLIENT_ONE, jwt_secret)
-        self.client.post("/service", json=consent, headers=auth_header, name="Setup requests")
-        pcard = payment_card.generate_unencrypted_random()
-        self.static_pcard_json = payment_card.encrypt(pcard, self.pub_key)
-        post_resp = self.client.post("/payment_cards", json=self.static_pcard_json, headers=auth_header,
-                                     name="Setup requests")
-        post_resp.raise_for_status()
-        pcard_id = post_resp.json()['id']
-        first_six = str(pcard['card']['first_six_digits'])
-        for _ in range(0, 120):
-            time.sleep(1)
-            resp = self.client.get(f"/payment_card/{pcard_id}", headers=auth_header, name="Setup requests")
-            if resp.json()['card']['first_six_digits'] == first_six:
-                self.static_pcard_id = resp.json()['id']
-                break
-        else:
-            raise RuntimeError("Static payment card took longer than expected to decrypt on API response "
-                               "please increase wait time and try again")
-
     @seq_task(1)
-    def test_setup_headers(self):
+    def setup_headers(self):
+        if not self.pub_key:
+            self.client_secrets = load_secrets()
+            self.pub_key = self.client_secrets[CLIENT_ONE['bundle_id']]['public_key']
+
         self.payment_cards = []
         self.membership_cards = []
         self.join_membership_cards = []
@@ -131,14 +112,26 @@ class UserBehavior(TaskSequence):
     @task(2)
     def post_payment_cards_single_property(self):
         pcard = payment_card.generate_unencrypted_random()
+        first_six = str(pcard['card']['first_six_digits'])
         pcard_json = payment_card.encrypt(pcard, self.pub_key)
         resp = self.client.post("/payment_cards", json=pcard_json, headers=self.single_prop_header,
                                 name=f"/payment_cards {LocustLabel.SINGLE_PROPERTY}")
+        pcard_id = resp.json()['id']
         pcard = {
-            'id': resp.json()['id'],
+            'id': pcard_id,
             'json': pcard_json
         }
         self.payment_cards.append(pcard)
+
+        # wait until pcard is decrypted for mutli-property tests
+        for _ in range(0, PCARD_DECRYPT_WAIT_TIME):
+            resp = self.client.get(f"/payment_card/{pcard_id}", headers=self.single_prop_header, name="Setup requests")
+            if resp.json()['card']['first_six_digits'] == first_six:
+                break
+            time.sleep(1)
+        else:
+            raise RuntimeError("Payment card took longer than expected to decrypt on API response, "
+                               "please increase wait time and try again")
 
     @seq_task(7)
     @task(8)
@@ -199,7 +192,8 @@ class UserBehavior(TaskSequence):
 
     @seq_task(11)
     def post_payment_cards_multiple_property(self):
-        self.client.post("/payment_cards", json=self.static_pcard_json, headers=self.multi_prop_header,
+        pcard_json = self.payment_cards[0]['json']
+        self.client.post("/payment_cards", json=pcard_json, headers=self.multi_prop_header,
                          name=f"/payment_cards {LocustLabel.MULTI_PROPERTY}")
 
     @seq_task(12)
@@ -334,11 +328,11 @@ class UserBehavior(TaskSequence):
 
     @seq_task(23)
     def delete_payment_card(self):
-        self.client.delete(f"/payment_card/{self.static_pcard_id}", headers=self.multi_prop_header,
+        pcard_id = self.payment_cards[0]['id']
+        self.client.delete(f"/payment_card/{pcard_id}", headers=self.multi_prop_header,
                            name=f"/payment_card/<card_id> {LocustLabel.MULTI_PROPERTY}")
 
-        pcard = self.payment_cards[0]
-        self.client.delete(f"/payment_card/{pcard['id']}", headers=self.single_prop_header,
+        self.client.delete(f"/payment_card/{pcard_id}", headers=self.single_prop_header,
                            name=f"/payment_card/<card_id> {LocustLabel.SINGLE_PROPERTY}")
 
     @seq_task(24)

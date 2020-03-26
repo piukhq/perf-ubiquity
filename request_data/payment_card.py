@@ -16,9 +16,9 @@ FIELDS_TO_ENCRYPT = (
 
 
 class PaymentProvider(str, Enum):
-    # AMEX = "37"
-    # MASTERCARD = "55"
-    VISA = "42"
+    AMEX = "37"
+    MASTERCARD = "55"
+    # VISA = "42"
 
 
 def generate_unencrypted_static():

@@ -9,4 +9,4 @@ RUN mkdir -p /root/.ssh && \
     pip install pipenv && \
     ssh-keyscan git.bink.com > /root/.ssh/known_hosts && \
     pipenv install --system && \
-    apt update && apt -y install tmux postgresql-client && apt-get clean
+    apt update && apt -y install vim tmux postgresql-client && apt-get clean

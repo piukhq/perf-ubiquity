@@ -275,7 +275,6 @@ class UserBehavior(TaskSequence):
 
     @seq_task(17)
     def put_membership_card(self):
-        self.put_counter += 1
         if self.put_counter % 4 == 0:
             mcard_id = self.membership_cards[0]['id']
             plan_id = self.membership_cards[0]['membership_plan_id']
@@ -287,6 +286,8 @@ class UserBehavior(TaskSequence):
             mcard_id = self.membership_cards[1]['id']
             self.client.put(f"/membership_card/{mcard_id}", json=put_json, headers=self.multi_prop_header,
                             name=f"/membership_card/<card_id> {LocustLabel.MULTI_PROPERTY}")
+
+        self.put_counter += 1
 
     @seq_task(18)
     def patch_membership_cards_id_add(self):
@@ -343,11 +344,12 @@ class UserBehavior(TaskSequence):
 
     @seq_task(24)
     def delete_service(self):
-        self.service_counter += 1
         if self.service_counter % 10 == 0:
             for auth_header in self.all_auth_headers:
                 self.client.delete("/service", headers=auth_header,
                                    name=f"/service {LocustLabel.SINGLE_PROPERTY}")
+
+        self.service_counter += 1
 
 
 class WebsiteUser(HttpLocust):

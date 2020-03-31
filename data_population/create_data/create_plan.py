@@ -4,6 +4,7 @@ from data_population.fixtures.client import ALL_CLIENTS
 from data_population.fixtures.membership_plan import CONSENT_LABEL
 
 PERFORMANCE_CATEGORY_ID = 5000
+SENSITIVE_FIELDS = ["Postcode"]
 
 
 def category():
@@ -93,7 +94,7 @@ def postcode_question(question_id, scheme_id):
         False,  # third_party_identifier
         False,  # one_question_link
         3,  # options
-        0,  # answer_type
+        1,  # answer_type
         "NULL",  # choice
         "description",  # description
         "(.*)",  # validation

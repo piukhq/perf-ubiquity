@@ -1,4 +1,3 @@
-import random
 import uuid
 
 from shared_config_storage.credentials.encryption import RSACipher
@@ -41,7 +40,7 @@ def random_add_json(plan_id, pub_key):
     return encrypt(mcard_json, pub_key)
 
 
-def random_join_json(plan_id_list, pub_key):
+def random_join_json(plan_id, pub_key):
     mcard_json = {
         "account": {
             "enrol_fields": [
@@ -49,7 +48,7 @@ def random_join_json(plan_id_list, pub_key):
                 {"column": "Postcode", "value": fake.postcode()}
             ]
         },
-        "membership_plan": random.choice(plan_id_list)
+        "membership_plan": plan_id
     }
 
     return encrypt(mcard_json, pub_key)

@@ -277,7 +277,7 @@ class UserBehavior(TaskSequence):
     def put_membership_card(self):
         if self.put_counter % 4 == 0:
             mcard_id = self.membership_cards[0]['id']
-            plan_id = self.membership_cards[0]['membership_plan_id']
+            plan_id = self.membership_cards[0]['plan_id']
             put_json = membership_card.random_add_json(plan_id, self.pub_key)
 
             self.client.put(f"/membership_card/{mcard_id}", json=put_json, headers=self.single_prop_header,

@@ -7,8 +7,8 @@ from locust import HttpLocust, TaskSequence, seq_task, constant, task
 from requests import codes
 from shared_config_storage.vault import secrets
 
-from data_population.fixtures.client import CLIENT_ONE, CLIENT_RESTRICTED, NON_RESTRICTED_CLIENTS
 from data_population.create_tsv import MEMBERSHIP_PLANS
+from data_population.fixtures.client import CLIENT_ONE, CLIENT_RESTRICTED, NON_RESTRICTED_CLIENTS
 from request_data import service, membership_card, payment_card
 from request_data.hermes import post_scheme_account_status
 from settings import CHANNEL_VAULT_PATH, VAULT_URL, VAULT_TOKEN, LOCAL_SECRETS, LOCAL_SECRETS_PATH
@@ -43,6 +43,7 @@ class UserBehavior(TaskSequence):
         self.restricted_prop_header = {}
         self.non_restricted_auth_headers = {}
         self.all_auth_headers = []
+        self.membership_plan_total = MEMBERSHIP_PLANS
         self.payment_cards = []
         self.membership_cards = []
         self.join_membership_cards = []
@@ -96,14 +97,15 @@ class UserBehavior(TaskSequence):
     @seq_task(4)
     @task(2)
     def get_membership_plans(self):
-        for locust_label, auth_header in self.non_restricted_auth_headers.items():
-            self.client.get("/membership_plans", headers=auth_header,
-                            name=f"/membership_plans {LocustLabel.SINGLE_PROPERTY}")
+        resp = self.client.get("/membership_plans", headers=self.single_prop_header,
+                               name=f"/membership_plans {LocustLabel.SINGLE_PROPERTY}")
+
+        self.membership_plan_total = len(resp.json())
 
     @seq_task(5)
     @task(8)
     def get_membership_plan_id(self):
-        plan_id = random.choice(range(1, MEMBERSHIP_PLANS))
+        plan_id = random.choice(range(1, self.membership_plan_total))
         for auth_header in self.non_restricted_auth_headers.values():
             self.client.get(f"/membership_plan/{plan_id}", headers=auth_header,
                             name=f"/membership_plan/<plan_id> {LocustLabel.SINGLE_PROPERTY}")
@@ -142,7 +144,7 @@ class UserBehavior(TaskSequence):
     @seq_task(7)
     @task(8)
     def post_membership_cards_single_property(self):
-        plan_id = random.choice(range(1, MEMBERSHIP_PLANS))
+        plan_id = random.choice(range(1, self.membership_plan_total))
         mcard_json = membership_card.random_add_json(plan_id, self.pub_key)
         with self.client.post("/membership_cards", json=mcard_json, headers=self.restricted_prop_header,
                               name=f"/membership_cards {LocustLabel.SINGLE_RESTRICTED_PROPERTY}",
@@ -254,7 +256,7 @@ class UserBehavior(TaskSequence):
 
     @seq_task(16)
     def post_membership_cards_join(self):
-        plan_id = random.choice(range(1, MEMBERSHIP_PLANS))
+        plan_id = random.choice(range(1, self.membership_plan_total))
         mcard_json = membership_card.random_join_json(plan_id, self.pub_key)
 
         with self.client.post("/membership_cards", json=mcard_json, headers=self.restricted_prop_header,

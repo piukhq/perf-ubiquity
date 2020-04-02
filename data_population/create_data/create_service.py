@@ -26,6 +26,7 @@ def user(user_id):
         "abcdefgh",  # salt
         user_email,  # external_id
         False,  # is_tester
+        "NULL",  # apple
     ]
 
 

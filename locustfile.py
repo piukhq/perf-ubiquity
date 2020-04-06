@@ -4,6 +4,7 @@ import time
 from enum import Enum
 
 from locust import HttpLocust, TaskSequence, seq_task, constant, task
+from locust.exception import StopLocust
 from requests import codes
 from shared_config_storage.vault import secrets
 
@@ -352,6 +353,10 @@ class UserBehavior(TaskSequence):
                                    name=f"/service {LocustLabel.SINGLE_PROPERTY}")
 
         self.service_counter += 1
+
+    @seq_task(25)
+    def done(self):
+        raise StopLocust()
 
 
 class WebsiteUser(HttpLocust):

@@ -1,8 +1,12 @@
+import time
+
 import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
 from settings import SERVICE_API_KEY, HERMES_URL
+
+REQUEST_TIMEOUT = 20
 
 
 def retry_session():
@@ -29,5 +33,16 @@ def headers():
 def post_scheme_account_status(status, scheme_account_id):
     session = retry_session()
     data = {"status": status}
+    auth_header = headers()
     session.post(f"{HERMES_URL}/schemes/accounts/{scheme_account_id}/status",
-                 json=data, headers=headers())
+                 json=data, headers=auth_header)
+
+    params = {"id": scheme_account_id}
+    for _ in range(0, REQUEST_TIMEOUT):
+        resp = requests.get(f"{HERMES_URL}/schemes/accounts/query",
+                            headers=auth_header, params=params)
+
+        if resp.json()[0]['status'] == status:
+            break
+
+        time.sleep(0.5)

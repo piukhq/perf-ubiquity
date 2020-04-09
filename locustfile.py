@@ -221,7 +221,6 @@ class UserBehavior(TaskSequence):
             if response.status_code == codes.NOT_FOUND:
                 response.success()
 
-
     @seq_task(14)
     def post_membership_cards_multiple_property(self):
         for mcard in self.membership_cards:

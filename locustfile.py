@@ -102,7 +102,10 @@ class UserBehavior(TaskSequence):
     @seq_task(4)
     @task(6)
     def get_membership_plans(self):
-        resp = self.client.get("/membership_plans", headers=self.single_prop_header,
+        plan_filters = {
+            "fields": ["id", "status", "feature_set", "account", "images", "balances", "card", "content"],
+        }
+        resp = self.client.get("/membership_plans", params=plan_filters, headers=self.single_prop_header,
                                name=f"/membership_plans {LocustLabel.SINGLE_PROPERTY}")
 
         self.membership_plan_total = len(resp.json())
@@ -318,8 +321,21 @@ class UserBehavior(TaskSequence):
     @seq_task(20)
     @task(27)
     def get_membership_cards(self):
+        mcard_filters = {
+            "fields": [
+                "id",
+                "membership_plan",
+                "status",
+                "payment_cards",
+                "card",
+                "account",
+                "balances",
+                "images",
+                "voucher"
+            ],
+        }
         for auth_header in self.non_restricted_auth_headers.values():
-            self.client.get("/membership_cards", headers=auth_header,
+            self.client.get("/membership_cards", params=mcard_filters, headers=auth_header,
                             name=f"/membership_cards {LocustLabel.SINGLE_PROPERTY}")
 
     @seq_task(21)

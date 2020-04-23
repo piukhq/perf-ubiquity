@@ -16,7 +16,7 @@ from request_data.hermes import post_scheme_account_status
 from settings import CHANNEL_VAULT_PATH, VAULT_URL, VAULT_TOKEN, LOCAL_SECRETS, LOCAL_SECRETS_PATH
 
 # Change this to specify how many channels the locust tests use
-TOTAL_CLIENTS = 12
+TOTAL_CLIENTS = 6
 PCARD_DECRYPT_WAIT_TIME = 120
 MULTIPLE_PROPERTY_PCARD_INDEX = 0
 

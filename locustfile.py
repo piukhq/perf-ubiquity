@@ -127,9 +127,13 @@ class UserBehavior(TaskSequence):
     @seq_task(6)
     @task(5)
     def post_membership_cards_single_property_join(self):
-        plan_id = self.plan_counter
-        self.plan_counter = increment_membership_plan_counter(self.plan_counter)
+        # plan_id = self.plan_counter
+
+        # remove me when midas performance agents are deployed
+        plan_id = 1
+
         mcard_json = membership_card.random_join_json(plan_id, self.pub_key)
+        self.plan_counter = increment_membership_plan_counter(self.plan_counter)
 
         with self.client.post("/membership_cards", params=AUTOLINK, json=mcard_json,
                               headers=self.restricted_prop_header,
@@ -185,8 +189,13 @@ class UserBehavior(TaskSequence):
     @task(4)
     def post_membership_cards_single_property_add(self):
         plan_id = self.plan_counter
-        self.plan_counter = increment_membership_plan_counter(self.plan_counter)
+
+        # remove me when midas performance agents are deployed
+        if plan_id == 1:
+            plan_id += 1
+
         mcard_json = membership_card.random_add_json(plan_id, self.pub_key)
+        self.plan_counter = increment_membership_plan_counter(self.plan_counter)
         with self.client.post("/membership_cards", params=AUTOLINK, json=mcard_json,
                               headers=self.restricted_prop_header,
                               name=f"/membership_cards {LocustLabel.SINGLE_RESTRICTED_PROPERTY}",

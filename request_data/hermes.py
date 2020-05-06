@@ -33,7 +33,7 @@ def headers():
 def wait_for_scheme_account_status(status, scheme_account_id):
     auth_header = headers()
     params = {"id": scheme_account_id}
-    for _ in range(0, REQUEST_TIMEOUT):
+    for _ in range(REQUEST_TIMEOUT):
         resp = requests.get(f"{HERMES_URL}/schemes/accounts/query",
                             headers=auth_header, params=params)
 

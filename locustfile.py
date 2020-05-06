@@ -134,7 +134,8 @@ class UserBehavior(TaskSequence):
         plan_id = 1
 
         # for loop to look at removing when we try to re-add @task() decorator
-        for _ in range(0, 5):
+        task_counter = 5
+        for _ in range(task_counter):
             mcard_json = membership_card.random_join_json(plan_id, self.pub_key)
             self.plan_counter = increment_membership_plan_counter(self.plan_counter)
 
@@ -179,7 +180,7 @@ class UserBehavior(TaskSequence):
         self.payment_cards.append(pcard)
 
         # wait until pcard is decrypted for mutli-property tests
-        for _ in range(0, PCARD_DECRYPT_WAIT_TIME):
+        for _ in range(PCARD_DECRYPT_WAIT_TIME):
             resp = self.client.get(f"/payment_card/{pcard_id}", headers=self.single_prop_header, name="Setup requests")
             if resp.json()['card']['first_six_digits'] == first_six:
                 break
@@ -324,7 +325,7 @@ class UserBehavior(TaskSequence):
     @seq_task(17)
     def patch_membership_cards_id_add(self):
         task_counter = 3
-        for x in range(0, task_counter):
+        for x in range(task_counter):
             # reset index if range > max number of membership cards
             converted_index = x % len(self.membership_cards)
             mcard_id = self.membership_cards[converted_index]['id']
@@ -336,7 +337,7 @@ class UserBehavior(TaskSequence):
     @seq_task(18)
     def patch_membership_cards_id_ghost(self):
         task_counter = 2
-        for x in range(0, task_counter):
+        for x in range(task_counter):
             # reset index if range > max number of membership cards
             converted_index = x % len(self.join_membership_cards)
             mcard_id = self.join_membership_cards[converted_index]['id']

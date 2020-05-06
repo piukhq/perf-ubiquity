@@ -224,7 +224,7 @@ def create_remaining_mcards_and_pcards(remaining_mcards, remaining_pcards):
                  f"and pcards: {remaining_pcards}")
     while remaining_mcards > 0:
         membership_cards = []
-        for _ in range(0, BULK_SIZE):
+        for _ in range(BULK_SIZE):
             if remaining_mcards <= 0:
                 break
             scheme_id = random.randint(1, MEMBERSHIP_PLANS)
@@ -235,7 +235,7 @@ def create_remaining_mcards_and_pcards(remaining_mcards, remaining_pcards):
 
     while remaining_pcards > 0:
         payment_cards = []
-        for _ in range(0, BULK_SIZE):
+        for _ in range(BULK_SIZE):
             if remaining_pcards <= 0:
                 break
             payment_cards.append(create_pcard.payment_card(remaining_pcards))
@@ -247,7 +247,7 @@ def create_membership_card_answers():
     while remaining_answers > 0:
         add_answers = []
         auth_answers = []
-        for _ in range(0, BULK_SIZE):
+        for _ in range(BULK_SIZE):
             if remaining_answers <= 0:
                 break
             add_answer_pk = remaining_answers
@@ -266,7 +266,7 @@ def create_transaction_tsv_files():
     remaining_transactions = TOTAL_TRANSACTIONS
     while remaining_transactions > 0:
         transactions = []
-        for _ in range(0, BULK_SIZE):
+        for _ in range(BULK_SIZE):
             if remaining_transactions <= 0:
                 break
             transactions.append(create_mcard.transaction(remaining_transactions, remaining_transactions))

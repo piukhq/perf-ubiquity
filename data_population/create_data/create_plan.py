@@ -137,7 +137,7 @@ def third_party_consent_link(pk, client_app_id, scheme_id, scheme_consent_id):
 
 def create_all_third_party_consent_links(static_id, consent_id):
     third_party_consent_links = []
-    for count in range(0, len(ALL_CLIENTS)):
+    for count in range(len(ALL_CLIENTS)):
         pk = static_id + count
         client = ALL_CLIENTS[count]
         consent_link = third_party_consent_link(pk, client['client_id'], consent_id, consent_id)

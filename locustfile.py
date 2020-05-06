@@ -13,7 +13,7 @@ from data_population.fixtures.client import CLIENT_ONE, CLIENT_RESTRICTED, NON_R
 from locust_config import check_suite_whitelist
 from request_data import service, membership_card, payment_card
 from request_data.membership_plan import increment_membership_plan_counter
-from request_data.hermes import post_scheme_account_status
+from request_data.hermes import post_scheme_account_status, wait_for_scheme_account_status
 from settings import CHANNEL_VAULT_PATH, VAULT_URL, VAULT_TOKEN, LOCAL_SECRETS, LOCAL_SECRETS_PATH
 
 # Change this to specify how many channels the locust tests use
@@ -125,32 +125,36 @@ class UserBehavior(TaskSequence):
 
     @check_suite_whitelist
     @seq_task(6)
-    @task(5)
+    # @task(5) - using for loop below to force requests to be sequential, investigate moving this back after
+    # performance test agents have been investigated
     def post_membership_cards_single_property_join(self):
         # plan_id = self.plan_counter
 
         # remove me when midas performance agents are deployed
         plan_id = 1
 
-        mcard_json = membership_card.random_join_json(plan_id, self.pub_key)
-        self.plan_counter = increment_membership_plan_counter(self.plan_counter)
+        # for loop to look at removing when we try to re-add @task() decorator
+        for _ in range(0, 5):
+            mcard_json = membership_card.random_join_json(plan_id, self.pub_key)
+            self.plan_counter = increment_membership_plan_counter(self.plan_counter)
 
-        with self.client.post("/membership_cards", params=AUTOLINK, json=mcard_json,
-                              headers=self.restricted_prop_header,
-                              name=f"/membership_cards {LocustLabel.SINGLE_RESTRICTED_PROPERTY}",
-                              catch_response=True) as response:
-            if response.status_code == codes.BAD_REQUEST:
-                response.success()
+            with self.client.post("/membership_cards", params=AUTOLINK, json=mcard_json,
+                                  headers=self.restricted_prop_header,
+                                  name=f"/membership_cards {LocustLabel.SINGLE_RESTRICTED_PROPERTY}",
+                                  catch_response=True) as response:
+                if response.status_code == codes.BAD_REQUEST:
+                    response.success()
 
-        resp = self.client.post("/membership_cards", json=mcard_json, headers=self.single_prop_header,
-                                name=f"/membership_cards {LocustLabel.SINGLE_PROPERTY}")
+            resp = self.client.post("/membership_cards", json=mcard_json, headers=self.single_prop_header,
+                                    name=f"/membership_cards {LocustLabel.SINGLE_PROPERTY}")
 
-        mcard = {
-            'id': resp.json()['id'],
-            'plan_id': plan_id,
-            'json': mcard_json
-        }
-        self.join_membership_cards.append(mcard)
+            wait_for_scheme_account_status(membership_card.JOIN_FAILED, resp.json()['id'])
+            mcard = {
+                'id': resp.json()['id'],
+                'plan_id': plan_id,
+                'json': mcard_json
+            }
+            self.join_membership_cards.append(mcard)
 
     @check_suite_whitelist
     @seq_task(7)

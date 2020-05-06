@@ -8,6 +8,7 @@ from settings import fake
 
 
 PRE_REGISTERED_CARD_STATUS = 406
+JOIN_FAILED = 900
 
 
 def static_add_json(pub_key):

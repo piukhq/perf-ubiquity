@@ -193,6 +193,7 @@ class UserBehavior(TaskSequence):
         # remove me when midas performance agents are deployed
         if plan_id == 1:
             plan_id += 1
+            self.plan_counter = increment_membership_plan_counter(self.plan_counter)
 
         mcard_json = membership_card.random_add_json(plan_id, self.pub_key)
         self.plan_counter = increment_membership_plan_counter(self.plan_counter)

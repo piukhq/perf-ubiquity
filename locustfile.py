@@ -335,15 +335,14 @@ class UserBehavior(TaskSequence):
     @check_suite_whitelist
     @seq_task(18)
     def patch_membership_cards_id_ghost(self):
-        status = membership_card.PRE_REGISTERED_CARD_STATUS
         task_counter = 2
         for x in range(0, task_counter):
             # reset index if range > max number of membership cards
-            converted_index = x % len(self.membership_cards)
-            mcard_id = self.membership_cards[converted_index]['id']
+            converted_index = x % len(self.join_membership_cards)
+            mcard_id = self.join_membership_cards[converted_index]['id']
             mcard_json = membership_card.random_registration_json(self.pub_key)
 
-            post_scheme_account_status(status, mcard_id)
+            post_scheme_account_status(membership_card.PRE_REGISTERED_CARD_STATUS, mcard_id)
             self.client.patch(f"/membership_card/{mcard_id}", json=mcard_json, headers=self.single_prop_header,
                               name=f"/membership_card/<mcard_id> {LocustLabel.SINGLE_PROPERTY}")
 

@@ -9,19 +9,25 @@ from enum import Enum
 
 from data_population.fixtures.client import ALL_CLIENTS, NON_RESTRICTED_CLIENTS
 from data_population.fixtures.payment_scheme import ALL_PAYMENT_PROVIDER_STATUS_MAPPINGS
-from data_population.create_data import (create_association, create_mcard, create_pcard, create_channel, create_plan,
-                                         create_service)
+from data_population.create_data import (
+    create_association,
+    create_mcard,
+    create_pcard,
+    create_channel,
+    create_plan,
+    create_service,
+)
 from settings import TSV_PATH
 
 logger = logging.getLogger("create-tsv")
 
 BULK_SIZE = 10000
 
-MEMBERSHIP_PLANS = int(os.environ.get('MEMBERSHIP_PLANS', '6'))
-TOTAL_USERS = int(os.environ.get('TOTAL_USERS', '500'))
-TOTAL_MCARDS = int(os.environ.get('TOTAL_MCARDS', '5000'))
-TOTAL_PCARDS = int(os.environ.get('TOTAL_PCARDS', '2000'))
-TOTAL_TRANSACTIONS = int(os.environ.get('TOTAL_TRANSACTIONS', '10000'))
+MEMBERSHIP_PLANS = int(os.environ.get("MEMBERSHIP_PLANS", "6"))
+TOTAL_USERS = int(os.environ.get("TOTAL_USERS", "500"))
+TOTAL_MCARDS = int(os.environ.get("TOTAL_MCARDS", "5000"))
+TOTAL_PCARDS = int(os.environ.get("TOTAL_PCARDS", "2000"))
+TOTAL_TRANSACTIONS = int(os.environ.get("TOTAL_TRANSACTIONS", "10000"))
 
 # MEMBERSHIP_PLANS = 40
 # TOTAL_USERS = 13017000
@@ -78,7 +84,7 @@ def tsv_path(table_name):
 
 
 def write_to_tsv_part(file_name, part, rows):
-    write_to_tsv(file_name + '-' + str(part), rows)
+    write_to_tsv(file_name + "-" + str(part), rows)
 
 
 def write_to_tsv(file_name, rows):
@@ -92,7 +98,7 @@ def delete_old_tsv_files(table_enum):
     os.makedirs(TSV_PATH, exist_ok=True)
     for table in table_enum:
         try:
-            path = os.path.join(TSV_PATH, table + '*.tsv')
+            path = os.path.join(TSV_PATH, table + "*.tsv")
             for file in glob.glob(path):
                 os.remove(file)
         except FileNotFoundError:
@@ -146,9 +152,7 @@ def create_membership_plan_tsv_files():
         scheme_consent = create_plan.scheme_consent(count, count)
         scheme_consents.append(scheme_consent)
         total_channels = len(ALL_CLIENTS)
-        plan_third_party_consent_links = create_plan.create_all_third_party_consent_links(
-            total_channels * count, count
-        )
+        plan_third_party_consent_links = create_plan.create_all_third_party_consent_links(total_channels * count, count)
         third_party_consents.extend(plan_third_party_consent_links)
         if count == 1:
             voucher_schemes.append(create_plan.voucher_scheme(count, count))
@@ -189,29 +193,31 @@ def create_service_mcard_and_pcard_tsv_files():
         mstart = min(mcards_idx, TOTAL_MCARDS)
         pstart = min(pcards_idx, TOTAL_PCARDS)
 
-        jobs.append({
-            'job_id': job_id,
-            'start': service_index,
-            'end': service_index + services_per_core,  # used in range, so this is the end+1
-            'mcards_start': mstart,
-            'mcards_count': min(mcards_idx + mcards_for_job, TOTAL_MCARDS) - mstart,
-            'pcards_start': pstart,
-            'pcards_count': min(pcards_idx + pcards_for_job, TOTAL_PCARDS) - pstart
-        })
+        jobs.append(
+            {
+                "job_id": job_id,
+                "start": service_index,
+                "end": service_index + services_per_core,  # used in range, so this is the end+1
+                "mcards_start": mstart,
+                "mcards_count": min(mcards_idx + mcards_for_job, TOTAL_MCARDS) - mstart,
+                "pcards_start": pstart,
+                "pcards_count": min(pcards_idx + pcards_for_job, TOTAL_PCARDS) - pstart,
+            }
+        )
 
         mcards_idx += mcards_for_job
         pcards_idx += pcards_for_job
 
-    logger.info('Starting jobs')
+    logger.info("Starting jobs")
     pool = multiprocessing.Pool(processes=cores)
     pool.map(create_service_mcard_and_pcard_job, jobs)
-    logger.info('Waiting for jobs')
+    logger.info("Waiting for jobs")
     pool.close()
     pool.join()
 
 
 def create_service_mcard_and_pcard_job(job):
-    part = job['job_id']
+    part = job["job_id"]
     users = []
     services = []
     membership_cards = []
@@ -220,11 +226,11 @@ def create_service_mcard_and_pcard_job(job):
     payment_card_associations = []
     pll_links = []
 
-    mcard_start = job['mcards_start']
-    pcard_start = job['pcards_start']
-    mcard_count = job['mcards_count']
-    pcard_count = job['pcards_count']
-    for service_pk in range(job['start'], job['end']):
+    mcard_start = job["mcards_start"]
+    pcard_start = job["pcards_start"]
+    mcard_count = job["mcards_count"]
+    pcard_count = job["pcards_count"]
+    for service_pk in range(job["start"], job["end"]):
         if len(users) > BULK_SIZE:
             write_to_tsv_part(HermesTables.USER, part, users)
             write_to_tsv_part(HermesTables.CONSENT, part, services)
@@ -233,7 +239,15 @@ def create_service_mcard_and_pcard_job(job):
             write_to_tsv_part(HermesTables.PAYMENT_ACCOUNT, part, payment_cards)
             write_to_tsv_part(HermesTables.PAYMENT_ACCOUNT_ENTRY, part, payment_card_associations)
             write_to_tsv_part(HermesTables.PAYMENT_MEMBERSHIP_ENTRY, part, pll_links)
-            for l in users, services, membership_cards, membership_card_associations, payment_cards, payment_card_associations, pll_links:
+            for l in (
+                users,
+                services,
+                membership_cards,
+                membership_card_associations,
+                payment_cards,
+                payment_card_associations,
+                pll_links,
+            ):
                 l.clear()
 
         users.append(create_service.user(service_pk))
@@ -241,34 +255,22 @@ def create_service_mcard_and_pcard_job(job):
 
         mcard_pk = None
         pcard_pk = None
-        for mcard_pk in range(
-                min(mcard_start, TOTAL_MCARDS),
-                min(mcard_start + MCARDS_PER_SERVICE, TOTAL_MCARDS)
-        ):
+        for mcard_pk in range(min(mcard_start, TOTAL_MCARDS), min(mcard_start + MCARDS_PER_SERVICE, TOTAL_MCARDS)):
             scheme_id = random.randint(1, MEMBERSHIP_PLANS)
             membership_cards.append(create_mcard.membership_card(mcard_pk, scheme_id))
-            membership_card_associations.append(
-                create_association.scheme_account(mcard_pk, mcard_pk, service_pk)
-            )
+            membership_card_associations.append(create_association.scheme_account(mcard_pk, mcard_pk, service_pk))
         mcard_start += MCARDS_PER_SERVICE
 
-        for pcard_pk in range(
-                min(pcard_start, TOTAL_PCARDS),
-                min(pcard_start + PCARDS_PER_SERVICE, TOTAL_PCARDS)
-        ):
+        for pcard_pk in range(min(pcard_start, TOTAL_PCARDS), min(pcard_start + PCARDS_PER_SERVICE, TOTAL_PCARDS)):
             payment_cards.append(create_pcard.payment_card(pcard_pk))
-            payment_card_associations.append(
-                create_association.payment_card(pcard_pk, pcard_pk, service_pk)
-            )
+            payment_card_associations.append(create_association.payment_card(pcard_pk, pcard_pk, service_pk))
         pcard_start += PCARDS_PER_SERVICE
 
         if mcard_pk is not None and pcard_pk is not None:
-            pll_links.append(
-                create_association.pll_link(pcard_pk, pcard_pk, mcard_pk)
-            )
+            pll_links.append(create_association.pll_link(pcard_pk, pcard_pk, mcard_pk))
 
         if service_pk % 100000 == 0:
-            logger.info(f'Generated {service_pk} users')
+            logger.info(f"Generated {service_pk} users")
 
     write_to_tsv_part(HermesTables.USER, part, users)
     write_to_tsv_part(HermesTables.CONSENT, part, services)
@@ -278,12 +280,11 @@ def create_service_mcard_and_pcard_job(job):
     write_to_tsv_part(HermesTables.PAYMENT_ACCOUNT_ENTRY, part, payment_card_associations)
     write_to_tsv_part(HermesTables.PAYMENT_MEMBERSHIP_ENTRY, part, pll_links)
 
-    logger.info(f'Finished {part}')
+    logger.info(f"Finished {part}")
 
 
 def create_remaining_mcards_and_pcards(remaining_mcards, remaining_pcards):
-    logger.debug(f"All wallets created. Creating overflow mcards {remaining_mcards} "
-                 f"and pcards: {remaining_pcards}")
+    logger.debug(f"All wallets created. Creating overflow mcards {remaining_mcards} " f"and pcards: {remaining_pcards}")
     while remaining_mcards > 0:
         membership_cards = []
         for _ in range(BULK_SIZE):
@@ -312,28 +313,24 @@ def create_membership_card_answers():
     for job_id, start in enumerate(range(0, TOTAL_MCARDS, answers_per_core)):
         end = min(start + answers_per_core, TOTAL_MCARDS)
 
-        jobs.append({
-            'job_id': job_id,
-            'start': start,
-            'count': end-start
-        })
+        jobs.append({"job_id": job_id, "start": start, "count": end - start})
 
-    logger.info('Starting jobs')
+    logger.info("Starting jobs")
     pool = multiprocessing.Pool(processes=cores)
     pool.map(create_membership_card_answers_job, jobs)
-    logger.info('Waiting for jobs')
+    logger.info("Waiting for jobs")
     pool.close()
     pool.join()
 
 
 def create_membership_card_answers_job(job):
-    part = job['job_id']
-    start = job['start']
-    count = job['count']
+    part = job["job_id"]
+    start = job["start"]
+    count = job["count"]
 
     add_answers = []
     auth_answers = []
-    for add_answer_pk in range(start, start+count):
+    for add_answer_pk in range(start, start + count):
         if len(add_answers) > BULK_SIZE:
             write_to_tsv_part(HermesTables.ANSWER, part, add_answers)
             write_to_tsv_part(HermesTables.ANSWER, part, auth_answers)
@@ -347,12 +344,12 @@ def create_membership_card_answers_job(job):
         auth_answers.append(create_mcard.postcode_answer(auth_answer_pk, add_answer_pk, auth_question_pk))
 
         if add_answer_pk % 100000 == 0:
-            logger.info(f'Generated {add_answer_pk} answers')
+            logger.info(f"Generated {add_answer_pk} answers")
 
     write_to_tsv_part(HermesTables.ANSWER, part, add_answers)
     write_to_tsv_part(HermesTables.ANSWER, part, auth_answers)
 
-    logger.info(f'Finished {part}')
+    logger.info(f"Finished {part}")
 
 
 def create_transaction_tsv_files():
@@ -363,24 +360,20 @@ def create_transaction_tsv_files():
     for job_id, start in enumerate(range(0, TOTAL_TRANSACTIONS, trans_per_core)):
         end = min(start + trans_per_core, TOTAL_TRANSACTIONS)
 
-        jobs.append({
-            'job_id': job_id,
-            'start': start,
-            'count': end - start
-        })
+        jobs.append({"job_id": job_id, "start": start, "count": end - start})
 
-    logger.info('Starting jobs')
+    logger.info("Starting jobs")
     pool = multiprocessing.Pool(processes=cores)
     pool.map(create_transaction_tsv_job, jobs)
-    logger.info('Waiting for jobs')
+    logger.info("Waiting for jobs")
     pool.close()
     pool.join()
 
 
 def create_transaction_tsv_job(job):
-    part = job['job_id']
-    start = job['start']
-    count = job['count']
+    part = job["job_id"]
+    start = job["start"]
+    count = job["count"]
 
     transactions = []
     for pk in range(start, start + count):
@@ -391,10 +384,10 @@ def create_transaction_tsv_job(job):
         transactions.append(create_mcard.transaction(pk, pk))
 
         if pk % 1000000 == 0:
-            logger.info(f'Generated {pk} transactions')
+            logger.info(f"Generated {pk} transactions")
 
     write_to_tsv_part(HadesTables.TRANSACTIONS, part, transactions)
-    logger.info(f'Finished {part}')
+    logger.info(f"Finished {part}")
 
 
 def create_tsv_files():

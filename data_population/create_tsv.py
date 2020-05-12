@@ -228,8 +228,6 @@ def create_service_mcard_and_pcard_job(job):
 
     mcard_start = job["mcards_start"]
     pcard_start = job["pcards_start"]
-    mcard_count = job["mcards_count"]
-    pcard_count = job["pcards_count"]
     for service_pk in range(job["start"], job["end"]):
         if len(users) > BULK_SIZE:
             write_to_tsv_part(HermesTables.USER, part, users)

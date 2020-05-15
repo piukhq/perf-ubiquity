@@ -181,7 +181,7 @@ def create_membership_plan_tsv_files():
 def create_service_mcard_and_pcard_tsv_files():
     cores = multiprocessing.cpu_count()
 
-    services_per_core = min(TOTAL_USERS // cores, 1)
+    services_per_core = max(TOTAL_USERS // cores, 1)
     mcards_for_job = services_per_core * (MCARDS_PER_SERVICE + 1)
     pcards_for_job = services_per_core * (PCARDS_PER_SERVICE + 1)
 

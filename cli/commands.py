@@ -5,6 +5,11 @@ from data_population.upload_tsv import upload_all_tsv_files, upload_single_tsv_f
 
 
 @click.command()
+def create_tsv():
+    create_tsv_files()
+
+
+@click.command()
 def populate_db():
     create_tsv_files()
     upload_all_tsv_files()

@@ -181,7 +181,7 @@ def create_membership_plan_tsv_files():
 def create_service_mcard_and_pcard_tsv_files():
     cores = multiprocessing.cpu_count()
 
-    services_per_core, remaining_services11 = divmod(TOTAL_USERS, cores)
+    services_per_core = min(TOTAL_USERS // cores, 1)
     mcards_for_job = services_per_core * (MCARDS_PER_SERVICE + 1)
     pcards_for_job = services_per_core * (PCARDS_PER_SERVICE + 1)
 
@@ -197,7 +197,7 @@ def create_service_mcard_and_pcard_tsv_files():
             {
                 "job_id": job_id,
                 "start": service_index,
-                "end": service_index + services_per_core,  # used in range, so this is the end+1
+                "end": min(service_index + services_per_core, TOTAL_USERS),  # used in range, so this is the end+1
                 "mcards_start": mstart,
                 "mcards_count": min(mcards_idx + mcards_for_job, TOTAL_MCARDS) - mstart,
                 "pcards_start": pstart,
@@ -214,6 +214,11 @@ def create_service_mcard_and_pcard_tsv_files():
     logger.info("Waiting for jobs")
     pool.close()
     pool.join()
+
+    remaining_mcards = TOTAL_MCARDS - (jobs[-1]['mcards_start'] + jobs[-1]['mcards_count'])
+    remaining_pcards = TOTAL_MCARDS - (jobs[-1]['pcards_start'] + jobs[-1]['pcards_count'])
+    logger.info('Creating remaining mcards and pcards')
+    create_remaining_mcards_and_pcards(remaining_mcards, remaining_pcards)
 
 
 def create_service_mcard_and_pcard_job(job):
@@ -282,7 +287,7 @@ def create_service_mcard_and_pcard_job(job):
 
 
 def create_remaining_mcards_and_pcards(remaining_mcards, remaining_pcards):
-    logger.debug(f"All wallets created. Creating overflow mcards {remaining_mcards} " f"and pcards: {remaining_pcards}")
+    logger.debug(f"All wallets created. Creating overflow mcards {remaining_mcards} and pcards: {remaining_pcards}")
     while remaining_mcards > 0:
         membership_cards = []
         for _ in range(BULK_SIZE):
@@ -305,7 +310,7 @@ def create_remaining_mcards_and_pcards(remaining_mcards, remaining_pcards):
 
 def create_membership_card_answers():
     cores = multiprocessing.cpu_count()
-    answers_per_core, _ = divmod(TOTAL_MCARDS, cores)
+    answers_per_core = TOTAL_MCARDS // cores
     jobs = []
 
     for job_id, start in enumerate(range(0, TOTAL_MCARDS, answers_per_core)):

@@ -7,42 +7,17 @@ import multiprocessing
 import glob
 from enum import Enum
 
+from data_population.job_creation import (create_tsv_jobs, cores, MEMBERSHIP_PLANS, CardTypes, MCARDS_PER_SERVICE,
+                                          PCARDS_PER_SERVICE, TOTAL_MCARDS, TOTAL_TRANSACTIONS)
 from data_population.fixtures.client import ALL_CLIENTS, NON_RESTRICTED_CLIENTS
 from data_population.fixtures.payment_scheme import ALL_PAYMENT_PROVIDER_STATUS_MAPPINGS
-from data_population.create_data import (
-    create_association,
-    create_mcard,
-    create_pcard,
-    create_channel,
-    create_plan,
-    create_service,
-)
+from data_population.create_data import (create_association, create_mcard, create_pcard, create_channel, create_plan,
+                                         create_service)
 from settings import TSV_PATH
 
 logger = logging.getLogger("create-tsv")
 
 BULK_SIZE = 10000
-
-MEMBERSHIP_PLANS = int(os.environ.get("MEMBERSHIP_PLANS", "6"))
-TOTAL_USERS = int(os.environ.get("TOTAL_USERS", "500"))
-TOTAL_MCARDS = int(os.environ.get("TOTAL_MCARDS", "5000"))
-TOTAL_PCARDS = int(os.environ.get("TOTAL_PCARDS", "2000"))
-TOTAL_TRANSACTIONS = int(os.environ.get("TOTAL_TRANSACTIONS", "10000"))
-
-# MEMBERSHIP_PLANS = 40
-# TOTAL_USERS = 13017000
-# TOTAL_MCARDS = 88953620
-# TOTAL_PCARDS = 19525500
-# TOTAL_TRANSACTIONS = 889536200
-
-# MEMBERSHIP_PLANS = 100
-# TOTAL_USERS = 27494000
-# TOTAL_MCARDS = 188265840
-# TOTAL_PCARDS = 41241000
-# TOTAL_TRANSACTIONS = 1882658400
-
-MCARDS_PER_SERVICE = 7
-PCARDS_PER_SERVICE = 2
 
 
 class HermesTables(str, Enum):
@@ -179,35 +154,36 @@ def create_membership_plan_tsv_files():
 
 
 def create_service_mcard_and_pcard_tsv_files():
-    cores = multiprocessing.cpu_count()
-
-    services_per_core = max(TOTAL_USERS // cores, 1)
-    mcards_for_job = services_per_core * (MCARDS_PER_SERVICE + 1)
-    pcards_for_job = services_per_core * (PCARDS_PER_SERVICE + 1)
-
-    jobs = []
-
-    mcards_idx = 0
-    pcards_idx = 0
-    for job_id, service_index in enumerate(range(0, TOTAL_USERS, services_per_core)):
-        mstart = min(mcards_idx, TOTAL_MCARDS)
-        pstart = min(pcards_idx, TOTAL_PCARDS)
-
-        jobs.append(
-            {
-                "job_id": job_id,
-                "start": service_index,
-                "end": min(service_index + services_per_core, TOTAL_USERS),  # used in range, so this is the end+1
-                "mcards_start": mstart,
-                "mcards_count": min(mcards_idx + mcards_for_job, TOTAL_MCARDS) - mstart,
-                "pcards_start": pstart,
-                "pcards_count": min(pcards_idx + pcards_for_job, TOTAL_PCARDS) - pstart,
-            }
-        )
-
-        mcards_idx += mcards_for_job
-        pcards_idx += pcards_for_job
-
+    # cores = multiprocessing.cpu_count()
+    #
+    # services_per_core = max(TOTAL_USERS // cores, 1)
+    # service_ids_by_job = range(1, TOTAL_USERS + 1, services_per_core)
+    #
+    # mcards_for_job = services_per_core * MCARDS_PER_SERVICE
+    # pcards_for_job = services_per_core * PCARDS_PER_SERVICE
+    # overflow_mcards_per_job = max(TOTAL_MCARDS // cores - mcards_for_job, 0)
+    # overflow_pcards_per_job = max(TOTAL_PCARDS // cores - pcards_for_job, 0)
+    #
+    # mcards_idx = 1
+    # pcards_idx = 1
+    # for job_id, service_index in enumerate(service_ids_by_job):
+    #     mstart = min(mcards_idx, TOTAL_MCARDS)
+    #     pstart = min(pcards_idx, TOTAL_PCARDS)
+    #
+    #     jobs.append(
+    #         {
+    #             "job_id": job_id,
+    #             "start": service_index,
+    #             "end": min(service_index + services_per_core, TOTAL_USERS + 1),
+    #             "mcards_start": mstart,
+    #             "mcard_overflow": min(mcards_idx + overflow_mcards_per_job, TOTAL_MCARDS + 1) - mstart,
+    #             "pcards_start": pstart,
+    #             "pcards_overflow": min(pcards_idx + overflow_pcards_per_job, TOTAL_PCARDS + 1) - pstart,
+    #         }
+    #     )
+    #     mcards_idx += mcards_for_job + overflow_mcards_per_job
+    #     pcards_idx += pcards_for_job + overflow_pcards_per_job
+    jobs = create_tsv_jobs()
     logger.info("Starting jobs")
     pool = multiprocessing.Pool(processes=cores)
     pool.map(create_service_mcard_and_pcard_job, jobs)
@@ -215,10 +191,10 @@ def create_service_mcard_and_pcard_tsv_files():
     pool.close()
     pool.join()
 
-    remaining_mcards = TOTAL_MCARDS - (jobs[-1]['mcards_start'] + jobs[-1]['mcards_count'])
-    remaining_pcards = TOTAL_MCARDS - (jobs[-1]['pcards_start'] + jobs[-1]['pcards_count'])
-    logger.info('Creating remaining mcards and pcards')
-    create_remaining_mcards_and_pcards(remaining_mcards, remaining_pcards)
+    # remaining_mcards = TOTAL_MCARDS - (TOTAL_USERS * MCARDS_PER_SERVICE)
+    # remaining_pcards = TOTAL_PCARDS - (TOTAL_USERS * PCARDS_PER_SERVICE)
+    # logger.info('Creating remaining mcards and pcards')
+    # create_remaining_mcards_and_pcards(remaining_mcards, remaining_pcards)
 
 
 def create_service_mcard_and_pcard_job(job):
@@ -231,9 +207,15 @@ def create_service_mcard_and_pcard_job(job):
     payment_card_associations = []
     pll_links = []
 
-    mcard_start = job["mcards_start"]
-    pcard_start = job["pcards_start"]
-    for service_pk in range(job["start"], job["end"]):
+    service_start = job["start"]
+    mcard_index = job[f"{CardTypes.MCARD}_start"]
+    pcard_index = job[f"{CardTypes.PCARD}_start"]
+    remaining_service_mcards = job[f"{CardTypes.MCARD}_service_count"]
+    remaining_service_pcards = job[f"{CardTypes.PCARD}_service_count"]
+    remaining_overflow_mcards = job[f"{CardTypes.MCARD}_overflow_count"]
+    remaining_overflow_pcards = job[f"{CardTypes.PCARD}_overflow_count"]
+    for service_count in range(0, job["count"]):
+        service_pk = service_start + service_count
         if len(users) > BULK_SIZE:
             write_to_tsv_part(HermesTables.USER, part, users)
             write_to_tsv_part(HermesTables.CONSENT, part, services)
@@ -256,24 +238,37 @@ def create_service_mcard_and_pcard_job(job):
         users.append(create_service.user(service_pk))
         services.append(create_service.service(service_pk))
 
-        mcard_pk = None
-        pcard_pk = None
-        for mcard_pk in range(min(mcard_start, TOTAL_MCARDS), min(mcard_start + MCARDS_PER_SERVICE, TOTAL_MCARDS)):
+        for mcard_count in range(0, MCARDS_PER_SERVICE):
+            if not remaining_service_mcards:
+                break
+
             scheme_id = random.randint(1, MEMBERSHIP_PLANS)
-            membership_cards.append(create_mcard.membership_card(mcard_pk, scheme_id))
-            membership_card_associations.append(create_association.scheme_account(mcard_pk, mcard_pk, service_pk))
-        mcard_start += MCARDS_PER_SERVICE
+            membership_cards.append(create_mcard.membership_card(mcard_index, scheme_id))
+            membership_card_associations.append(create_association.scheme_account(mcard_index, mcard_index, service_pk))
+            mcard_index += 1
+            remaining_service_mcards -= 1
 
-        for pcard_pk in range(min(pcard_start, TOTAL_PCARDS), min(pcard_start + PCARDS_PER_SERVICE, TOTAL_PCARDS)):
-            payment_cards.append(create_pcard.payment_card(pcard_pk))
-            payment_card_associations.append(create_association.payment_card(pcard_pk, pcard_pk, service_pk))
-        pcard_start += PCARDS_PER_SERVICE
+        for pcard_count in range(0, PCARDS_PER_SERVICE):
+            if not remaining_service_pcards:
+                break
 
-        if mcard_pk is not None and pcard_pk is not None:
-            pll_links.append(create_association.pll_link(pcard_pk, pcard_pk, mcard_pk))
+            payment_cards.append(create_pcard.payment_card(pcard_index))
+            payment_card_associations.append(create_association.payment_card(pcard_index, pcard_index, service_pk))
+            pcard_index += 1
+            remaining_service_pcards -= 1
+
+        pll_links.append(create_association.pll_link(pcard_index - 1, pcard_index - 1, mcard_index - 1))
 
         if service_pk % 100000 == 0:
             logger.info(f"Generated {service_pk} users")
+
+    overflow_mcard_start = job[f"{CardTypes.MCARD}_start"] + len(membership_cards)
+    overflow_pcard_start = job[f"{CardTypes.PCARD}_start"] + len(payment_cards)
+    overflow_mcards, overflow_pcards = create_remaining_mcards_and_pcards(
+        overflow_mcard_start, overflow_pcard_start, remaining_overflow_mcards, remaining_overflow_pcards
+    )
+    membership_cards.extend(overflow_mcards)
+    payment_cards.extend(overflow_pcards)
 
     write_to_tsv_part(HermesTables.USER, part, users)
     write_to_tsv_part(HermesTables.CONSENT, part, services)
@@ -286,26 +281,20 @@ def create_service_mcard_and_pcard_job(job):
     logger.info(f"Finished {part}")
 
 
-def create_remaining_mcards_and_pcards(remaining_mcards, remaining_pcards):
-    logger.debug(f"All wallets created. Creating overflow mcards {remaining_mcards} and pcards: {remaining_pcards}")
-    while remaining_mcards > 0:
-        membership_cards = []
-        for _ in range(BULK_SIZE):
-            if remaining_mcards <= 0:
-                break
-            scheme_id = random.randint(1, MEMBERSHIP_PLANS)
-            membership_cards.append(create_mcard.membership_card(remaining_mcards, scheme_id))
-            remaining_mcards -= 1
+def create_remaining_mcards_and_pcards(mcard_start, pcard_start, mcard_count, pcard_count):
+    logger.debug(f"Creating overflow cards - mcards: {mcard_count}, pcards: {pcard_count}")
+    membership_cards = []
+    for x in range(0, mcard_count):
+        mcard_pk = x + mcard_start
+        scheme_id = random.randint(1, MEMBERSHIP_PLANS)
+        membership_cards.append(create_mcard.membership_card(mcard_pk, scheme_id))
 
-        write_to_tsv(HermesTables.SCHEME_ACCOUNT, membership_cards)
+    payment_cards = []
+    for x in range(0, pcard_count):
+        pcard_pk = x + pcard_start
+        payment_cards.append(create_pcard.payment_card(pcard_pk))
 
-    while remaining_pcards > 0:
-        payment_cards = []
-        for _ in range(BULK_SIZE):
-            if remaining_pcards <= 0:
-                break
-            payment_cards.append(create_pcard.payment_card(remaining_pcards))
-            remaining_pcards -= 1
+    return membership_cards, payment_cards
 
 
 def create_membership_card_answers():
@@ -313,8 +302,8 @@ def create_membership_card_answers():
     answers_per_core = TOTAL_MCARDS // cores
     jobs = []
 
-    for job_id, start in enumerate(range(0, TOTAL_MCARDS, answers_per_core)):
-        end = min(start + answers_per_core, TOTAL_MCARDS)
+    for job_id, start in enumerate(range(1, TOTAL_MCARDS + 1, answers_per_core)):
+        end = min(start + answers_per_core, TOTAL_MCARDS + 1)
 
         jobs.append({"job_id": job_id, "start": start, "count": end - start})
 
@@ -343,7 +332,7 @@ def create_membership_card_answers_job(job):
         add_question_pk = random.randint(1, MEMBERSHIP_PLANS)
         add_answers.append(create_mcard.card_number_answer(add_answer_pk, add_answer_pk, add_question_pk))
         auth_answer_pk = TOTAL_MCARDS + add_answer_pk
-        auth_question_pk = add_question_pk + 1
+        auth_question_pk = add_question_pk + MEMBERSHIP_PLANS
         auth_answers.append(create_mcard.postcode_answer(auth_answer_pk, add_answer_pk, auth_question_pk))
 
         if add_answer_pk % 100000 == 0:
@@ -356,12 +345,10 @@ def create_membership_card_answers_job(job):
 
 
 def create_transaction_tsv_files():
-    cores = multiprocessing.cpu_count()
     trans_per_core, _ = divmod(TOTAL_TRANSACTIONS, cores)
     jobs = []
-
-    for job_id, start in enumerate(range(0, TOTAL_TRANSACTIONS, trans_per_core)):
-        end = min(start + trans_per_core, TOTAL_TRANSACTIONS)
+    for job_id, start in enumerate(range(1, TOTAL_TRANSACTIONS + 1, trans_per_core)):
+        end = min(start + trans_per_core, TOTAL_TRANSACTIONS + 1)
 
         jobs.append({"job_id": job_id, "start": start, "count": end - start})
 

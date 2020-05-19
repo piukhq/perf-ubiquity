@@ -154,35 +154,6 @@ def create_membership_plan_tsv_files():
 
 
 def create_service_mcard_and_pcard_tsv_files():
-    # cores = multiprocessing.cpu_count()
-    #
-    # services_per_core = max(TOTAL_USERS // cores, 1)
-    # service_ids_by_job = range(1, TOTAL_USERS + 1, services_per_core)
-    #
-    # mcards_for_job = services_per_core * MCARDS_PER_SERVICE
-    # pcards_for_job = services_per_core * PCARDS_PER_SERVICE
-    # overflow_mcards_per_job = max(TOTAL_MCARDS // cores - mcards_for_job, 0)
-    # overflow_pcards_per_job = max(TOTAL_PCARDS // cores - pcards_for_job, 0)
-    #
-    # mcards_idx = 1
-    # pcards_idx = 1
-    # for job_id, service_index in enumerate(service_ids_by_job):
-    #     mstart = min(mcards_idx, TOTAL_MCARDS)
-    #     pstart = min(pcards_idx, TOTAL_PCARDS)
-    #
-    #     jobs.append(
-    #         {
-    #             "job_id": job_id,
-    #             "start": service_index,
-    #             "end": min(service_index + services_per_core, TOTAL_USERS + 1),
-    #             "mcards_start": mstart,
-    #             "mcard_overflow": min(mcards_idx + overflow_mcards_per_job, TOTAL_MCARDS + 1) - mstart,
-    #             "pcards_start": pstart,
-    #             "pcards_overflow": min(pcards_idx + overflow_pcards_per_job, TOTAL_PCARDS + 1) - pstart,
-    #         }
-    #     )
-    #     mcards_idx += mcards_for_job + overflow_mcards_per_job
-    #     pcards_idx += pcards_for_job + overflow_pcards_per_job
     jobs = create_tsv_jobs()
     logger.info("Starting jobs")
     pool = multiprocessing.Pool(processes=cores)
@@ -190,11 +161,6 @@ def create_service_mcard_and_pcard_tsv_files():
     logger.info("Waiting for jobs")
     pool.close()
     pool.join()
-
-    # remaining_mcards = TOTAL_MCARDS - (TOTAL_USERS * MCARDS_PER_SERVICE)
-    # remaining_pcards = TOTAL_PCARDS - (TOTAL_USERS * PCARDS_PER_SERVICE)
-    # logger.info('Creating remaining mcards and pcards')
-    # create_remaining_mcards_and_pcards(remaining_mcards, remaining_pcards)
 
 
 def create_service_mcard_and_pcard_job(job):

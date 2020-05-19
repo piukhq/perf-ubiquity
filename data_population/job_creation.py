@@ -40,7 +40,6 @@ def create_tsv_jobs():
     return jobs
 
 
-# maybe add both ard type keys when init
 def init_jobs():
     jobs = []
     job_id = 0
@@ -71,12 +70,10 @@ def add_card_info_to_jobs(jobs, card_type, total_cards, card_per_service):
     if remaining_service_cards >= total_cards:
         remaining_service_cards = total_cards
 
-    # add cards related to services
     for job in jobs:
         card_start = card_index
         card_count = job['count'] * card_per_service
 
-        # refactor card job to only add count when adding things related to services - then remove me
         if card_start >= total_cards:
             card_count = 0
         elif card_start + card_count > total_cards:
@@ -91,7 +88,6 @@ def add_card_info_to_jobs(jobs, card_type, total_cards, card_per_service):
         remaining_service_cards -= card_count
         remaining_cards -= card_count
 
-    # if we need to creat more cards, create overflow cards not related to services
     if remaining_cards:
         overflow_cards_per_job = (remaining_cards // len(jobs)) + 1
         for job in jobs:

@@ -9,17 +9,40 @@ TOTAL_MCARDS = int(os.environ.get("TOTAL_MCARDS", "5000"))
 TOTAL_PCARDS = int(os.environ.get("TOTAL_PCARDS", "2000"))
 TOTAL_TRANSACTIONS = int(os.environ.get("TOTAL_TRANSACTIONS", "10000"))
 
-# MEMBERSHIP_PLANS = 40
-# TOTAL_USERS = 13017000
-# TOTAL_MCARDS = 88953620
-# TOTAL_PCARDS = 19525500
-# TOTAL_TRANSACTIONS = 889536200
+# Benchmark Test (6 channels)
+# MEMBERSHIP_PLANS = int(os.environ.get("MEMBERSHIP_PLANS", "6"))
+# TOTAL_USERS = int(os.environ.get("TOTAL_USERS", "449333"))
+# TOTAL_MCARDS = int(os.environ.get("TOTAL_MCARDS", "3082426"))
+# TOTAL_PCARDS = int(os.environ.get("TOTAL_PCARDS", "674000"))
+# TOTAL_TRANSACTIONS = int(os.environ.get("TOTAL_TRANSACTIONS", "30824266"))
 
-# MEMBERSHIP_PLANS = 100
-# TOTAL_USERS = 27494000
-# TOTAL_MCARDS = 188265840
-# TOTAL_PCARDS = 41241000
-# TOTAL_TRANSACTIONS = 1882658400
+# Barclays Day One 2021 Cycle One and Two (6 Channels)
+# MEMBERSHIP_PLANS = int(os.environ.get("MEMBERSHIP_PLANS", "18"))
+# TOTAL_USERS = int(os.environ.get("TOTAL_USERS", "5392000"))
+# TOTAL_MCARDS = int(os.environ.get("TOTAL_MCARDS", "36989120"))
+# TOTAL_PCARDS = int(os.environ.get("TOTAL_PCARDS", "8088000"))
+# TOTAL_TRANSACTIONS = int(os.environ.get("TOTAL_TRANSACTIONS", "369891200"))
+
+# Barclays 2022 (8 channels)
+# MEMBERSHIP_PLANS = int(os.environ.get("MEMBERSHIP_PLANS", "26"))
+# TOTAL_USERS = int(os.environ.get("TOTAL_USERS", "8192000"))
+# TOTAL_MCARDS = int(os.environ.get("TOTAL_MCARDS", "56197120"))
+# TOTAL_PCARDS = int(os.environ.get("TOTAL_PCARDS", "12288000"))
+# TOTAL_TRANSACTIONS = int(os.environ.get("TOTAL_TRANSACTIONS", "561971200"))
+
+# Barclays 2023 (10 channels)
+# MEMBERSHIP_PLANS = int(os.environ.get("MEMBERSHIP_PLANS", "35"))
+# TOTAL_USERS = int(os.environ.get("TOTAL_USERS", "11011000"))
+# TOTAL_MCARDS = int(os.environ.get("TOTAL_MCARDS", "75535460"))
+# TOTAL_PCARDS = int(os.environ.get("TOTAL_PCARDS", "16516500"))
+# TOTAL_TRANSACTIONS = int(os.environ.get("TOTAL_TRANSACTIONS", "755354600"))
+
+# Barclays 2024 (12 channels)
+# MEMBERSHIP_PLANS = int(os.environ.get("MEMBERSHIP_PLANS", "50"))
+# TOTAL_USERS = int(os.environ.get("TOTAL_USERS", "13593000"))
+# TOTAL_MCARDS = int(os.environ.get("TOTAL_MCARDS", "93247980"))
+# TOTAL_PCARDS = int(os.environ.get("TOTAL_PCARDS", "20389500"))
+# TOTAL_TRANSACTIONS = int(os.environ.get("TOTAL_TRANSACTIONS", "932479800"))
 
 MCARDS_PER_SERVICE = 7
 PCARDS_PER_SERVICE = 2

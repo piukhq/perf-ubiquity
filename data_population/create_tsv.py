@@ -113,6 +113,7 @@ def create_membership_plan_tsv_files():
     scheme_consents = []
     third_party_consents = []
     voucher_schemes = []
+    third_party_consent_index = 1
     for count in range(1, MEMBERSHIP_PLANS + 1):
         plan_name = f"performance plan {count}"
         plan_slug = f"performance-plan-{count}"
@@ -127,7 +128,10 @@ def create_membership_plan_tsv_files():
         scheme_consent = create_plan.scheme_consent(count, count)
         scheme_consents.append(scheme_consent)
         total_channels = len(ALL_CLIENTS)
-        plan_third_party_consent_links = create_plan.create_all_third_party_consent_links(total_channels * count, count)
+        plan_third_party_consent_links = create_plan.create_all_third_party_consent_links(
+            third_party_consent_index, count
+        )
+        third_party_consent_index += total_channels
         third_party_consents.extend(plan_third_party_consent_links)
         if count == 1:
             voucher_schemes.append(create_plan.voucher_scheme(count, count))

@@ -104,26 +104,43 @@ def add_card_info_to_jobs(jobs, card_type, total_cards, card_per_service):
         remaining_service_cards = total_cards
         enough_cards_per_service = False
 
-    for job in jobs:
-        card_start = card_index
-        card_count = job['count'] * card_per_service
+    if not enough_cards_per_service:
+        for job in jobs:
+            job[f"{card_type}_start"] = 0
+            job[f"{card_type}_service_count"] = 0
 
-        if not enough_cards_per_service:
-            card_count = remaining_service_cards // job["count"] + 1
+        job_count = 0
+        while remaining_cards > 0:
+            job_index = job_count % len(jobs)
+            cards_to_add = card_per_service
+            if cards_to_add > remaining_cards:
+                cards_to_add = remaining_cards
 
-        if card_start >= total_cards:
-            card_count = 0
-        elif card_start + card_count > total_cards:
-            card_count = total_cards - card_start + 1
+            if jobs[job_index][f"{card_type}_service_count"] + cards_to_add > jobs[job_index]["count"] * card_per_service:
+                job_count += 1
+                continue
 
-        if card_count > remaining_service_cards:
-            card_count = remaining_service_cards
+            jobs[job_index][f"{card_type}_service_count"] += cards_to_add
+            remaining_cards -= cards_to_add
+            job_count += 1
 
-        job[f"{card_type}_start"] = card_start
-        job[f"{card_type}_service_count"] = card_count
-        card_index += card_count
-        remaining_service_cards -= card_count
-        remaining_cards -= card_count
+    else:
+        for job in jobs:
+            card_start = card_index
+            card_count = job['count'] * card_per_service
+            if card_start >= total_cards:
+                card_count = 0
+            elif card_start + card_count > total_cards:
+                card_count = total_cards - card_start + 1
+
+            if card_count > remaining_service_cards:
+                card_count = remaining_service_cards
+
+            job[f"{card_type}_start"] = card_start
+            job[f"{card_type}_service_count"] = card_count
+            card_index += card_count
+            remaining_service_cards -= card_count
+            remaining_cards -= card_count
 
     overflow_cards_per_job = 0
     if remaining_cards:

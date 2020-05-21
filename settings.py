@@ -15,7 +15,7 @@ logging.getLogger("faker").setLevel(logging.WARNING)
 
 fake = Faker("en_GB")
 
-TSV_PATH = env_var("TSV_PATH", "tsv")
+TSV_BASE_DIR = env_var("TSV_BASE_DIR", "tsv")
 
 LOCAL_SECRETS = env_var("LOCAL_SECRETS", "False")
 LOCAL_SECRETS_PATH = env_var("LOCAL_SECRETS_PATH", "local_secrets.json")

@@ -12,11 +12,21 @@ WALLET_ONLY = 10
 PRE_REGISTERED_CARD_STATUS = 406
 JOIN_FAILED = 900
 
+GHOST_CARD_PREFIX = 0
+NON_GHOST_CARD_PREFIX = 1
+
+
+def card_number(ghost=False):
+    if ghost:
+        f"{GHOST_CARD_PREFIX}{uuid.uuid4()}"
+
+    return f"{NON_GHOST_CARD_PREFIX}{uuid.uuid4()}"
+
 
 def static_add_json(pub_key):
     mcard_json = {
         "account": {
-            "add_fields": [{"column": "Card Number", "value": "9000000000000000016"}],
+            "add_fields": [{"column": "Card Number", "value": f"{NON_GHOST_CARD_PREFIX}000000000000000016"}],
             "authorise_fields": [
                 {"column": "Postcode", "value": "rg5 5aa"},
                 {"column": CONSENT_LABEL, "value": "true"}
@@ -31,7 +41,22 @@ def static_add_json(pub_key):
 def random_add_json(plan_id, pub_key):
     mcard_json = {
         "account": {
-            "add_fields": [{"column": "Card Number", "value": str(uuid.uuid4())}],
+            "add_fields": [{"column": "Card Number", "value": card_number()}],
+            "authorise_fields": [
+                {"column": "Postcode", "value": fake.postcode()},
+                {"column": CONSENT_LABEL, "value": "true"}
+            ],
+        },
+        "membership_plan": plan_id,
+    }
+
+    return encrypt(mcard_json, pub_key)
+
+
+def random_add_ghost_card_json(plan_id, pub_key):
+    mcard_json = {
+        "account": {
+            "add_fields": [{"column": "Card Number", "value": card_number(ghost=True)}],
             "authorise_fields": [
                 {"column": "Postcode", "value": fake.postcode()},
                 {"column": CONSENT_LABEL, "value": "true"}
@@ -47,7 +72,7 @@ def random_join_json(plan_id, pub_key):
     mcard_json = {
         "account": {
             "enrol_fields": [
-                {"column": "Card Number", "value": str(uuid.uuid4())},
+                {"column": "Card Number", "value": card_number()},
                 {"column": "Postcode", "value": fake.postcode()}
             ]
         },
@@ -60,7 +85,7 @@ def random_join_json(plan_id, pub_key):
 def random_patch_json(pub_key):
     mcard_json = {
         "account": {
-            "add_fields": [{"column": "Card Number", "value": str(uuid.uuid4())}]
+            "auth_fields": [{"column": "Postcode", "value": fake.postcode()}]
         }
     }
 

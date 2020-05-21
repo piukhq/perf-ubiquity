@@ -109,12 +109,12 @@ def add_card_info_to_jobs(jobs, card_type, total_cards, card_per_service):
         card_count = job['count'] * card_per_service
 
         if not enough_cards_per_service:
-            card_count = job["count"] // remaining_service_cards + 1
+            card_count = remaining_service_cards // job["count"] + 1
 
         if card_start >= total_cards:
             card_count = 0
         elif card_start + card_count > total_cards:
-            card_count = total_cards - card_start
+            card_count = total_cards - card_start + 1
 
         if card_count > remaining_service_cards:
             card_count = remaining_service_cards
@@ -125,15 +125,17 @@ def add_card_info_to_jobs(jobs, card_type, total_cards, card_per_service):
         remaining_service_cards -= card_count
         remaining_cards -= card_count
 
+    overflow_cards_per_job = 0
     if remaining_cards:
         overflow_cards_per_job = (remaining_cards // len(jobs)) + 1
-        for job in jobs:
-            overflow_count = overflow_cards_per_job
-            if overflow_cards_per_job > remaining_cards:
-                overflow_count = remaining_cards
 
-            job[f"{card_type}_overflow_count"] = overflow_count
-            remaining_cards -= overflow_count
+    for job in jobs:
+        overflow_count = overflow_cards_per_job
+        if overflow_cards_per_job > remaining_cards:
+            overflow_count = remaining_cards
+
+        job[f"{card_type}_overflow_count"] = overflow_count
+        remaining_cards -= overflow_count
 
     jobs = fix_indexes_for_card_jobs(jobs, card_type)
     return jobs

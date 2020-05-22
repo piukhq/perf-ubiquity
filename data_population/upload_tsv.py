@@ -4,7 +4,7 @@ import os
 import psycopg2
 import time
 
-from data_population.create_tsv import HermesTables, HadesTables, tsv_path, TSV_BASE_DIR
+from data_population.create_tsv import HermesTables, HadesTables, TSV_BASE_DIR
 from settings import DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, HERMES_DB, HADES_DB
 
 logger = logging.getLogger("upload-tsv")

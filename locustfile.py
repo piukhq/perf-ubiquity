@@ -340,7 +340,6 @@ class UserBehavior(TaskSequence):
             self.client.patch(f"/membership_card/{mcard_id}", json=mcard_json, headers=self.single_prop_header,
                               name=f"/membership_card/<mcard_id> {LocustLabel.SINGLE_PROPERTY}")
 
-
     @check_suite_whitelist
     @seq_task(19)
     @task(27)

@@ -9,12 +9,12 @@ def generate_transactions(transaction_total):
     transactions = []
     for count in range(transaction_total):
         transactions.append(
-                {
-                    "date": arrow.now().shift(days=-count).format("DD/MM/YYYY HH:mm:ss"),
-                    "description": f"Test Transaction: {uuid.uuid4()}",
-                    "points": str(random.randint(1, 99)),
-                }
-            )
+            {
+                "date": arrow.now().shift(days=-count).format("DD/MM/YYYY HH:mm:ss"),
+                "description": f"Test Transaction: {uuid.uuid4()}",
+                "points": str(random.randint(1, 99)),
+            }
+        )
     return json.dumps(transactions)
 
 

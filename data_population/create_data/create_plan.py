@@ -225,7 +225,7 @@ def voucher_scheme(pk, scheme_id):
         "Voucher expired",  # headline_expired
         "Voucher redeemed",  # headline_redeemed
         "{{earn_prefix}}{{earn_value}}{{earn_suffix}} voucher earned!",  # headline_issued
-        "For joining FatFace",  # subtext
+        "Performance voucher",  # subtext
         3,  # expiry_months
         scheme_id,  # scheme_id
         "body text expired",  # body_text_expired

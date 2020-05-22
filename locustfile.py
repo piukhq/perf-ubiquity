@@ -125,40 +125,47 @@ class UserBehavior(TaskSequence):
 
     @check_suite_whitelist
     @seq_task(6)
-    # @task(5) - using for loop below to force requests to be sequential, investigate moving this back after
-    # performance test agents have been investigated
+    @task(5)
     def post_membership_cards_single_property_join(self):
-        # plan_id = self.plan_counter
+        plan_id = self.plan_counter
+        mcard_json = membership_card.random_join_json(plan_id, self.pub_key)
+        self.plan_counter = increment_membership_plan_counter(self.plan_counter)
 
-        # remove me when midas performance agents are deployed
-        plan_id = 1
+        with self.client.post("/membership_cards", params=AUTOLINK, json=mcard_json,
+                              headers=self.restricted_prop_header,
+                              name=f"/membership_cards {LocustLabel.SINGLE_RESTRICTED_PROPERTY}",
+                              catch_response=True) as response:
+            if response.status_code == codes.BAD_REQUEST:
+                response.success()
 
-        # for loop to look at removing when we try to re-add @task() decorator
-        task_counter = 5
-        for _ in range(task_counter):
-            mcard_json = membership_card.random_join_json(plan_id, self.pub_key)
-            self.plan_counter = increment_membership_plan_counter(self.plan_counter)
+        resp = self.client.post("/membership_cards", json=mcard_json, headers=self.single_prop_header,
+                                name=f"/membership_cards {LocustLabel.SINGLE_PROPERTY}")
 
-            with self.client.post("/membership_cards", params=AUTOLINK, json=mcard_json,
-                                  headers=self.restricted_prop_header,
-                                  name=f"/membership_cards {LocustLabel.SINGLE_RESTRICTED_PROPERTY}",
-                                  catch_response=True) as response:
-                if response.status_code == codes.BAD_REQUEST:
-                    response.success()
-
-            resp = self.client.post("/membership_cards", json=mcard_json, headers=self.single_prop_header,
-                                    name=f"/membership_cards {LocustLabel.SINGLE_PROPERTY}")
-
-            wait_for_scheme_account_status(membership_card.JOIN_FAILED, resp.json()['id'])
-            mcard = {
-                'id': resp.json()['id'],
-                'plan_id': plan_id,
-                'json': mcard_json
-            }
-            self.join_membership_cards.append(mcard)
+        wait_for_scheme_account_status(membership_card.ACTIVE, resp.json()['id'])
+        mcard = {
+            'id': resp.json()['id'],
+            'plan_id': plan_id,
+            'json': mcard_json
+        }
+        self.join_membership_cards.append(mcard)
 
     @check_suite_whitelist
     @seq_task(7)
+    def patch_membership_cards_id_ghost(self):
+        task_counter = 2
+        for x in range(task_counter):
+            # reset index if range > max number of membership cards
+            converted_index = x % len(self.join_membership_cards)
+            mcard_id = self.join_membership_cards[converted_index]['id']
+            mcard_json = membership_card.random_registration_json(self.pub_key)
+
+            # wait_for_scheme_account_status(membership_card.ACTIVE, mcard_id)
+            post_scheme_account_status(membership_card.PRE_REGISTERED_CARD_STATUS, mcard_id)
+            self.client.patch(f"/membership_card/{mcard_id}", json=mcard_json, headers=self.single_prop_header,
+                              name=f"/membership_card/<mcard_id> {LocustLabel.SINGLE_PROPERTY}")
+
+    @check_suite_whitelist
+    @seq_task(8)
     @task(5)
     def post_payment_cards_single_property(self):
         pcard = payment_card.generate_unencrypted_random()
@@ -190,7 +197,7 @@ class UserBehavior(TaskSequence):
                                "please increase wait time and try again")
 
     @check_suite_whitelist
-    @seq_task(8)
+    @seq_task(9)
     @task(4)
     def post_membership_cards_single_property_add(self):
         plan_id = self.plan_counter
@@ -220,14 +227,14 @@ class UserBehavior(TaskSequence):
         self.membership_cards.append(mcard)
 
     @check_suite_whitelist
-    @seq_task(9)
+    @seq_task(10)
     def post_payment_cards_multiple_property(self):
         pcard_json = self.payment_cards[MULTIPLE_PROPERTY_PCARD_INDEX]['json']
         self.client.post("/payment_cards", params=AUTOLINK, json=pcard_json, headers=self.multi_prop_header,
                          name=f"/payment_cards {LocustLabel.MULTI_PROPERTY}")
 
     @check_suite_whitelist
-    @seq_task(10)
+    @seq_task(11)
     @task(3)
     def get_membership_card_single_property(self):
         for mcard in self.membership_cards:
@@ -235,7 +242,7 @@ class UserBehavior(TaskSequence):
                             name=f"/membership_card/<card_id> {LocustLabel.SINGLE_PROPERTY}")
 
     @check_suite_whitelist
-    @seq_task(11)
+    @seq_task(12)
     def patch_membership_card_id_payment_card_id_single_property(self):
         pcard_id = self.payment_cards[1]['id']
         mcard_id = self.membership_cards[0]['id']
@@ -251,7 +258,7 @@ class UserBehavior(TaskSequence):
                 response.success()
 
     @check_suite_whitelist
-    @seq_task(12)
+    @seq_task(13)
     def patch_payment_card_id_membership_card_id_single_property(self):
         pcard_id = self.payment_cards[1]['id']
         mcard_id = self.membership_cards[1]['id']
@@ -267,7 +274,7 @@ class UserBehavior(TaskSequence):
                 response.success()
 
     @check_suite_whitelist
-    @seq_task(13)
+    @seq_task(14)
     def post_membership_cards_multiple_property(self):
         for mcard in self.membership_cards:
             mcard_json = mcard['json']
@@ -282,7 +289,7 @@ class UserBehavior(TaskSequence):
                              name=f"/membership_cards {LocustLabel.MULTI_PROPERTY}")
 
     @check_suite_whitelist
-    @seq_task(14)
+    @seq_task(15)
     def patch_membership_card_id_payment_card_id_multiple_property(self):
         pcard_id = self.payment_cards[MULTIPLE_PROPERTY_PCARD_INDEX]['id']
         mcard_id = self.membership_cards[0]['id']
@@ -298,7 +305,7 @@ class UserBehavior(TaskSequence):
                 response.success()
 
     @check_suite_whitelist
-    @seq_task(15)
+    @seq_task(16)
     def patch_payment_card_id_membership_card_id_multiple_property(self):
         pcard_id = self.payment_cards[MULTIPLE_PROPERTY_PCARD_INDEX]['id']
         mcard_id = self.membership_cards[1]['id']
@@ -314,7 +321,7 @@ class UserBehavior(TaskSequence):
                 response.success()
 
     @check_suite_whitelist
-    @seq_task(16)
+    @seq_task(17)
     @task(2)
     def get_membership_card_multiple_property(self):
         for mcard in self.membership_cards:
@@ -322,7 +329,7 @@ class UserBehavior(TaskSequence):
                             name=f"/membership_card/<card_id> {LocustLabel.MULTI_PROPERTY}")
 
     @check_suite_whitelist
-    @seq_task(17)
+    @seq_task(18)
     def patch_membership_cards_id_add(self):
         task_counter = 3
         for x in range(task_counter):
@@ -330,20 +337,6 @@ class UserBehavior(TaskSequence):
             converted_index = x % len(self.membership_cards)
             mcard_id = self.membership_cards[converted_index]['id']
             mcard_json = membership_card.random_patch_json(self.pub_key)
-            self.client.patch(f"/membership_card/{mcard_id}", json=mcard_json, headers=self.single_prop_header,
-                              name=f"/membership_card/<mcard_id> {LocustLabel.SINGLE_PROPERTY}")
-
-    @check_suite_whitelist
-    @seq_task(18)
-    def patch_membership_cards_id_ghost(self):
-        task_counter = 2
-        for x in range(task_counter):
-            # reset index if range > max number of membership cards
-            converted_index = x % len(self.join_membership_cards)
-            mcard_id = self.join_membership_cards[converted_index]['id']
-            mcard_json = membership_card.random_registration_json(self.pub_key)
-
-            post_scheme_account_status(membership_card.PRE_REGISTERED_CARD_STATUS, mcard_id)
             self.client.patch(f"/membership_card/{mcard_id}", json=mcard_json, headers=self.single_prop_header,
                               name=f"/membership_card/<mcard_id> {LocustLabel.SINGLE_PROPERTY}")
 

@@ -13,11 +13,12 @@ from data_population.fixtures.client import ALL_CLIENTS, NON_RESTRICTED_CLIENTS
 from data_population.fixtures.payment_scheme import ALL_PAYMENT_PROVIDER_STATUS_MAPPINGS
 from data_population.create_data import (create_association, create_mcard, create_pcard, create_channel, create_plan,
                                          create_service)
-from settings import TSV_PATH
+from settings import TSV_BASE_DIR
 
 logger = logging.getLogger("create-tsv")
 
 BULK_SIZE = 10000
+TRANSACTIONS_PER_MCARD = TOTAL_TRANSACTIONS // TOTAL_MCARDS
 
 
 class HermesTables(str, Enum):
@@ -55,7 +56,7 @@ class HadesTables(str, Enum):
 
 
 def tsv_path(table_name):
-    return f"{TSV_PATH}/{table_name}.tsv"
+    return f"{TSV_BASE_DIR}/{table_name}.tsv"
 
 
 def write_to_tsv_part(file_name, part, rows):
@@ -70,10 +71,10 @@ def write_to_tsv(file_name, rows):
 
 
 def delete_old_tsv_files(table_enum):
-    os.makedirs(TSV_PATH, exist_ok=True)
+    os.makedirs(TSV_BASE_DIR, exist_ok=True)
     for table in table_enum:
         try:
-            path = os.path.join(TSV_PATH, table + "*.tsv")
+            path = os.path.join(TSV_BASE_DIR, table + "*.tsv")
             for file in glob.glob(path):
                 os.remove(file)
         except FileNotFoundError:
@@ -82,27 +83,27 @@ def delete_old_tsv_files(table_enum):
 
 def create_channel_tsv_files():
     organisations = [create_channel.organisation(client) for client in ALL_CLIENTS]
-    write_to_tsv(HermesTables.ORGANISATION, organisations)
+    write_to_tsv_part(HermesTables.ORGANISATION, 0, organisations)
     client_applications = [create_channel.client_application(client) for client in ALL_CLIENTS]
-    write_to_tsv(HermesTables.CLIENT_APP, client_applications)
+    write_to_tsv_part(HermesTables.CLIENT_APP, 0, client_applications)
     client_application_bundle = [create_channel.client_application_bundle(client) for client in ALL_CLIENTS]
-    write_to_tsv(HermesTables.CLIENT_APP_BUNDLE, client_application_bundle)
+    write_to_tsv_part(HermesTables.CLIENT_APP_BUNDLE, 0, client_application_bundle)
 
 
 def create_payment_scheme_tsv_files():
     issuer_names = ["Barclays", "Performance"]
     issuers = [create_pcard.issuer(pk, name) for pk, name in enumerate(issuer_names, 1)]
-    write_to_tsv(HermesTables.PAYMENT_CARD_ISSUER, issuers)
+    write_to_tsv_part(HermesTables.PAYMENT_CARD_ISSUER, 0, issuers)
     payment_schemes = create_pcard.create_all_payment_schemes()
-    write_to_tsv(HermesTables.PAYMENT_SCHEME, payment_schemes)
+    write_to_tsv_part(HermesTables.PAYMENT_SCHEME, 0, payment_schemes)
     payment_images = create_pcard.create_all_payment_card_images()
-    write_to_tsv(HermesTables.PAYMENT_CARD_IMAGE, payment_images)
-    write_to_tsv(HermesTables.PROVIDER_STATUS_MAPPING, ALL_PAYMENT_PROVIDER_STATUS_MAPPINGS)
+    write_to_tsv_part(HermesTables.PAYMENT_CARD_IMAGE, 0, payment_images)
+    write_to_tsv_part(HermesTables.PROVIDER_STATUS_MAPPING, 0, ALL_PAYMENT_PROVIDER_STATUS_MAPPINGS)
 
 
 def create_membership_plan_tsv_files():
     categories = [create_plan.category()]
-    write_to_tsv(HermesTables.CATEGORY, categories)
+    write_to_tsv_part(HermesTables.CATEGORY, 0, categories)
 
     membership_plans = []
     plan_questions = []
@@ -115,8 +116,13 @@ def create_membership_plan_tsv_files():
     voucher_schemes = []
     third_party_consent_index = 1
     for count in range(1, MEMBERSHIP_PLANS + 1):
-        plan_name = f"performance plan {count}"
-        plan_slug = f"performance-plan-{count}"
+        if count == 1:
+            plan_name = f"performance voucher mock {count}"
+            plan_slug = f"performance-voucher-mock-{count}"
+            voucher_schemes.append(create_plan.voucher_scheme(count, count))
+        else:
+            plan_name = f"performance mock {count}"
+            plan_slug = f"performance-mock-{count}"
         membership_plans.append(create_plan.membership_plan(count, plan_name, plan_slug))
         plan_questions.append(create_plan.card_no_question(count, count))
         postcode_question_id = MEMBERSHIP_PLANS + count
@@ -133,18 +139,16 @@ def create_membership_plan_tsv_files():
         )
         third_party_consent_index += total_channels
         third_party_consents.extend(plan_third_party_consent_links)
-        if count == 1:
-            voucher_schemes.append(create_plan.voucher_scheme(count, count))
 
-    write_to_tsv(HermesTables.SCHEME, membership_plans)
-    write_to_tsv(HermesTables.QUESTION, plan_questions)
-    write_to_tsv(HermesTables.SCHEME_IMAGE, scheme_images)
-    write_to_tsv(HermesTables.SCHEME_BALANCE_DETAILS, scheme_balance_details)
-    write_to_tsv(HermesTables.SCHEME_CONTENT, scheme_contents)
-    write_to_tsv(HermesTables.MEMBERSHIP_PLAN_DOCUMENTS, membership_plan_documents)
-    write_to_tsv(HermesTables.SCHEME_CONSENT, scheme_consents)
-    write_to_tsv(HermesTables.THIRD_PARTY_CONSENT_LINK, third_party_consents)
-    write_to_tsv(HermesTables.VOUCHER_SCHEME, voucher_schemes)
+    write_to_tsv_part(HermesTables.SCHEME, 0, membership_plans)
+    write_to_tsv_part(HermesTables.QUESTION, 0, plan_questions)
+    write_to_tsv_part(HermesTables.SCHEME_IMAGE, 0, scheme_images)
+    write_to_tsv_part(HermesTables.SCHEME_BALANCE_DETAILS, 0, scheme_balance_details)
+    write_to_tsv_part(HermesTables.SCHEME_CONTENT, 0, scheme_contents)
+    write_to_tsv_part(HermesTables.MEMBERSHIP_PLAN_DOCUMENTS, 0, membership_plan_documents)
+    write_to_tsv_part(HermesTables.SCHEME_CONSENT, 0, scheme_consents)
+    write_to_tsv_part(HermesTables.THIRD_PARTY_CONSENT_LINK, 0, third_party_consents)
+    write_to_tsv_part(HermesTables.VOUCHER_SCHEME, 0, voucher_schemes)
 
     whitelist_list = []
     whitelist_id = 0
@@ -154,7 +158,7 @@ def create_membership_plan_tsv_files():
             plan_id = plan[0]
             whitelist_list.append(create_channel.channel_scheme_whitelist(whitelist_id, client_fixture, plan_id))
 
-    write_to_tsv(HermesTables.SCHEME_WHITELIST, whitelist_list)
+    write_to_tsv_part(HermesTables.SCHEME_WHITELIST, 0, whitelist_list)
 
 
 def create_service_mcard_and_pcard_tsv_files():
@@ -213,7 +217,7 @@ def create_service_mcard_and_pcard_job(job):
                 break
 
             scheme_id = random.randint(1, MEMBERSHIP_PLANS)
-            membership_cards.append(create_mcard.membership_card(mcard_index, scheme_id))
+            membership_cards.append(create_mcard.membership_card(mcard_index, scheme_id, TRANSACTIONS_PER_MCARD))
             membership_card_associations.append(create_association.scheme_account(mcard_index, mcard_index, service_pk))
             mcard_index += 1
             remaining_service_mcards -= 1
@@ -257,7 +261,7 @@ def create_remaining_mcards_and_pcards(mcard_start, pcard_start, mcard_count, pc
     for x in range(0, mcard_count):
         mcard_pk = x + mcard_start
         scheme_id = random.randint(1, MEMBERSHIP_PLANS)
-        membership_cards.append(create_mcard.membership_card(mcard_pk, scheme_id))
+        membership_cards.append(create_mcard.membership_card(mcard_pk, scheme_id, TRANSACTIONS_PER_MCARD))
 
     payment_cards = []
     for x in range(0, pcard_count):

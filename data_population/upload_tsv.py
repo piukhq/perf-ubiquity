@@ -1,8 +1,10 @@
+import glob
 import logging
+import os
 import psycopg2
 import time
 
-from data_population.create_tsv import HermesTables, HadesTables, tsv_path
+from data_population.create_tsv import HermesTables, HadesTables, TSV_BASE_DIR
 from settings import DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, HERMES_DB, HADES_DB
 
 logger = logging.getLogger("upload-tsv")
@@ -26,8 +28,8 @@ def truncate_table(cur, table_name):
     cur.execute(truncate_statement)
 
 
-def upload_tsv(cur, table_name):
-    with open(tsv_path(table_name)) as f:
+def upload_tsv(cur, table_name, tsv):
+    with open(tsv) as f:
         formatted_name = format_table_name(table_name)
         cur.copy_from(f, formatted_name, sep="\t", null="NULL")
 
@@ -58,8 +60,10 @@ def truncate_and_populate_tables(db_name, tables):
                 truncate_table(cursor, table)
 
             for table in tables:
-                logger.debug(f"Populating table: {table}...")
-                upload_tsv(cursor, table)
+                path = os.path.join(TSV_BASE_DIR, table + "-*.tsv")
+                for tsv in glob.glob(path):
+                    logger.debug(f"Uploading file {tsv} to table {table}")
+                    upload_tsv(cursor, table, tsv)
                 update_seq(cursor, table)
 
 

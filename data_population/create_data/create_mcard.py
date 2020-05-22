@@ -1,8 +1,27 @@
 import json
+import random
 import uuid
 
+import arrow
 
-def membership_card(card_id, scheme_id):
+
+def generate_transactions(transaction_total):
+    transactions = []
+    for count in range(transaction_total):
+        transactions.append(
+            {
+                "date": arrow.now().shift(days=-count).format("DD/MM/YYYY HH:mm:ss"),
+                "description": f"Test Transaction: {uuid.uuid4()}",
+                "points": str(random.randint(1, 99)),
+            }
+        )
+    return json.dumps(transactions)
+
+
+def membership_card(card_id, scheme_id, transaction_total):
+    card_number = uuid.uuid4()
+    transactions = generate_transactions(transaction_total)
+
     return [
         card_id,  # id
         1,  # status
@@ -27,6 +46,9 @@ def membership_card(card_id, scheme_id):
             "scheme_account_id": card_id
         }]),  # balances
         "{}",  # vouchers
+        card_number,  # barcode
+        card_number,  # card number
+        transactions,  # transactions
     ]
 
 

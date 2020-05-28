@@ -6,7 +6,7 @@ from urllib3.util.retry import Retry
 
 from settings import SERVICE_API_KEY, HERMES_URL
 
-REQUEST_TIMEOUT = 20
+REQUEST_TIMEOUT = 30
 
 
 def retry_session():
@@ -37,10 +37,10 @@ def wait_for_scheme_account_status(status, scheme_account_id):
         resp = requests.get(f"{HERMES_URL}/schemes/accounts/query",
                             headers=auth_header, params=params)
 
-        if resp.json()[0]['status'] == status:
+        if resp.json()[0]['status'] == status and resp.json()[0]['card_number']:
             break
 
-        time.sleep(0.5)
+        time.sleep(1)
 
 
 def post_scheme_account_status(status, scheme_account_id):

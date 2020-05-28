@@ -64,6 +64,32 @@ def payment_card_image(pk, image, payment_scheme_id):
     ]
 
 
+def barclay_payment_card_images(pk, image, scheme):
+    images = []
+    image_types = [0, 6]
+    for count in range(2):
+        images.append([
+            pk + count,  # id
+            image_types[count],  # image_type_code (hero)
+            "",  # size_code
+            image,  # image
+            "",  # strap_line
+            "barclays",  # description
+            "NULL",  # url
+            "0",  # call_to_action
+            0,  # order
+            1,  # status (published)
+            "2020-01-01 00:00:00",  # start_date
+            "3030-01-01 00:00:00",  # end_date
+            "2020-01-01 00:00:00",  # created
+            scheme,  # scheme
+            0,  # reward_tier
+            "NULL",  # encoding
+        ])
+
+    return images
+
+
 def create_all_payment_card_images():
     payment_card_images = []
     for scheme_info in PAYMENT_SCHEME_INFO.values():
@@ -73,6 +99,12 @@ def create_all_payment_card_images():
             scheme_info['pk']
         )
         payment_card_images.append(row)
+
+    next_image_pk = len(payment_card_images) + 1
+    barclays_scheme = PAYMENT_SCHEME_INFO["amex"]
+    payment_card_images.extend(
+        barclay_payment_card_images(next_image_pk, barclays_scheme["image"], barclays_scheme["pk"])
+    )
 
     return payment_card_images
 

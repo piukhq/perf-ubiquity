@@ -3,7 +3,8 @@ def pll_link(pk, pcard_id, mcard_id):
         pk,  # id
         True,  # active_link
         pcard_id,  # payment_card_account_id
-        mcard_id  # scheme_account_id
+        mcard_id,  # scheme_account_id
+        3,  # vop_link
     ]
 
 

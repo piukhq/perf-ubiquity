@@ -230,12 +230,6 @@ class UserBehavior(TaskSequence):
     @seq_task(11)
     @task(3)
     def get_membership_card_single_property(self):
-        for mcard in self.join_membership_cards:
-            wait_for_scheme_account_status(membership_card.ACTIVE, mcard['id'])
-
-        for mcard in self.membership_cards:
-            wait_for_scheme_account_status(membership_card.ACTIVE, mcard['id'])
-
         for mcard in self.membership_cards:
             self.client.get(f"/membership_card/{mcard['id']}", headers=self.single_prop_header,
                             name=f"/membership_card/<card_id> {LocustLabel.SINGLE_PROPERTY}")

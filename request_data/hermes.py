@@ -33,14 +33,18 @@ def headers():
 def wait_for_scheme_account_status(status, scheme_account_id):
     auth_header = headers()
     params = {"id": scheme_account_id}
+    match = False
     for _ in range(REQUEST_TIMEOUT):
         resp = requests.get(f"{HERMES_URL}/schemes/accounts/query",
                             headers=auth_header, params=params)
 
-        if resp.json()[0]['status'] == status and resp.json()[0]['card_number']:
+        if resp.json()[0]['status'] == status:
+            match = True
             break
 
         time.sleep(2)
+
+    return match
 
 
 def post_scheme_account_status(status, scheme_account_id):

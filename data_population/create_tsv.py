@@ -42,6 +42,7 @@ class HermesTables(str, Enum):
     PAYMENT_CARD_ISSUER = "payment_card_issuer"
     PAYMENT_SCHEME = "payment_card_paymentcard"
     PAYMENT_CARD_IMAGE = "payment_card_paymentcardimage"
+    PAYMENT_CARD_ACCOUNT_IMAGE = "payment_card_paymentcardaccountimage"
     PROVIDER_STATUS_MAPPING = "payment_card_providerstatusmapping"
     SCHEME_ACCOUNT = "scheme_schemeaccount"
     ANSWER = "scheme_schemeaccountcredentialanswer"
@@ -98,6 +99,8 @@ def create_payment_scheme_tsv_files():
     write_to_tsv_part(HermesTables.PAYMENT_SCHEME, 0, payment_schemes)
     payment_images = create_pcard.create_all_payment_card_images()
     write_to_tsv_part(HermesTables.PAYMENT_CARD_IMAGE, 0, payment_images)
+    payment_card_account_images = create_pcard.create_all_payment_card_account_images()
+    write_to_tsv_part(HermesTables.PAYMENT_CARD_ACCOUNT_IMAGE, 0, payment_card_account_images)
     write_to_tsv_part(HermesTables.PROVIDER_STATUS_MAPPING, 0, ALL_PAYMENT_PROVIDER_STATUS_MAPPINGS)
 
 

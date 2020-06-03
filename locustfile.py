@@ -255,7 +255,6 @@ class UserBehavior(SequentialTaskSet):
             self.client.get(f"/membership_card/{mcard['id']}", headers=auth_header,
                             name=f"/membership_card/<card_id> {LocustLabel.SINGLE_PROPERTY}")
 
-
     @check_suite_whitelist
     @task
     def patch_membership_card_id_payment_card_id_single_property(self):
@@ -304,7 +303,7 @@ class UserBehavior(SequentialTaskSet):
     @task
     def post_membership_cards_multiple_property(self):
         multi_property_error = ("Multi-property membership card request created brand new card rather than "
-                               "linking to existing card")
+                                "linking to existing card")
         for mcard in self.membership_cards:
             with self.client.post("/membership_cards", params=AUTOLINK, json=mcard["json"],
                                   headers=self.multi_prop_header, catch_response=True,

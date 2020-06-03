@@ -108,7 +108,7 @@ class UserBehavior(SequentialTaskSet):
             LocustLabel.SINGLE_PROPERTY: self.single_prop_header,
             LocustLabel.MULTI_PROPERTY: self.multi_prop_header
         }
-        self.enumerated_patch_users = enumerate([self.single_prop_header, self.multi_prop_header])
+        self.enumerated_patch_users = list(enumerate([self.single_prop_header, self.multi_prop_header]))
         self.all_auth_headers = [self.single_prop_header, self.multi_prop_header, self.restricted_prop_header]
 
     @task

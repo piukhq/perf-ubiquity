@@ -6,7 +6,7 @@ from urllib3.util.retry import Retry
 
 from settings import SERVICE_API_KEY, HERMES_URL
 
-REQUEST_TIMEOUT = 10
+REQUEST_TIMEOUT = 6
 
 
 def retry_session():
@@ -42,7 +42,7 @@ def wait_for_scheme_account_status(status, scheme_account_id):
             match = True
             break
 
-        time.sleep(2)
+        time.sleep(5)
 
     return match
 

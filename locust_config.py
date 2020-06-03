@@ -11,6 +11,7 @@ TEST_SUITE = {
     "get_membership_card_single_property": True,
     "patch_membership_card_id_payment_card_id_single_property": False,  # Barclays don't use this endpoint
     "patch_payment_card_id_membership_card_id_single_property": False,  # Barclays don't use this endpoint
+    "post_membership_cards_multiple_property_restricted": True,
     "post_membership_cards_multiple_property": True,
     "patch_membership_card_id_payment_card_id_multiple_property": False,  # Barclays don't use this endpoint
     "patch_payment_card_id_membership_card_id_multiple_property": False,  # Barclays don't use this endpoint

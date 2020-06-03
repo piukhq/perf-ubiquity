@@ -9,7 +9,7 @@ black = "*"
 
 [packages]
 ubiquity-performance = {editable = true,path = "."}
-locustio = "==0.14.5"
+locustio = "*"
 geventhttpclient-wheels = "*"
 faker = "*"
 pyjwt = "*"

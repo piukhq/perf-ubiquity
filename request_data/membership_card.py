@@ -18,7 +18,7 @@ NON_GHOST_CARD_PREFIX = 1
 
 def card_number(ghost=False):
     if ghost:
-        f"{GHOST_CARD_PREFIX}{uuid.uuid4()}"
+        return f"{GHOST_CARD_PREFIX}{uuid.uuid4()}"
 
     return f"{NON_GHOST_CARD_PREFIX}{uuid.uuid4()}"
 
@@ -101,6 +101,20 @@ def random_registration_json(pub_key):
         }
     }
     return encrypt(mcard_json, pub_key)
+
+
+def convert_enrol_to_add_json(enrol_json):
+    enrol_credentials = {cred["column"]: cred["value"] for cred in enrol_json["account"]["enrol_fields"]}
+    return {
+        "account": {
+            "add_fields": [{"column": "Card Number", "value": enrol_credentials["Card Number"]}],
+            "authorise_fields": [
+                {"column": "Postcode", "value": enrol_credentials["Postcode"]},
+                {"column": CONSENT_LABEL, "value": "true"}
+            ],
+        },
+        "membership_plan": enrol_json["membership_plan"]
+    }
 
 
 def encrypt(mcard, pub_key):

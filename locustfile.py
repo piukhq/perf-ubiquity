@@ -20,8 +20,8 @@ TOTAL_CLIENTS = 6
 PCARD_DECRYPT_WAIT_TIME = 120
 MULTIPLE_PROPERTY_PCARD_INDEX = 0
 MULTIPLE_PROPERTY_MCARD_TOTAL = 4
-PATCH_PLAN = MEMBERSHIP_PLANS
-NON_PATCH_PLANS = range(1, MEMBERSHIP_PLANS + 1)[:-1]
+PATCH_PLANS = range(1, MEMBERSHIP_PLANS + 1)[-2:]
+NON_PATCH_PLANS = range(1, MEMBERSHIP_PLANS + 1)[:-2]
 
 AUTOLINK = {"autolink": "true"}
 
@@ -66,6 +66,7 @@ class UserBehavior(SequentialTaskSet):
         self.multi_prop_header = {}
         self.restricted_prop_header = {}
         self.non_restricted_auth_headers = {}
+        self.enumerated_patch_users = []
         self.all_auth_headers = []
         self.membership_plan_total = MEMBERSHIP_PLANS
         self.payment_cards = []
@@ -107,6 +108,7 @@ class UserBehavior(SequentialTaskSet):
             LocustLabel.SINGLE_PROPERTY: self.single_prop_header,
             LocustLabel.MULTI_PROPERTY: self.multi_prop_header
         }
+        self.enumerated_patch_users = enumerate([self.single_prop_header, self.multi_prop_header])
         self.all_auth_headers = [self.single_prop_header, self.multi_prop_header, self.restricted_prop_header]
 
     @task
@@ -194,8 +196,8 @@ class UserBehavior(SequentialTaskSet):
     @check_suite_whitelist
     @task
     def post_membership_cards_single_property_add_ghost_cards(self):
-        for auth_header in [self.single_prop_header, self.multi_prop_header]:
-            plan_id = PATCH_PLAN
+        for count, auth_header in self.enumerated_patch_users:
+            plan_id = PATCH_PLANS[count]
             mcard_json = membership_card.random_add_ghost_card_json(plan_id, self.pub_key)
             with self.client.post("/membership_cards", params=AUTOLINK, json=mcard_json,
                                   headers=self.restricted_prop_header,
@@ -223,11 +225,6 @@ class UserBehavior(SequentialTaskSet):
         resp = self.client.post("/payment_cards", params=AUTOLINK, json=pcard_json, headers=self.single_prop_header,
                                 name=f"/payment_cards {LocustLabel.SINGLE_PROPERTY}")
 
-        if resp.status_code == codes.BAD_REQUEST:
-            raise ValueError(f"HTTP 400 response on post payment card request. "
-                             f"response json: {resp.json()}, "
-                             f"request json: {pcard_json}")
-
         pcard_id = resp.json()['id']
         pcard = {
             'id': pcard_id,
@@ -250,7 +247,7 @@ class UserBehavior(SequentialTaskSet):
             self.client.get(f"/membership_card/{mcard['id']}", headers=self.single_prop_header,
                             name=f"/membership_card/<card_id> {LocustLabel.SINGLE_PROPERTY}")
 
-        for count, auth_header in enumerate([self.single_prop_header, self.multi_prop_header]):
+        for count, auth_header in self.enumerated_patch_users:
             mcard = self.ghost_cards[count]
             self.client.get(f"/membership_card/{mcard['id']}", headers=auth_header,
                             name=f"/membership_card/<card_id> {LocustLabel.SINGLE_PROPERTY}")
@@ -400,7 +397,7 @@ class UserBehavior(SequentialTaskSet):
     @check_suite_whitelist
     @task
     def patch_membership_cards_id_ghost(self):
-        for count, auth_header in enumerate([self.single_prop_header, self.multi_prop_header]):
+        for count, auth_header in self.enumerated_patch_users:
             mcard_id = self.ghost_cards[count]["id"]
             mcard_json = membership_card.random_registration_json(self.pub_key)
 

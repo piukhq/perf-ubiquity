@@ -2,15 +2,15 @@ import multiprocessing
 import os
 from enum import Enum
 
-
-MEMBERSHIP_PLANS = int(os.environ.get("MEMBERSHIP_PLANS", "6"))
+# temp change from 6 to 7 until https://hellobink.atlassian.net/browse/DS-854 is implemented
+MEMBERSHIP_PLANS = int(os.environ.get("MEMBERSHIP_PLANS", "7"))
 TOTAL_USERS = int(os.environ.get("TOTAL_USERS", "500"))
 TOTAL_MCARDS = int(os.environ.get("TOTAL_MCARDS", "200"))
 TOTAL_PCARDS = int(os.environ.get("TOTAL_PCARDS", "2000"))
 TOTAL_TRANSACTIONS = int(os.environ.get("TOTAL_TRANSACTIONS", "10000"))
 
 # Benchmark Test (6 channels)
-# MEMBERSHIP_PLANS = int(os.environ.get("MEMBERSHIP_PLANS", "6"))
+# MEMBERSHIP_PLANS = int(os.environ.get("MEMBERSHIP_PLANS", "7"))
 # TOTAL_USERS = int(os.environ.get("TOTAL_USERS", "449333"))
 # TOTAL_MCARDS = int(os.environ.get("TOTAL_MCARDS", "3082426"))
 # TOTAL_PCARDS = int(os.environ.get("TOTAL_PCARDS", "674000"))

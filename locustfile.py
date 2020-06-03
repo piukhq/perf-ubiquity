@@ -397,11 +397,8 @@ class UserBehavior(SequentialTaskSet):
             converted_index = x % len(self.join_membership_cards)
             mcard_id = self.join_membership_cards[converted_index]['id']
             mcard_json = membership_card.random_patch_json(self.pub_key)
-            resp = self.client.patch(f"/membership_card/{mcard_id}", json=mcard_json, headers=self.single_prop_header,
-                                     name=f"/membership_card/<mcard_id> {LocustLabel.SINGLE_PROPERTY}")
-            if resp.status_code in [400, 404]:
-                print("ghost failed")
-                print(resp.json())
+            self.client.patch(f"/membership_card/{mcard_id}", json=mcard_json, headers=self.single_prop_header,
+                              name=f"/membership_card/<mcard_id> {LocustLabel.SINGLE_PROPERTY}")
 
     @check_suite_whitelist
     @task

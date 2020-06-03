@@ -20,8 +20,8 @@ TOTAL_CLIENTS = 6
 PCARD_DECRYPT_WAIT_TIME = 120
 MULTIPLE_PROPERTY_PCARD_INDEX = 0
 MULTIPLE_PROPERTY_MCARD_TOTAL = 4
-PATCH_PLAN = MEMBERSHIP_PLANS
-NON_PATCH_PLANS = range(1, MEMBERSHIP_PLANS + 1)[:-1]
+PATCH_PLANS = range(1, MEMBERSHIP_PLANS + 1)[-2:]
+NON_PATCH_PLANS = range(1, MEMBERSHIP_PLANS + 1)[:-2]
 
 AUTOLINK = {"autolink": "true"}
 
@@ -66,6 +66,7 @@ class UserBehavior(SequentialTaskSet):
         self.multi_prop_header = {}
         self.restricted_prop_header = {}
         self.non_restricted_auth_headers = {}
+        self.enumerated_patch_users = []
         self.all_auth_headers = []
         self.membership_plan_total = MEMBERSHIP_PLANS
         self.payment_cards = []
@@ -107,6 +108,7 @@ class UserBehavior(SequentialTaskSet):
             LocustLabel.SINGLE_PROPERTY: self.single_prop_header,
             LocustLabel.MULTI_PROPERTY: self.multi_prop_header
         }
+        self.enumerated_patch_users = enumerate([self.single_prop_header, self.multi_prop_header])
         self.all_auth_headers = [self.single_prop_header, self.multi_prop_header, self.restricted_prop_header]
 
     @task
@@ -194,8 +196,8 @@ class UserBehavior(SequentialTaskSet):
     @check_suite_whitelist
     @task
     def post_membership_cards_single_property_add_ghost_cards(self):
-        for auth_header in [self.single_prop_header, self.multi_prop_header]:
-            plan_id = PATCH_PLAN
+        for count, auth_header in self.enumerated_patch_users:
+            plan_id = PATCH_PLANS[count]
             mcard_json = membership_card.random_add_ghost_card_json(plan_id, self.pub_key)
             with self.client.post("/membership_cards", params=AUTOLINK, json=mcard_json,
                                   headers=self.restricted_prop_header,
@@ -223,11 +225,6 @@ class UserBehavior(SequentialTaskSet):
         resp = self.client.post("/payment_cards", params=AUTOLINK, json=pcard_json, headers=self.single_prop_header,
                                 name=f"/payment_cards {LocustLabel.SINGLE_PROPERTY}")
 
-        if resp.status_code == codes.BAD_REQUEST:
-            raise ValueError(f"HTTP 400 response on post payment card request. "
-                             f"response json: {resp.json()}, "
-                             f"request json: {pcard_json}")
-
         pcard_id = resp.json()['id']
         pcard = {
             'id': pcard_id,
@@ -246,15 +243,20 @@ class UserBehavior(SequentialTaskSet):
     @task
     @repeat_task(3)
     def get_membership_card_single_property(self):
-        for mcard in self.join_membership_cards[:MULTIPLE_PROPERTY_MCARD_TOTAL]:
+        for mcard in self.membership_cards:
             self.client.get(f"/membership_card/{mcard['id']}", headers=self.single_prop_header,
+                            name=f"/membership_card/<card_id> {LocustLabel.SINGLE_PROPERTY}")
+
+        for count, auth_header in self.enumerated_patch_users:
+            mcard = self.ghost_cards[count]
+            self.client.get(f"/membership_card/{mcard['id']}", headers=auth_header,
                             name=f"/membership_card/<card_id> {LocustLabel.SINGLE_PROPERTY}")
 
     @check_suite_whitelist
     @task
     def patch_membership_card_id_payment_card_id_single_property(self):
         pcard_id = self.payment_cards[1]['id']
-        mcard_id = self.join_membership_cards[0]['id']
+        mcard_id = self.membership_cards[0]['id']
         self.client.patch(f"/membership_card/{mcard_id}/payment_card/{pcard_id}", headers=self.single_prop_header,
                           name=f"/membership_card/<mcard_id>/payment_card/<pcard_id> "
                                f"{LocustLabel.SINGLE_PROPERTY}")
@@ -270,7 +272,7 @@ class UserBehavior(SequentialTaskSet):
     @task
     def patch_payment_card_id_membership_card_id_single_property(self):
         pcard_id = self.payment_cards[1]['id']
-        mcard_id = self.join_membership_cards[1]['id']
+        mcard_id = self.membership_cards[1]['id']
         self.client.patch(f"/payment_card/{pcard_id}/membership_card/{mcard_id}", headers=self.single_prop_header,
                           name=f"/payment_card/<pcard_id>/membership_card/<mcard_id> "
                                f"{LocustLabel.SINGLE_PROPERTY}")
@@ -284,18 +286,23 @@ class UserBehavior(SequentialTaskSet):
 
     @check_suite_whitelist
     @task
-    def post_membership_cards_multiple_property(self):
-        for mcard in self.join_membership_cards[:MULTIPLE_PROPERTY_MCARD_TOTAL]:
-            mcard_json = membership_card.convert_enrol_to_add_json(mcard["json"])
-            with self.client.post("/membership_cards", params=AUTOLINK, json=mcard_json,
+    def post_membership_cards_multiple_property_restricted(self):
+        all_restricted_cards = self.membership_cards + self.ghost_cards
+        for mcard in all_restricted_cards:
+            with self.client.post("/membership_cards", params=AUTOLINK, json=mcard["json"],
                                   headers=self.restricted_prop_header,
                                   name=f"/membership_cards {LocustLabel.MULTI_RESTRICTED_PROPERTY}",
                                   catch_response=True) as response:
                 if response.status_code == codes.BAD_REQUEST:
                     response.success()
 
-            wait_for_scheme_account_status(membership_card.ACTIVE, mcard["id"])
-            with self.client.post("/membership_cards", params=AUTOLINK, json=mcard_json,
+    @check_suite_whitelist
+    @task
+    def post_membership_cards_multiple_property(self):
+        multi_property_error = ("Multi-property membership card request created brand new card rather than "
+                                "linking to existing card")
+        for mcard in self.membership_cards:
+            with self.client.post("/membership_cards", params=AUTOLINK, json=mcard["json"],
                                   headers=self.multi_prop_header, catch_response=True,
                                   name=f"/membership_cards {LocustLabel.MULTI_PROPERTY}") as response:
 
@@ -303,14 +310,25 @@ class UserBehavior(SequentialTaskSet):
                 if new_mcard_id == mcard["id"]:
                     response.success()
                 else:
-                    response.failure("Multi-property membership card request created brand new card rather than "
-                                     "linking to existing card")
+                    response.failure(multi_property_error)
+
+        for count, auth_header in enumerate([self.multi_prop_header, self.single_prop_header]):
+            mcard = self.ghost_cards[count]
+            with self.client.post("/membership_cards", params=AUTOLINK, json=mcard["json"],
+                                  headers=auth_header, catch_response=True,
+                                  name=f"/membership_cards {LocustLabel.MULTI_PROPERTY}") as response:
+
+                new_mcard_id = response.json()["id"]
+                if new_mcard_id == mcard["id"]:
+                    response.success()
+                else:
+                    response.failure(multi_property_error)
 
     @check_suite_whitelist
     @task
     def patch_membership_card_id_payment_card_id_multiple_property(self):
         pcard_id = self.payment_cards[MULTIPLE_PROPERTY_PCARD_INDEX]['id']
-        mcard_id = self.join_membership_cards[0]['id']
+        mcard_id = self.membership_cards[0]['id']
         self.client.patch(f"/membership_card/{mcard_id}/payment_card/{pcard_id}", headers=self.multi_prop_header,
                           name=f"/membership_card/<mcard_id>/payment_card/<pcard_id> "
                                f"{LocustLabel.MULTI_PROPERTY}")
@@ -326,7 +344,7 @@ class UserBehavior(SequentialTaskSet):
     @task
     def patch_payment_card_id_membership_card_id_multiple_property(self):
         pcard_id = self.payment_cards[MULTIPLE_PROPERTY_PCARD_INDEX]['id']
-        mcard_id = self.join_membership_cards[1]['id']
+        mcard_id = self.membership_cards[1]['id']
         self.client.patch(f"/payment_card/{pcard_id}/membership_card/{mcard_id}", headers=self.multi_prop_header,
                           name=f"/payment_card/<pcard_id>/membership_card/<mcard_id> "
                                f"{LocustLabel.MULTI_PROPERTY}")
@@ -342,7 +360,8 @@ class UserBehavior(SequentialTaskSet):
     @task
     @repeat_task(2)
     def get_membership_card_multiple_property(self):
-        for mcard in self.join_membership_cards[:MULTIPLE_PROPERTY_MCARD_TOTAL]:
+        all_multi_property_cards = self.membership_cards + self.ghost_cards
+        for mcard in all_multi_property_cards:
             self.client.get(f"/membership_card/{mcard['id']}", headers=self.multi_prop_header,
                             name=f"/membership_card/<card_id> {LocustLabel.MULTI_PROPERTY}")
 
@@ -378,7 +397,7 @@ class UserBehavior(SequentialTaskSet):
     @check_suite_whitelist
     @task
     def patch_membership_cards_id_ghost(self):
-        for count, auth_header in enumerate([self.single_prop_header, self.multi_prop_header]):
+        for count, auth_header in self.enumerated_patch_users:
             mcard_id = self.ghost_cards[count]["id"]
             mcard_json = membership_card.random_registration_json(self.pub_key)
 
@@ -419,7 +438,7 @@ class UserBehavior(SequentialTaskSet):
     @task
     @repeat_task(2)
     def delete_membership_card(self):
-        mcard = self.join_membership_cards.pop(0)
+        mcard = self.membership_cards.pop(0)
         self.client.delete(f"/membership_card/{mcard['id']}", headers=self.multi_prop_header,
                            name=f"/membership_card/<card_id> {LocustLabel.MULTI_PROPERTY}")
 

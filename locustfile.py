@@ -244,7 +244,7 @@ class UserBehavior(SequentialTaskSet):
 
     @check_suite_whitelist
     @task
-    @repeat_task(12)
+    @repeat_task(3)
     def get_membership_card_single_property(self):
         for mcard in self.join_membership_cards[:MULTIPLE_PROPERTY_MCARD_TOTAL]:
             self.client.get(f"/membership_card/{mcard['id']}", headers=self.single_prop_header,

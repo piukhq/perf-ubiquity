@@ -33,17 +33,12 @@ def membership_card(card_id, scheme_id, transaction_total):
         "NULL",  # link_date
         "NULL",  # join_date
         json.dumps([{
-            "value": 0.0,
-            "points": 380.01,
-            "balance": "NULL",
-            "is_stale": False,
-            "user_set": "NULL",
-            "scheme_id": 194,
-            "updated_at": 1584012379,
-            "reward_tier": 1,
-            "value_label": "NULL",
-            "points_label": "380",
-            "scheme_account_id": card_id
+            "value": 31,
+            "prefix": "",
+            "suffix": "pts",
+            "currency": "points",
+            "updated_at": 1591719196,
+            "description": "Placeholder Balance Description"
         }]),  # balances
         "{}",  # vouchers
         card_number,  # barcode

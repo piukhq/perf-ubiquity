@@ -215,8 +215,10 @@ def create_service_mcard_and_pcard_job(job):
         users.append(create_service.user(service_pk))
         services.append(create_service.service(service_pk))
 
+        create_pll_link = True
         for mcard_count in range(0, MCARDS_PER_SERVICE):
             if not remaining_service_mcards:
+                create_pll_link = False
                 break
 
             scheme_id = random.randint(1, MEMBERSHIP_PLANS)
@@ -227,6 +229,7 @@ def create_service_mcard_and_pcard_job(job):
 
         for pcard_count in range(0, PCARDS_PER_SERVICE):
             if not remaining_service_pcards:
+                create_pll_link = False
                 break
 
             payment_cards.append(create_pcard.payment_card(pcard_index))
@@ -234,7 +237,8 @@ def create_service_mcard_and_pcard_job(job):
             pcard_index += 1
             remaining_service_pcards -= 1
 
-        pll_links.append(create_association.pll_link(pcard_index - 1, pcard_index - 1, mcard_index - 1))
+        if create_pll_link:
+            pll_links.append(create_association.pll_link(pcard_index - 1, pcard_index - 1, mcard_index - 1))
 
         if service_pk % 100000 == 0:
             logger.info(f"Generated {service_pk} users")

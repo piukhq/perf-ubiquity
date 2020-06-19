@@ -2,9 +2,11 @@
 TEST_SUITE = {
     "get_service": True,
     "post_membership_cards_single_property_join": True,
+    "post_membership_cards_restricted_property_join": True,
     "get_membership_plans": True,
     "get_membership_plan_id": True,
     "post_membership_cards_single_property_add": True,
+    "post_membership_cards_restricted_property_add": True,
     "post_membership_cards_single_property_add_ghost_cards": True,
     "post_payment_cards_single_property": True,
     "post_payment_cards_multiple_property": True,

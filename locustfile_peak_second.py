@@ -79,18 +79,11 @@ class UserBehavior(SequentialTaskSet):
 
     @check_suite_whitelist
     @task
-    @repeat_task(5)
+    @repeat_task(3)
     def post_membership_cards_single_property_join(self):
         plan_id = self.plan_counter
         mcard_json = membership_card.random_join_json(plan_id, self.pub_key)
         self.plan_counter = increment_locust_counter(self.plan_counter, len(NON_PATCH_PLANS))
-
-        with self.client.post("/membership_cards", params=AUTOLINK, json=mcard_json,
-                              headers=self.restricted_prop_header,
-                              name=f"/membership_cards {LocustLabel.SINGLE_RESTRICTED_PROPERTY}",
-                              catch_response=True) as response:
-            if response.status_code == codes.BAD_REQUEST:
-                response.success()
 
         resp = self.client.post("/membership_cards", json=mcard_json, headers=self.single_prop_header,
                                 name=f"/membership_cards {LocustLabel.SINGLE_PROPERTY}")
@@ -104,7 +97,20 @@ class UserBehavior(SequentialTaskSet):
 
     @check_suite_whitelist
     @task
-    @repeat_task(6)
+    def post_membership_cards_restricted_property_join(self):
+        mcard_info = self.join_membership_cards[0]
+        mcard_json = mcard_info["json"]
+
+        with self.client.post("/membership_cards", params=AUTOLINK, json=mcard_json,
+                              headers=self.restricted_prop_header,
+                              name=f"/membership_cards {LocustLabel.SINGLE_RESTRICTED_PROPERTY}",
+                              catch_response=True) as response:
+            if response.status_code == codes.BAD_REQUEST:
+                response.success()
+
+    @check_suite_whitelist
+    @task
+    @repeat_task(5)
     def get_membership_plans(self):
         plan_filters = {
             "fields": ["id", "status", "feature_set", "account", "images", "balances", "card", "content"],
@@ -116,7 +122,7 @@ class UserBehavior(SequentialTaskSet):
 
     @check_suite_whitelist
     @task
-    @repeat_task(24)
+    @repeat_task(15)
     def get_membership_plan_id(self):
         plan_id = random.choice(range(1, self.membership_plan_total))
         self.client.get(f"/membership_plan/{plan_id}", headers=self.single_prop_header,
@@ -129,12 +135,6 @@ class UserBehavior(SequentialTaskSet):
         plan_id = self.plan_counter
         mcard_json = membership_card.random_add_json(plan_id, self.pub_key)
         self.plan_counter = increment_locust_counter(self.plan_counter, len(NON_PATCH_PLANS))
-        with self.client.post("/membership_cards", params=AUTOLINK, json=mcard_json,
-                              headers=self.restricted_prop_header,
-                              name=f"/membership_cards {LocustLabel.SINGLE_RESTRICTED_PROPERTY}",
-                              catch_response=True) as response:
-            if response.status_code == codes.BAD_REQUEST:
-                response.success()
 
         resp = self.client.post("/membership_cards", params=AUTOLINK, json=mcard_json, headers=self.single_prop_header,
                                 name=f"/membership_cards {LocustLabel.SINGLE_PROPERTY}")
@@ -148,16 +148,24 @@ class UserBehavior(SequentialTaskSet):
 
     @check_suite_whitelist
     @task
+    def post_membership_cards_restricted_property_add(self):
+        mcard_info = self.membership_cards[0]
+        mcard_json = mcard_info["json"]
+
+        self.plan_counter = increment_locust_counter(self.plan_counter, len(NON_PATCH_PLANS))
+        with self.client.post("/membership_cards", params=AUTOLINK, json=mcard_json,
+                              headers=self.restricted_prop_header,
+                              name=f"/membership_cards {LocustLabel.SINGLE_RESTRICTED_PROPERTY}",
+                              catch_response=True) as response:
+            if response.status_code == codes.BAD_REQUEST:
+                response.success()
+
+    @check_suite_whitelist
+    @task
     def post_membership_cards_single_property_add_ghost_cards(self):
         for count, auth_header in self.enumerated_patch_users:
             plan_id = PATCH_PLANS[count]
             mcard_json = membership_card.random_add_ghost_card_json(plan_id, self.pub_key)
-            with self.client.post("/membership_cards", params=AUTOLINK, json=mcard_json,
-                                  headers=self.restricted_prop_header,
-                                  name=f"/membership_cards {LocustLabel.SINGLE_RESTRICTED_PROPERTY}",
-                                  catch_response=True) as response:
-                if response.status_code == codes.BAD_REQUEST:
-                    response.success()
 
             resp = self.client.post("/membership_cards", params=AUTOLINK, json=mcard_json, headers=auth_header,
                                     name=f"/membership_cards {LocustLabel.SINGLE_PROPERTY}")
@@ -171,7 +179,7 @@ class UserBehavior(SequentialTaskSet):
 
     @check_suite_whitelist
     @task
-    @repeat_task(5)
+    @repeat_task(4)
     def post_payment_cards_single_property(self):
         pcard = payment_card.generate_unencrypted_random()
         pcard_json = payment_card.encrypt(pcard, self.pub_key)
@@ -194,7 +202,7 @@ class UserBehavior(SequentialTaskSet):
 
     @check_suite_whitelist
     @task
-    @repeat_task(3)
+    @repeat_task(2)
     def get_membership_card_single_property(self):
         for mcard in self.membership_cards:
             self.client.get(f"/membership_card/{mcard['id']}", headers=self.single_prop_header,
@@ -241,7 +249,8 @@ class UserBehavior(SequentialTaskSet):
     @task
     def post_membership_cards_multiple_property_restricted(self):
         all_restricted_cards = self.membership_cards + self.ghost_cards
-        for mcard in all_restricted_cards:
+        # remove list slice to revert peak second change
+        for mcard in all_restricted_cards[:1]:
             with self.client.post("/membership_cards", params=AUTOLINK, json=mcard["json"],
                                   headers=self.restricted_prop_header,
                                   name=f"/membership_cards {LocustLabel.MULTI_RESTRICTED_PROPERTY}",
@@ -311,16 +320,16 @@ class UserBehavior(SequentialTaskSet):
 
     @check_suite_whitelist
     @task
-    @repeat_task(2)
     def get_membership_card_multiple_property(self):
         all_multi_property_cards = self.membership_cards + self.ghost_cards
-        for mcard in all_multi_property_cards:
+        # remove list slice to revert peak second change
+        for mcard in all_multi_property_cards[:3]:
             self.client.get(f"/membership_card/{mcard['id']}", headers=self.multi_prop_header,
                             name=f"/membership_card/<card_id> {LocustLabel.MULTI_PROPERTY}")
 
     @check_suite_whitelist
     @task
-    @repeat_task(27)
+    @repeat_task(11)
     def get_payment_cards(self):
         for auth_header in self.non_restricted_auth_headers.values():
             self.client.get("/payment_cards", headers=auth_header,
@@ -328,7 +337,7 @@ class UserBehavior(SequentialTaskSet):
 
     @check_suite_whitelist
     @task
-    @repeat_task(27)
+    @repeat_task(11)
     def get_membership_cards(self):
         mcard_filters = {
             "fields": [
@@ -381,7 +390,7 @@ class UserBehavior(SequentialTaskSet):
 
     @check_suite_whitelist
     @task
-    @repeat_task(3)
+    @repeat_task(2)
     def delete_payment_card_single_property(self):
         pcard_id = self.payment_cards.pop(0)['id']
         self.client.delete(f"/payment_card/{pcard_id}", headers=self.single_prop_header,

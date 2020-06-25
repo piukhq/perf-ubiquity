@@ -71,7 +71,7 @@ class UserBehavior(SequentialTaskSet):
     def post_payment_cards_single_property(self):
         pcard = payment_card.generate_unencrypted_random()
         pcard_json = payment_card.encrypt(pcard, self.pub_key)
-        resp = self.client.post("/payment_cards", params=AUTOLINK, json=pcard_json, headers=self.single_prop_header,
+        resp = self.client.post("/payment_cards", json=pcard_json, headers=self.single_prop_header,
                                 name="LC003 - Register payment cards with BINK")
 
         pcard_id = resp.json()['id']

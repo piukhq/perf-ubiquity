@@ -46,6 +46,8 @@ TEST_SUITE = {
     "delete_membership_card": True,
     "delete_service": True,
     "stop_locust_after_test_suite": True,
+    # barclays specific tests
+    "post_membership_cards": True,
 }
 
 

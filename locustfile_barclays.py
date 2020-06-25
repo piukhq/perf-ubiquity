@@ -157,15 +157,6 @@ class UserBehavior(SequentialTaskSet):
 
     @check_suite_whitelist
     @task
-    @repeat_task(10)
-    # LC007 - Retrieve loyalty card transactions
-    def get_membership_card_single_property(self):
-        mcard = self.membership_cards[0]
-        self.client.get(f"/membership_card/{mcard['id']}", headers=self.single_prop_header,
-                        name="LC007 - Retrieve loyalty card transactions")
-
-    @check_suite_whitelist
-    @task
     # LC006 - Delete loyalty card
     def delete_membership_card(self):
         check_counter = self.service_counter - 1

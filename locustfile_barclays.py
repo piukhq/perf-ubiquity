@@ -124,7 +124,7 @@ class UserBehavior(SequentialTaskSet):
         plan_id = random.choice(range(1, self.membership_plan_total + 1))
         journey = random.choice(list(MembershipCardJourney))
 
-        if journey == MembershipCardJourney.Add:
+        if journey == MembershipCardJourney.ADD:
             self.post_membership_card_add_auth(plan_id)
         elif journey == MembershipCardJourney.ENROL:
             self.post_membership_cards_enrol(plan_id)

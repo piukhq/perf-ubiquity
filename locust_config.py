@@ -1,3 +1,22 @@
+import json
+from enum import Enum
+from functools import wraps
+
+from shared_config_storage.vault import secrets
+
+from data_population.create_tsv import MEMBERSHIP_PLANS
+from settings import CHANNEL_VAULT_PATH, VAULT_URL, VAULT_TOKEN, LOCAL_SECRETS, LOCAL_SECRETS_PATH
+
+# Change this to specify how many channels the locust tests use
+TOTAL_CLIENTS = 6
+PCARD_DECRYPT_WAIT_TIME = 120
+MULTIPLE_PROPERTY_PCARD_INDEX = 0
+MULTIPLE_PROPERTY_MCARD_TOTAL = 4
+PATCH_PLANS = range(1, MEMBERSHIP_PLANS + 1)[-2:]
+NON_PATCH_PLANS = range(1, MEMBERSHIP_PLANS + 1)[:-2]
+
+AUTOLINK = {"autolink": "true"}
+
 
 TEST_SUITE = {
     "get_service": True,
@@ -35,3 +54,36 @@ def check_suite_whitelist(test_func):
         return test_func
     else:
         return lambda *args, **kwargs: None
+
+
+def repeat_task(num: int):
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            for _ in range(num):
+                func(*args, **kwargs)
+            return True
+        return wrapper
+    return decorator
+
+
+class LocustLabel(str, Enum):
+    SINGLE_PROPERTY = "- Single property"
+    MULTI_PROPERTY = "- Multi property"
+    SINGLE_RESTRICTED_PROPERTY = "- Single restricted property"
+    MULTI_RESTRICTED_PROPERTY = "- Multi restricted property"
+
+
+def increment_locust_counter(count, max_count):
+    new_count = (count % max_count) + 1
+    return new_count
+
+
+def load_secrets():
+    if LOCAL_SECRETS:
+        with open(LOCAL_SECRETS_PATH) as fp:
+            channel_info = json.load(fp)
+    else:
+        channel_info = secrets.read_vault(CHANNEL_VAULT_PATH, VAULT_URL, VAULT_TOKEN)
+
+    return channel_info

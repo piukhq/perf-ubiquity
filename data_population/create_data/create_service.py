@@ -27,6 +27,7 @@ def user(user_id):
         user_email,  # external_id
         False,  # is_tester
         "NULL",  # apple
+        "",  # delete_token
     ]
 
 

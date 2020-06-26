@@ -1,3 +1,4 @@
+import json
 import uuid
 
 from data_population.fixtures.client import ALL_CLIENTS
@@ -56,6 +57,15 @@ def membership_plan(scheme_id, name, slug):
         "register info",  # plan_register_info
         {"ADD", "REGISTRATION", "ENROL"},  # linking_support
         False,  # test_scheme
+        json.dumps({
+            "0": {
+                "url": "/media/schemes/HarveyNichols_UPPT2Yx.png",
+                "type": 0,
+                "encoding": "png",
+                "description": "performance hero image"
+            },
+            "8": {}
+        }),  # formatted_images
     ]
 
 
@@ -163,7 +173,7 @@ def scheme_image(pk, scheme_id):
         scheme_id,  # scheme
         "schemes/HarveyNichols_UPPT2Yx.png",  # image
         0,  # reward tier
-        "NULL",  # encoding
+        "png",  # encoding
     ]
 
 

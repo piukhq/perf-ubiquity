@@ -28,7 +28,7 @@ def static_add_json(pub_key):
         "account": {
             "add_fields": [{"column": "Card Number", "value": f"{NON_GHOST_CARD_PREFIX}000000000000000016"}],
             "authorise_fields": [
-                {"column": "Postcode", "value": "rg5 5aa"},
+                {"column": "Password", "value": "testpassword123"},
                 {"column": CONSENT_LABEL, "value": "true"}
             ],
         },
@@ -43,7 +43,7 @@ def random_add_json(plan_id, pub_key):
         "account": {
             "add_fields": [{"column": "Card Number", "value": card_number()}],
             "authorise_fields": [
-                {"column": "Postcode", "value": fake.postcode()},
+                {"column": "Password", "value": fake.password()},
                 {"column": CONSENT_LABEL, "value": "true"}
             ],
         },
@@ -58,7 +58,7 @@ def random_add_ghost_card_json(plan_id, pub_key):
         "account": {
             "add_fields": [{"column": "Card Number", "value": card_number(ghost=True)}],
             "authorise_fields": [
-                {"column": "Postcode", "value": fake.postcode()},
+                {"column": "Password", "value": fake.password()},
                 {"column": CONSENT_LABEL, "value": "true"}
             ],
         },
@@ -73,7 +73,7 @@ def random_join_json(plan_id, pub_key):
         "account": {
             "enrol_fields": [
                 {"column": "Card Number", "value": card_number()},
-                {"column": "Postcode", "value": fake.postcode()}
+                {"column": "Password", "value": fake.password()}
             ]
         },
         "membership_plan": plan_id
@@ -85,7 +85,7 @@ def random_join_json(plan_id, pub_key):
 def random_patch_json(pub_key):
     mcard_json = {
         "account": {
-            "auth_fields": [{"column": "Postcode", "value": fake.postcode()}]
+            "auth_fields": [{"column": "Password", "value": fake.password()}]
         }
     }
 
@@ -96,7 +96,7 @@ def random_registration_json(pub_key):
     mcard_json = {
         "account": {
             "registration_fields": [
-                {"column": "Postcode", "value": fake.postcode()}
+                {"column": "Password", "value": fake.password()}
             ]
         }
     }
@@ -109,7 +109,7 @@ def convert_enrol_to_add_json(enrol_json):
         "account": {
             "add_fields": [{"column": "Card Number", "value": enrol_credentials["Card Number"]}],
             "authorise_fields": [
-                {"column": "Postcode", "value": enrol_credentials["Postcode"]},
+                {"column": "Password", "value": enrol_credentials["Password"]},
                 {"column": CONSENT_LABEL, "value": "true"}
             ],
         },

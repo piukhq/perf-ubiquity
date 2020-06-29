@@ -5,7 +5,7 @@ from data_population.fixtures.client import ALL_CLIENTS
 from data_population.fixtures.membership_plan import CONSENT_LABEL
 
 PERFORMANCE_CATEGORY_ID = 5000
-SENSITIVE_FIELDS = ["Postcode"]
+SENSITIVE_FIELDS = ["Password"]
 
 
 def category():
@@ -92,12 +92,12 @@ def card_no_question(question_id, scheme_id):
     ]
 
 
-def postcode_question(question_id, scheme_id):
+def password_question(question_id, scheme_id):
     return [
         question_id,  # id
-        "Postcode",  # label
+        "Password",  # label
         scheme_id,  # scheme_id
-        "postcode",  # type
+        "password",  # type
         0,  # order
         False,  # manual_question
         False,  # scan_question

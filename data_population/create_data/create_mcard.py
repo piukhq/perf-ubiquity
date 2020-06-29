@@ -56,7 +56,7 @@ def card_number_answer(answer_id, scheme_account_id, question_id):
     ]
 
 
-def postcode_answer(answer_id, scheme_account_id, question_id):
+def password_answer(answer_id, scheme_account_id, question_id):
     return [
         answer_id,  # id
         uuid.uuid4(),  # answer

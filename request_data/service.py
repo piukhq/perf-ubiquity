@@ -32,5 +32,5 @@ def generate_random():
 
 def generate_static():
     return {
-        "consent": {"email": f"performance-test@testbink.com", "timestamp": 1542189471}
+        "consent": {"email": "performance-test@testbink.com", "timestamp": 1542189471}
     }

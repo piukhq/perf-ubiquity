@@ -4,7 +4,7 @@ from locust import constant, task, HttpUser, SequentialTaskSet
 
 from data_population.create_tsv import MEMBERSHIP_PLANS
 from data_population.fixtures.client import CLIENT_ONE, NON_RESTRICTED_CLIENTS
-from locust_config import repeat_task, load_secrets, LocustLabel, AUTOLINK
+from locust_config import repeat_task, load_secrets, AUTOLINK
 from request_data import service, membership_card, payment_card
 
 
@@ -91,7 +91,7 @@ class UserBehavior(SequentialTaskSet):
             "/payment_cards",
             headers=self.single_prop_header,
             params={"threading_threshold": 20},
-            name=f"/payment_cards 2 no thread"
+            name="/payment_cards 2 no thread"
         )
 
     @task
@@ -101,7 +101,7 @@ class UserBehavior(SequentialTaskSet):
             "/payment_cards",
             headers=self.single_prop_header,
             params={"threading_threshold": 1},
-            name=f"/payment_cards 2 yes thread"
+            name="/payment_cards 2 yes thread"
         )
 
     @task
@@ -126,7 +126,7 @@ class UserBehavior(SequentialTaskSet):
             "/payment_cards",
             headers=self.single_prop_header,
             params={"threading_threshold": 20},
-            name=f"/payment_cards 3 no thread"
+            name="/payment_cards 3 no thread"
         )
 
     @task
@@ -136,7 +136,7 @@ class UserBehavior(SequentialTaskSet):
             "/payment_cards",
             headers=self.single_prop_header,
             params={"threading_threshold": 1},
-            name=f"/payment_cards 3 yes thread"
+            name="/payment_cards 3 yes thread"
         )
 
     @task
@@ -161,7 +161,7 @@ class UserBehavior(SequentialTaskSet):
             "/payment_cards",
             headers=self.single_prop_header,
             params={"threading_threshold": 20},
-            name=f"/payment_cards 4 no thread"
+            name="/payment_cards 4 no thread"
         )
 
     @task
@@ -171,7 +171,7 @@ class UserBehavior(SequentialTaskSet):
             "/payment_cards",
             headers=self.single_prop_header,
             params={"threading_threshold": 1},
-            name=f"/payment_cards 4 yes thread"
+            name="/payment_cards 4 yes thread"
         )
 
     @task

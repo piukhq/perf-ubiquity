@@ -3,18 +3,18 @@ import os
 from enum import Enum
 
 # temp change from 6 to 7 until https://hellobink.atlassian.net/browse/DS-854 is implemented
-# MEMBERSHIP_PLANS = int(os.environ.get("MEMBERSHIP_PLANS", "7"))
-# TOTAL_USERS = int(os.environ.get("TOTAL_USERS", "500"))
-# TOTAL_MCARDS = int(os.environ.get("TOTAL_MCARDS", "5000"))
-# TOTAL_PCARDS = int(os.environ.get("TOTAL_PCARDS", "2000"))
-# TOTAL_TRANSACTIONS = int(os.environ.get("TOTAL_TRANSACTIONS", "10000"))
-
-# Barclays configuration
-MEMBERSHIP_PLANS = int(os.environ.get("MEMBERSHIP_PLANS", "3"))
-TOTAL_USERS = int(os.environ.get("TOTAL_USERS", "5000"))
+MEMBERSHIP_PLANS = int(os.environ.get("MEMBERSHIP_PLANS", "7"))
+TOTAL_USERS = int(os.environ.get("TOTAL_USERS", "500"))
 TOTAL_MCARDS = int(os.environ.get("TOTAL_MCARDS", "5000"))
 TOTAL_PCARDS = int(os.environ.get("TOTAL_PCARDS", "2000"))
 TOTAL_TRANSACTIONS = int(os.environ.get("TOTAL_TRANSACTIONS", "10000"))
+
+# Barclays configuration
+# MEMBERSHIP_PLANS = int(os.environ.get("MEMBERSHIP_PLANS", "3"))
+# TOTAL_USERS = int(os.environ.get("TOTAL_USERS", "5000"))
+# TOTAL_MCARDS = int(os.environ.get("TOTAL_MCARDS", "5000"))
+# TOTAL_PCARDS = int(os.environ.get("TOTAL_PCARDS", "2000"))
+# TOTAL_TRANSACTIONS = int(os.environ.get("TOTAL_TRANSACTIONS", "10000"))
 
 # Benchmark Test (6 channels)
 # MEMBERSHIP_PLANS = int(os.environ.get("MEMBERSHIP_PLANS", "7"))

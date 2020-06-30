@@ -128,8 +128,8 @@ def create_membership_plan_tsv_files():
             plan_slug = f"performance-mock-{count}"
         membership_plans.append(create_plan.membership_plan(count, plan_name, plan_slug))
         plan_questions.append(create_plan.card_no_question(count, count))
-        postcode_question_id = MEMBERSHIP_PLANS + count
-        plan_questions.append(create_plan.postcode_question(postcode_question_id, count))
+        password_question_id = MEMBERSHIP_PLANS + count
+        plan_questions.append(create_plan.password_question(password_question_id, count))
         scheme_images.append(create_plan.scheme_image(count, count))
         scheme_balance_details.append(create_plan.scheme_balance_details(count, count))
         scheme_contents.append(create_plan.scheme_content(count, count))
@@ -314,7 +314,7 @@ def create_membership_card_answers_job(job):
         add_answers.append(create_mcard.card_number_answer(add_answer_pk, add_answer_pk, add_question_pk))
         auth_answer_pk = TOTAL_MCARDS + add_answer_pk
         auth_question_pk = add_question_pk + MEMBERSHIP_PLANS
-        auth_answers.append(create_mcard.postcode_answer(auth_answer_pk, add_answer_pk, auth_question_pk))
+        auth_answers.append(create_mcard.password_answer(auth_answer_pk, add_answer_pk, auth_question_pk))
 
         if add_answer_pk % 100000 == 0:
             logger.info(f"Generated {add_answer_pk} answers")

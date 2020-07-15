@@ -1,7 +1,6 @@
 stages:
   - tests
   - build
-  - dev
 
 complexity:
   stage: tests
@@ -23,17 +22,9 @@ build-master:
   before_script:
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
   script:
-    - docker build --pull -t "$CI_REGISTRY/ubiquity-performance:latest" --build-arg "DEPLOY_KEY=$DEPLOY_KEY" .
+    - docker build --pull -t "$CI_REGISTRY/ubiquity-performance:latest" .
+    - docker tag "$CI_REGISTRY/ubiquity-performance:latest" "$CI_REGISTRY/ubiquity-performance:master-$CI_COMMIT_SHORT_SHA"
     - docker push "$CI_REGISTRY/ubiquity-performance:latest"
+    - docker push "$CI_REGISTRY/ubiquity-performance:master-$CI_COMMIT_SHORT_SHA"
   only:
     - master
-
-tag-master:
-  stage: dev
-  image: binkops.azurecr.io/tagbot:latest
-  environment: dev
-  script:
-    - tagbot --username "$CI_REGISTRY_USER" --password "$CI_REGISTRY_PASSWORD" --source "$CI_REGISTRY/ubiquity-performance:latest" --tag "master-$CI_COMMIT_SHORT_SHA"
-  only:
-    - master
-

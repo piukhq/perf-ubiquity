@@ -3,22 +3,27 @@ name = "pypi"
 url = "https://pypi.org/simple"
 verify_ssl = true
 
+[[source]]
+url = "https://269fdc63-af3d-4eca-8101-8bddc22d6f14:b694b5b1-f97e-49e4-959e-f3c202e3ab91@pypi.tools.bink.sh/simple"
+verify_ssl = true
+name = "bink-pypi"
+
 [dev-packages]
 flake8 = "*"
 black = "*"
 
 [packages]
 ubiquity-performance = {editable = true,path = "."}
-locustio = "*"
+locust = "*"
 geventhttpclient-wheels = "*"
 faker = "*"
 pyjwt = "*"
-shared-config-storage = {git = "ssh://git@git.bink.com/libs/shared-config-storage.git",version = "*"}
 requests = "*"
 psycopg2 = "*"
 urllib3 = "*"
 click = "*"
 arrow = "*"
+shared-config-storage = {index = "bink-pypi", version = "*"}
 
 [requires]
 python_version = "3.7"

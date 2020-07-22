@@ -46,6 +46,7 @@ def membership_card(card_id, scheme_id, transaction_total):
         transactions,  # transactions
         card_number,  # main_answer
         json.dumps([]),  # pll_links
+        "{}",  # formatted_images
     ]
 
 

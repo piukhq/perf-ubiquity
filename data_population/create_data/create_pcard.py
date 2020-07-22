@@ -23,6 +23,7 @@ def payment_scheme(pk, name, slug, url, input_label, system, token_method):
         system,  # system
         "debit",  # type
         token_method,  # token_method
+        "{}",  # formatted_images
     ]
 
 
@@ -134,4 +135,5 @@ def payment_card(card_id):
         token,  # psp_token
         "{}",  # consents
         token,  # hash
+        "{}",  # formatted_images
     ]

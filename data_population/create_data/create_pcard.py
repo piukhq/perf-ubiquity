@@ -1,3 +1,4 @@
+import json
 import uuid
 
 from data_population.fixtures.payment_scheme import PAYMENT_SCHEME_INFO
@@ -136,4 +137,6 @@ def payment_card(card_id):
         "{}",  # consents
         token,  # hash
         "{}",  # formatted_images
+        json.dumps([]),  # PLL_links
+
     ]

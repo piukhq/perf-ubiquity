@@ -131,7 +131,7 @@ def payment_card(card_id):
         "GBP",  # currency code
         "3333",  # pan_end
         "333333",  # pan_start
-        True,  # is_deleted
+        False,  # is_deleted
         token,  # fingerprint
         token,  # psp_token
         "{}",  # consents

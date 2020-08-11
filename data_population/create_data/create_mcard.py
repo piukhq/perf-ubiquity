@@ -29,7 +29,7 @@ def membership_card(card_id, scheme_id, transaction_total):
         "2019-03-12 15:51:36.390742+00",  # created
         "2019-03-15 05:55:28.532571+00",  # updated
         scheme_id,  # scheme_id
-        True,  # is_deleted
+        False,  # is_deleted
         "NULL",  # link_date
         "NULL",  # join_date
         json.dumps([{

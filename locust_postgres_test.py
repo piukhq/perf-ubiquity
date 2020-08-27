@@ -8,7 +8,7 @@ class PostgresTest(SequentialTaskSet):
 
     def auth_header(self):
         return {
-            "Authorization": "Token F616CE5C88744DD52DB628FAD8B3D"
+            "Authorization": f"Token {SERVICE_KEY}"
         }
 
     @task

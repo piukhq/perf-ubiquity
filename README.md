@@ -18,7 +18,7 @@ TODO:
 
 ### Local: 
 * Run locust web ui pointing at sandbox:
-  * `pipenv run locust --host=https://performance.sandbox.k8s.uksouth.bink.sh/ubiquity --locustfile=locust_postgres_test.py`
+  * `pipenv run locust --host=https://performance.sandbox.k8s.uksouth.bink.sh/ubiquity`
 * Open up web ui by going to below link:
   * `localhost:8089`
 * Enter required users and push `Start swarming`

@@ -4,13 +4,15 @@ stages:
 
 complexity:
   stage: tests
+  before_script:
+    - pip install xenon
   script:
     - xenon --max-average A --max-modules B --max-absolute B .
 
 style:
   stage: tests
   before_script:
-    - pip install black
+    - pip install black flake8
   script:
     - flake8 *
 

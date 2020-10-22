@@ -150,6 +150,7 @@ dmypy.json
 .venv/
 
 .idea/
+.vscode/
 # End of https://www.gitignore.io/api/macos,python
 
 *.tsv

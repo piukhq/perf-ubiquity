@@ -56,16 +56,19 @@ def membership_plan(scheme_id, name, slug):
         "barcode redeem",  # barcode_redeem_instructions
         "register info",  # plan_register_info
         {"ADD", "REGISTRATION", "ENROL"},  # linking_support
-        False,  # test_scheme
-        json.dumps({
-            "0": {
-                "url": "/media/schemes/HarveyNichols_UPPT2Yx.png",
-                "type": 0,
-                "encoding": "png",
-                "description": "performance hero image"
-            },
-            "8": {}
-        }),  # formatted_images
+        False,  # test_scheme,
+        json.dumps(
+            {
+                "0": {
+                    "url": "/media/schemes/HarveyNichols_UPPT2Yx.png",
+                    "type": 0,
+                    "encoding": "png",
+                    "description": "performance hero image",
+                },
+                "8": {},
+            }
+        ),  # formatted_images
+        "#fc03e3",  # secondary_colour
     ]
 
 
@@ -150,7 +153,7 @@ def create_all_third_party_consent_links(static_id, consent_id):
     for count in range(len(ALL_CLIENTS)):
         pk = static_id + count
         client = ALL_CLIENTS[count]
-        consent_link = third_party_consent_link(pk, client['client_id'], consent_id, consent_id)
+        consent_link = third_party_consent_link(pk, client["client_id"], consent_id, consent_id)
         third_party_consent_links.append(consent_link)
 
     return third_party_consent_links
@@ -174,6 +177,8 @@ def scheme_image(pk, scheme_id):
         "schemes/HarveyNichols_UPPT2Yx.png",  # image
         0,  # reward tier
         "png",  # encoding
+        "schemes/HarveyNichols_UPPT2Yx.png",  # dark_mode_image
+        "NULL",  # dark_mode_url
     ]
 
 
@@ -244,4 +249,6 @@ def voucher_scheme(pk, scheme_id):
         "body text redeemed",  # body_text_redeemed
         "https://bink.com",  # terms_and_conditions_url
         "NULL",  # earn_target_value
+        "",  # body_text_cancelled
+        "",  # headline_cancelled
     ]

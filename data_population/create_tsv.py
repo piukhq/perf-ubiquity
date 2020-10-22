@@ -205,7 +205,7 @@ def create_service_mcard_and_pcard_job(job):
             write_to_tsv_part(HermesTables.PAYMENT_MEMBERSHIP_ENTRY, part, pll_links)
             vop_activation_list = list(vop_activation_dict.values())
             write_to_tsv_part(HermesTables.VOP_ACTIVATION, part, vop_activation_list)
-            for l in (
+            for entries in (
                 users,
                 services,
                 membership_cards,
@@ -215,7 +215,7 @@ def create_service_mcard_and_pcard_job(job):
                 pll_links,
                 vop_activation_dict,
             ):
-                l.clear()
+                entries.clear()
 
         users.append(create_service.user(service_pk))
         services.append(create_service.service(service_pk))

@@ -8,7 +8,7 @@ def issuer(pk, name):
     return [
         pk,  # id
         name,  # name
-        "performance/image.jpg"  # image
+        "performance/image.jpg",  # image
     ]
 
 
@@ -32,13 +32,13 @@ def create_all_payment_schemes():
     payment_schemes = []
     for slug, scheme_info in PAYMENT_SCHEME_INFO.items():
         row = payment_scheme(
-            scheme_info['pk'],
+            scheme_info["pk"],
             scheme_info["name"],
             slug,
             scheme_info["url"],
             scheme_info["input_label"],
             scheme_info["system"],
-            scheme_info["token_method"]
+            scheme_info["token_method"],
         )
         payment_schemes.append(row)
 
@@ -62,18 +62,16 @@ def payment_card_image(pk, image, payment_scheme_id):
         "2020-01-01 00:00:00",  # created
         payment_scheme_id,  # scheme
         0,  # reward_tier
-        "NULL",  # encoding
+        "NULL",  # encoding,
+        image,  # dark_mode_image
+        "NULL",  # dark_mode_url
     ]
 
 
 def create_all_payment_card_images():
     payment_card_images = []
     for scheme_info in PAYMENT_SCHEME_INFO.values():
-        row = payment_card_image(
-            scheme_info['pk'],
-            scheme_info["image"],
-            scheme_info['pk']
-        )
+        row = payment_card_image(scheme_info["pk"], scheme_info["image"], scheme_info["pk"])
         payment_card_images.append(row)
 
     return payment_card_images
@@ -99,6 +97,8 @@ def payment_card_account_image(pk, image_type_code):
         1,  # status (published)
         0,  # reward_tier
         "NULL",  # encoding
+        account_image_scheme["image"],  # dark_mode_image
+        "NULL",  # dark_mode_url
     ]
 
 
@@ -138,5 +138,4 @@ def payment_card(card_id):
         token,  # hash
         "{}",  # formatted_images
         json.dumps([]),  # PLL_links
-
     ]

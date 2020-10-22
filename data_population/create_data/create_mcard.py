@@ -32,14 +32,18 @@ def membership_card(card_id, scheme_id, transaction_total):
         False,  # is_deleted
         "NULL",  # link_date
         "NULL",  # join_date
-        json.dumps([{
-            "value": 31,
-            "prefix": "",
-            "suffix": "pts",
-            "currency": "points",
-            "updated_at": 1591719196,
-            "description": "Placeholder Balance Description"
-        }]),  # balances
+        json.dumps(
+            [
+                {
+                    "value": 31,
+                    "prefix": "",
+                    "suffix": "pts",
+                    "currency": "points",
+                    "updated_at": 1591719196,
+                    "description": "Placeholder Balance Description",
+                }
+            ]
+        ),  # balances
         "{}",  # vouchers
         card_number,  # barcode
         card_number,  # card number
@@ -55,7 +59,7 @@ def card_number_answer(answer_id, scheme_account_id, question_id):
         answer_id,  # id
         uuid.uuid4(),  # answer
         scheme_account_id,  # scheme_account_id
-        question_id  # question_id
+        question_id,  # question_id
     ]
 
 

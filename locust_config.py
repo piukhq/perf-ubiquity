@@ -30,6 +30,7 @@ TEST_SUITE = {
     "post_payment_cards_single_property": True,
     "post_payment_cards_multiple_property": True,
     "get_membership_card_single_property": True,
+    "get_membership_card_transactions_single_property": True,
     "patch_membership_card_id_payment_card_id_single_property": False,  # Barclays don't use this endpoint
     "patch_payment_card_id_membership_card_id_single_property": False,  # Barclays don't use this endpoint
     "post_membership_cards_multiple_property_restricted": True,
@@ -37,6 +38,7 @@ TEST_SUITE = {
     "patch_membership_card_id_payment_card_id_multiple_property": False,  # Barclays don't use this endpoint
     "patch_payment_card_id_membership_card_id_multiple_property": False,  # Barclays don't use this endpoint
     "get_membership_card_multiple_property": True,
+    "get_membership_card_transactions_multiple_property": True,
     "get_payment_cards": True,
     "get_membership_cards": True,
     "patch_membership_cards_id_ghost": True,

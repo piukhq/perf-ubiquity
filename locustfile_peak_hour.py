@@ -207,6 +207,19 @@ class UserBehavior(SequentialTaskSet):
 
     @check_suite_whitelist
     @task
+    @repeat_task(3)
+    def get_membership_card_transactions_single_property(self):
+        for mcard in self.membership_cards:
+            self.client.get(f"/membership_card/{mcard['id']}/membership_transactions", headers=self.single_prop_header,
+                            name=f"/membership_card/<card_id>/membership_transactions {LocustLabel.SINGLE_PROPERTY}")
+
+        for count, auth_header in self.enumerated_patch_users:
+            mcard = self.ghost_cards[count]
+            self.client.get(f"/membership_card/{mcard['id']}/membership_transactions", headers=auth_header,
+                            name=f"/membership_card/<card_id>/membership_transactions {LocustLabel.SINGLE_PROPERTY}")
+
+    @check_suite_whitelist
+    @task
     def patch_membership_card_id_payment_card_id_single_property(self):
         pcard_id = self.payment_cards[1]['id']
         mcard_id = self.membership_cards[0]['id']
@@ -317,6 +330,16 @@ class UserBehavior(SequentialTaskSet):
         for mcard in all_multi_property_cards:
             self.client.get(f"/membership_card/{mcard['id']}", headers=self.multi_prop_header,
                             name=f"/membership_card/<card_id> {LocustLabel.MULTI_PROPERTY}")
+
+    @check_suite_whitelist
+    @task
+    @repeat_task(2)
+    def get_membership_card_transactions_multiple_property(self):
+        all_multi_property_cards = self.membership_cards + self.ghost_cards
+        for mcard in all_multi_property_cards:
+            self.client.get(f"/membership_card/{mcard['id']}/membership_transactions", headers=self.multi_prop_header,
+                            name=f"/membership_card/<card_id>/membership_transactions {LocustLabel.MULTI_PROPERTY}")
+
 
     @check_suite_whitelist
     @task

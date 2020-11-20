@@ -226,7 +226,6 @@ class UserBehavior(SequentialTaskSet):
             self.client.get(f"/membership_card/{mcard['id']}/membership_transactions", headers=auth_header,
                             name=f"/membership_card/<card_id>/membership_transactions {LocustLabel.SINGLE_PROPERTY}")
 
-
     @check_suite_whitelist
     @task
     def patch_membership_card_id_payment_card_id_single_property(self):

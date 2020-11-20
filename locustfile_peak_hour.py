@@ -340,7 +340,6 @@ class UserBehavior(SequentialTaskSet):
             self.client.get(f"/membership_card/{mcard['id']}/membership_transactions", headers=self.multi_prop_header,
                             name=f"/membership_card/<card_id>/membership_transactions {LocustLabel.MULTI_PROPERTY}")
 
-
     @check_suite_whitelist
     @task
     @repeat_task(27)

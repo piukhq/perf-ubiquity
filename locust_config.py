@@ -1,11 +1,17 @@
 import json
 from enum import Enum
 from functools import wraps
+from time import sleep
 
 from shared_config_storage.vault import secrets
 
 from data_population.create_tsv import MEMBERSHIP_PLANS
-from settings import CHANNEL_VAULT_PATH, VAULT_URL, VAULT_TOKEN, LOCAL_SECRETS, LOCAL_SECRETS_PATH
+from settings import CHANNEL_VAULT_PATH, LOCAL_SECRETS, LOCAL_SECRETS_PATH, VAULT_TOKEN, VAULT_URL
+
+
+class VaultException(Exception):
+    pass
+
 
 # Change this to specify how many channels the locust tests use
 TOTAL_CLIENTS = 6
@@ -53,6 +59,9 @@ TEST_SUITE = {
 }
 
 
+channel_info = None
+
+
 def check_suite_whitelist(test_func):
     if TEST_SUITE.get(test_func.__name__):
         return test_func
@@ -67,7 +76,9 @@ def repeat_task(num: int):
             for _ in range(num):
                 func(*args, **kwargs)
             return True
+
         return wrapper
+
     return decorator
 
 
@@ -83,11 +94,26 @@ def increment_locust_counter(count, max_count):
     return new_count
 
 
+def _read_vault_with_retry() -> dict:
+    for i in range(1, 3):
+        try:
+            channel_info = secrets.read_vault(CHANNEL_VAULT_PATH, VAULT_URL, VAULT_TOKEN)
+        except ConnectionError:
+            sleep(3 * i)
+        else:
+            return channel_info
+
+    raise VaultException("Failed to read from the Vault even after 3 retries.")
+
+
 def load_secrets():
-    if LOCAL_SECRETS:
-        with open(LOCAL_SECRETS_PATH) as fp:
-            channel_info = json.load(fp)
-    else:
-        channel_info = secrets.read_vault(CHANNEL_VAULT_PATH, VAULT_URL, VAULT_TOKEN)
+    global channel_info
+
+    if channel_info is not None:
+        if LOCAL_SECRETS:
+            with open(LOCAL_SECRETS_PATH) as fp:
+                channel_info = json.load(fp)
+        else:
+            channel_info = _read_vault_with_retry()
 
     return channel_info

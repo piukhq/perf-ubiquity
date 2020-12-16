@@ -16,6 +16,9 @@ class VaultException(Exception):
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
+channel_info = None
+
+
 # Change this to specify how many channels the locust tests use
 TOTAL_CLIENTS = 6
 PCARD_DECRYPT_WAIT_TIME = 120
@@ -99,23 +102,25 @@ def _read_vault_with_retry() -> dict:
         try:
             channel_info = secrets.read_vault(CHANNEL_VAULT_PATH, VAULT_URL, VAULT_TOKEN)
             if not channel_info:
-                raise VaultException("Vault returned empty channel_info")
+                raise secrets.VaultError("Vault returned empty channel_info")
 
-        except Exception as e:
-            logger.warning(f"failed to read from vault, error: {e}")
+        except secrets.VaultError:
+            logger.warning("VaultError: failed to read from vault.")
             sleep(3 * i)
         else:
-            logger.debug("collected channel_info: {channel_info}")
+            logger.info("collected channel_info: {channel_info}")
             return channel_info
 
     raise VaultException("Failed to read from the Vault even after 3 retries.")
 
 
 def load_secrets():
-    if LOCAL_SECRETS:
-        with open(LOCAL_SECRETS_PATH) as fp:
-            channel_info = json.load(fp)
-    else:
-        channel_info = _read_vault_with_retry()
+    global channel_info
+    if channel_info is None:
+        if LOCAL_SECRETS:
+            with open(LOCAL_SECRETS_PATH) as fp:
+                channel_info = json.load(fp)
+        else:
+            channel_info = _read_vault_with_retry()
 
     return channel_info

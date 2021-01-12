@@ -139,3 +139,37 @@ def payment_card(card_id):
         "{}",  # formatted_images
         json.dumps([]),  # PLL_links
     ]
+
+
+def historical_payment_card(p_card: list, history_id: int) -> list:
+    return [
+        p_card[0],  # id
+        p_card[1],  # name_on_card
+        p_card[2],  # start_month
+        p_card[3],  # start_year
+        p_card[4],  # expiry_month
+        p_card[5],  # expiry_year
+        p_card[14],  # currency code
+        p_card[13],  # country
+        p_card[12],  # token
+        p_card[19],  # psp_token
+        p_card[16],  # pan_start
+        p_card[15],  # pan_end
+        p_card[6],  # status
+        p_card[7],  # order
+        p_card[8],  # created
+        p_card[9],  # updated
+        p_card[18],  # fingerprint
+        p_card[17],  # is_deleted
+        p_card[20],  # consents
+        p_card[21],  # hash
+        p_card[22],  # formatted_images
+        p_card[23],  # PLL_links
+        history_id,
+        "2019-03-12 15:51:36.390742+00",  # history_date
+        "NULL",  # history_change_reason
+        "~",  # history_type ~ == update
+        "NULL",  # history_user_id,
+        p_card[10],  # issuer id
+        p_card[11],  # payment card id
+    ]

@@ -54,6 +54,20 @@ def membership_card(card_id, scheme_id, transaction_total):
     ]
 
 
+def historical_membership_card(original_m_card: list, history_id: int) -> list:
+    m_card = original_m_card.copy()
+    scheme_id = m_card.pop(5)
+    return [
+        *m_card,
+        history_id,
+        "2019-03-12 15:51:36.390742+00",  # history_date
+        "NULL",  # history_change_reason
+        "~",  # history_type ~ == update
+        "NULL",  # history_user_id,
+        scheme_id
+    ]
+
+
 def card_number_answer(answer_id, scheme_account_id, question_id):
     return [
         answer_id,  # id

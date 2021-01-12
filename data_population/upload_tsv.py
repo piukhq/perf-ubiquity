@@ -39,8 +39,13 @@ def update_seq(cur, table_name):
         return
 
     formatted_name = format_table_name(table_name)
+    prefix = ""
+
+    if "historical" in table_name:
+        prefix = "history_"
+
     setval_statement = (
-        f"SELECT setval('{table_name}_id_seq', max(id)) FROM {formatted_name}"
+        f"SELECT setval('{table_name}_{prefix}id_seq', max(id)) FROM {formatted_name}"
     )
     cur.execute(setval_statement)
 

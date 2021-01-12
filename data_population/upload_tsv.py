@@ -1,8 +1,9 @@
 import glob
 import logging
 import os
-import psycopg2
 import time
+
+import psycopg2
 
 from data_population.create_tsv import HermesTables, HadesTables, TSV_BASE_DIR
 from settings import DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, HERMES_DB, HADES_DB
@@ -39,13 +40,9 @@ def update_seq(cur, table_name):
         return
 
     formatted_name = format_table_name(table_name)
-    prefix = ""
-
-    if "historical" in table_name:
-        prefix = "history_"
-
+    primary_key = format_primary_key(formatted_name)
     setval_statement = (
-        f"SELECT setval('{table_name}_{prefix}id_seq', max(id)) FROM {formatted_name}"
+        f"SELECT setval('{table_name}_{primary_key}_seq', max(id)) FROM {formatted_name}"
     )
     cur.execute(setval_statement)
 
@@ -54,6 +51,12 @@ def format_table_name(table_name):
     if table_name == "user":
         return '"user"'
     return table_name
+
+
+def format_primary_key(table_name):
+    if "historical" in table_name:
+        return "history_id"
+    return "id"
 
 
 def truncate_and_populate_tables(db_name, tables):

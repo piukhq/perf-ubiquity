@@ -1,18 +1,18 @@
 import csv
+import glob
 import logging
+import multiprocessing
 import os
 import random
 import time
-import multiprocessing
-import glob
 from enum import Enum
 
-from data_population.job_creation import (create_tsv_jobs, cores, MEMBERSHIP_PLANS, CardTypes, MCARDS_PER_SERVICE,
-                                          PCARDS_PER_SERVICE, TOTAL_MCARDS, TOTAL_TRANSACTIONS)
-from data_population.fixtures.client import ALL_CLIENTS, NON_RESTRICTED_CLIENTS
-from data_population.fixtures.payment_scheme import ALL_PAYMENT_PROVIDER_STATUS_MAPPINGS
 from data_population.create_data import (create_association, create_mcard, create_pcard, create_channel, create_plan,
                                          create_service)
+from data_population.fixtures.client import ALL_CLIENTS, NON_RESTRICTED_CLIENTS
+from data_population.fixtures.payment_scheme import ALL_PAYMENT_PROVIDER_STATUS_MAPPINGS
+from data_population.job_creation import (create_tsv_jobs, cores, MEMBERSHIP_PLANS, CardTypes, MCARDS_PER_SERVICE,
+                                          PCARDS_PER_SERVICE, TOTAL_MCARDS, TOTAL_TRANSACTIONS)
 from settings import TSV_BASE_DIR
 
 logger = logging.getLogger("create-tsv")
@@ -273,11 +273,24 @@ def create_service_mcard_and_pcard_job(job):
 
     overflow_mcard_start = job[f"{CardTypes.MCARD}_start"] + len(membership_cards)
     overflow_pcard_start = job[f"{CardTypes.PCARD}_start"] + len(payment_cards)
-    overflow_mcards, overflow_pcards = create_remaining_mcards_and_pcards(
-        overflow_mcard_start, overflow_pcard_start, remaining_overflow_mcards, remaining_overflow_pcards
+    (
+        overflow_mcards,
+        overflow_historical_mcard,
+        overflow_pcards,
+        overflow_historical_pcards
+    ) = create_remaining_mcards_and_pcards(
+        overflow_mcard_start,
+        mcard_history_index,
+        overflow_pcard_start,
+        pcard_history_index,
+        remaining_overflow_mcards,
+        remaining_overflow_pcards
     )
+
     membership_cards.extend(overflow_mcards)
+    historical_membership_cards.extend(overflow_historical_mcard)
     payment_cards.extend(overflow_pcards)
+    historical_payment_cards.extend(overflow_historical_pcards)
 
     write_to_tsv_part(HermesTables.USER, part, users)
     write_to_tsv_part(HermesTables.CONSENT, part, services)
@@ -294,20 +307,34 @@ def create_service_mcard_and_pcard_job(job):
     logger.info(f"Finished {part}")
 
 
-def create_remaining_mcards_and_pcards(mcard_start, pcard_start, mcard_count, pcard_count):
+def create_remaining_mcards_and_pcards(
+        mcard_start, mcard_history_index, pcard_start, pcard_history_index, mcard_count, pcard_count
+):
     logger.debug(f"Creating overflow cards - mcards: {mcard_count}, pcards: {pcard_count}")
     membership_cards = []
+    overflow_historical_mcard = []
     for x in range(0, mcard_count):
         mcard_pk = x + mcard_start
         scheme_id = random.randint(1, MEMBERSHIP_PLANS)
-        membership_cards.append(create_mcard.membership_card(mcard_pk, scheme_id, TRANSACTIONS_PER_MCARD))
+        mcard = create_mcard.membership_card(mcard_pk, scheme_id, TRANSACTIONS_PER_MCARD)
+        membership_cards.append(mcard)
+
+        for _ in range(random.randint(8, 15)):
+            overflow_historical_mcard.append(create_mcard.historical_membership_card(mcard, mcard_history_index))
+            mcard_history_index += 1
 
     payment_cards = []
+    overflow_historical_pcard = []
     for x in range(0, pcard_count):
         pcard_pk = x + pcard_start
-        payment_cards.append(create_pcard.payment_card(pcard_pk))
+        pcard = create_pcard.payment_card(pcard_pk)
+        payment_cards.append(pcard)
 
-    return membership_cards, payment_cards
+        for _ in range(random.randint(4, 8)):
+            overflow_historical_pcard.append(create_pcard.historical_payment_card(pcard, pcard_history_index))
+            pcard_history_index += 1
+
+    return membership_cards, overflow_historical_mcard, payment_cards, overflow_historical_pcard
 
 
 def create_membership_card_answers():

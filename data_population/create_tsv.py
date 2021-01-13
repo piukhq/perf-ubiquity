@@ -48,8 +48,11 @@ class HermesTables(str, Enum):
     ANSWER = "scheme_schemeaccountcredentialanswer"
     PAYMENT_ACCOUNT = "payment_card_paymentcardaccount"
     PAYMENT_ACCOUNT_ENTRY = "ubiquity_paymentcardaccountentry"
+    HISTORICAL_PAYMENT_ACCOUNT_ENTRY = "ubiquity_historicalpaymentcardaccountentry"
     SCHEME_ACCOUNT_ENTRY = "ubiquity_schemeaccountentry"
+    HISTORICAL_SCHEME_ACCOUNT_ENTRY = "ubiquity_historicalschemeaccountentry"
     PAYMENT_MEMBERSHIP_ENTRY = "ubiquity_paymentcardschemeentry"
+    HISTORICAL_PAYMENT_MEMBERSHIP_ENTRY = "ubiquity_historicalpaymentcardschemeentry"
     VOP_ACTIVATION = "ubiquity_vopactivation"
     HISTORICAL_SCHEME_ACCOUNT = "scheme_historicalschemeaccount"
     HISTORICAL_PAYMENT_CARD_ACCOUNT = "payment_card_historicalpaymentcardaccount"
@@ -184,10 +187,13 @@ def create_service_mcard_and_pcard_job(job):
     membership_cards = []
     historical_membership_cards = []
     membership_card_associations = []
+    historical_m_card_associations = []
     payment_cards = []
     historical_payment_cards = []
     payment_card_associations = []
+    historical_p_card_associations = []
     pll_links = []
+    historical_pll_links = []
     vop_activation_dict = {}
 
     service_start = job["start"]
@@ -207,20 +213,28 @@ def create_service_mcard_and_pcard_job(job):
             write_to_tsv_part(HermesTables.SCHEME_ACCOUNT, part, membership_cards)
             write_to_tsv_part(HermesTables.HISTORICAL_SCHEME_ACCOUNT, part, historical_membership_cards)
             write_to_tsv_part(HermesTables.SCHEME_ACCOUNT_ENTRY, part, membership_card_associations)
+            write_to_tsv_part(HermesTables.HISTORICAL_SCHEME_ACCOUNT_ENTRY, part, historical_m_card_associations)
             write_to_tsv_part(HermesTables.PAYMENT_ACCOUNT, part, payment_cards)
             write_to_tsv_part(HermesTables.HISTORICAL_PAYMENT_CARD_ACCOUNT, part, historical_payment_cards)
             write_to_tsv_part(HermesTables.PAYMENT_ACCOUNT_ENTRY, part, payment_card_associations)
+            write_to_tsv_part(HermesTables.HISTORICAL_PAYMENT_ACCOUNT_ENTRY, part, historical_p_card_associations)
             write_to_tsv_part(HermesTables.PAYMENT_MEMBERSHIP_ENTRY, part, pll_links)
+            write_to_tsv_part(HermesTables.HISTORICAL_PAYMENT_MEMBERSHIP_ENTRY, part, historical_pll_links)
             vop_activation_list = list(vop_activation_dict.values())
             write_to_tsv_part(HermesTables.VOP_ACTIVATION, part, vop_activation_list)
             for entries in (
                 users,
                 services,
                 membership_cards,
+                historical_membership_cards,
+                historical_payment_cards,
                 membership_card_associations,
+                historical_m_card_associations,
                 payment_cards,
                 payment_card_associations,
+                historical_p_card_associations,
                 pll_links,
+                historical_pll_links,
                 vop_activation_dict,
             ):
                 entries.clear()
@@ -238,7 +252,10 @@ def create_service_mcard_and_pcard_job(job):
 
             mcard = create_mcard.membership_card(mcard_index, scheme_id, TRANSACTIONS_PER_MCARD)
             membership_cards.append(mcard)
-            membership_card_associations.append(create_association.scheme_account(mcard_index, mcard_index, service_pk))
+            link = create_association.scheme_account(mcard_index, mcard_index, service_pk)
+            membership_card_associations.append(link)
+            historical_m_card_associations.append(create_association.historical_scheme_account(link, mcard_index))
+
             for _ in range(random.randint(8, 15)):
                 historical_membership_cards.append(create_mcard.historical_membership_card(mcard, mcard_history_index))
                 mcard_history_index += 1
@@ -253,7 +270,9 @@ def create_service_mcard_and_pcard_job(job):
 
             pcard = create_pcard.payment_card(pcard_index)
             payment_cards.append(pcard)
-            payment_card_associations.append(create_association.payment_card(pcard_index, pcard_index, service_pk))
+            link = create_association.payment_card(pcard_index, pcard_index, service_pk)
+            payment_card_associations.append(link)
+            historical_p_card_associations.append(create_association.historical_payment_card(link, pcard_index))
 
             for _ in range(random.randint(4, 8)):
                 historical_payment_cards.append(create_pcard.historical_payment_card(pcard, pcard_history_index))
@@ -263,7 +282,9 @@ def create_service_mcard_and_pcard_job(job):
             remaining_service_pcards -= 1
 
         if create_pll_link:
-            pll_links.append(create_association.pll_link(pcard_index - 1, pcard_index - 1, mcard_index - 1))
+            link = create_association.pll_link(pcard_index - 1, pcard_index - 1, mcard_index - 1)
+            pll_links.append(link)
+            historical_pll_links.append(create_association.historical_pll_link(link, pcard_index - 1))
             scheme_id = random.randint(1, MEMBERSHIP_PLANS)
             vop_activation = create_association.vop_activation(pcard_index - 1, pcard_index - 1, scheme_id)
             vop_activation_dict[pcard_index - 1] = vop_activation
@@ -297,10 +318,13 @@ def create_service_mcard_and_pcard_job(job):
     write_to_tsv_part(HermesTables.SCHEME_ACCOUNT, part, membership_cards)
     write_to_tsv_part(HermesTables.HISTORICAL_SCHEME_ACCOUNT, part, historical_membership_cards)
     write_to_tsv_part(HermesTables.SCHEME_ACCOUNT_ENTRY, part, membership_card_associations)
+    write_to_tsv_part(HermesTables.HISTORICAL_SCHEME_ACCOUNT_ENTRY, part, historical_m_card_associations)
     write_to_tsv_part(HermesTables.PAYMENT_ACCOUNT, part, payment_cards)
     write_to_tsv_part(HermesTables.HISTORICAL_PAYMENT_CARD_ACCOUNT, part, historical_payment_cards)
     write_to_tsv_part(HermesTables.PAYMENT_ACCOUNT_ENTRY, part, payment_card_associations)
+    write_to_tsv_part(HermesTables.HISTORICAL_PAYMENT_ACCOUNT_ENTRY, part, historical_p_card_associations)
     write_to_tsv_part(HermesTables.PAYMENT_MEMBERSHIP_ENTRY, part, pll_links)
+    write_to_tsv_part(HermesTables.HISTORICAL_PAYMENT_MEMBERSHIP_ENTRY, part, historical_pll_links)
     vop_activation_list = list(vop_activation_dict.values())
     write_to_tsv_part(HermesTables.VOP_ACTIVATION, part, vop_activation_list)
 

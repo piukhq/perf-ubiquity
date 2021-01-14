@@ -42,7 +42,7 @@ def update_seq(cur, table_name):
     formatted_name = format_table_name(table_name)
     primary_key = format_primary_key(formatted_name)
     setval_statement = (
-        f"SELECT setval('{table_name}_{primary_key}_seq', max(id)) FROM {formatted_name}"
+        f"SELECT setval('{table_name}_{primary_key}_seq', max({primary_key})) FROM {formatted_name}"
     )
     cur.execute(setval_statement)
 

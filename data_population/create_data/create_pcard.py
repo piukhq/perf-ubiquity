@@ -138,6 +138,7 @@ def payment_card(card_id):
         token,  # hash
         "{}",  # formatted_images
         json.dumps([]),  # PLL_links
+        "{}",  # agent_data
     ]
 
 
@@ -165,6 +166,7 @@ def historical_payment_card(p_card: list, history_id: int) -> list:
         p_card[21],  # hash
         p_card[22],  # formatted_images
         p_card[23],  # PLL_links
+        p_card[24],  # agent_data
         history_id,
         "2019-03-12 15:51:36.390742+00",  # history_date
         "NULL",  # history_change_reason

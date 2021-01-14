@@ -93,11 +93,14 @@ def init_jobs():
     return jobs
 
 
-def fix_indexes_for_card_jobs(jobs, card_type):
+def fix_indexes_for_card_jobs(jobs, card_type, history_per_card):
     fixed_card_start_index = 1
+    card_history_index = 1
     for job in jobs:
         job[f"{card_type}_start"] = fixed_card_start_index
+        job[f"historical_{card_type}_start"] = card_history_index
         fixed_card_start_index += job[f"{card_type}_service_count"] + job[f"{card_type}_overflow_count"]
+        card_history_index += fixed_card_start_index * history_per_card
 
     return jobs
 
@@ -153,6 +156,7 @@ def process_enough_cards_per_service(jobs, card_type, remaining_cards, total_car
 def add_card_info_to_jobs(jobs, card_type, total_cards, cards_per_service):
     remaining_cards = total_cards
     remaining_service_cards = TOTAL_USERS * cards_per_service
+    history_per_card = 15 if card_type == CardTypes.MCARD else 8
     enough_cards_per_service = True
     if remaining_service_cards > total_cards:
         remaining_service_cards = total_cards
@@ -178,5 +182,5 @@ def add_card_info_to_jobs(jobs, card_type, total_cards, cards_per_service):
         job[f"{card_type}_overflow_count"] = overflow_count
         remaining_cards -= overflow_count
 
-    jobs = fix_indexes_for_card_jobs(jobs, card_type)
+    jobs = fix_indexes_for_card_jobs(jobs, card_type, history_per_card)
     return jobs

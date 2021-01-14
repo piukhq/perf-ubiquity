@@ -1,18 +1,18 @@
 import csv
+import glob
 import logging
+import multiprocessing
 import os
 import random
 import time
-import multiprocessing
-import glob
 from enum import Enum
 
-from data_population.job_creation import (create_tsv_jobs, cores, MEMBERSHIP_PLANS, CardTypes, MCARDS_PER_SERVICE,
-                                          PCARDS_PER_SERVICE, TOTAL_MCARDS, TOTAL_TRANSACTIONS)
-from data_population.fixtures.client import ALL_CLIENTS, NON_RESTRICTED_CLIENTS
-from data_population.fixtures.payment_scheme import ALL_PAYMENT_PROVIDER_STATUS_MAPPINGS
 from data_population.create_data import (create_association, create_mcard, create_pcard, create_channel, create_plan,
                                          create_service)
+from data_population.fixtures.client import ALL_CLIENTS, NON_RESTRICTED_CLIENTS
+from data_population.fixtures.payment_scheme import ALL_PAYMENT_PROVIDER_STATUS_MAPPINGS
+from data_population.job_creation import (create_tsv_jobs, cores, MEMBERSHIP_PLANS, CardTypes, MCARDS_PER_SERVICE,
+                                          PCARDS_PER_SERVICE, TOTAL_MCARDS, TOTAL_TRANSACTIONS)
 from settings import TSV_BASE_DIR
 
 logger = logging.getLogger("create-tsv")
@@ -48,9 +48,88 @@ class HermesTables(str, Enum):
     ANSWER = "scheme_schemeaccountcredentialanswer"
     PAYMENT_ACCOUNT = "payment_card_paymentcardaccount"
     PAYMENT_ACCOUNT_ENTRY = "ubiquity_paymentcardaccountentry"
+    HISTORICAL_PAYMENT_ACCOUNT_ENTRY = "ubiquity_historicalpaymentcardaccountentry"
     SCHEME_ACCOUNT_ENTRY = "ubiquity_schemeaccountentry"
+    HISTORICAL_SCHEME_ACCOUNT_ENTRY = "ubiquity_historicalschemeaccountentry"
     PAYMENT_MEMBERSHIP_ENTRY = "ubiquity_paymentcardschemeentry"
+    HISTORICAL_PAYMENT_MEMBERSHIP_ENTRY = "ubiquity_historicalpaymentcardschemeentry"
     VOP_ACTIVATION = "ubiquity_vopactivation"
+    HISTORICAL_SCHEME_ACCOUNT = "scheme_historicalschemeaccount"
+    HISTORICAL_PAYMENT_CARD_ACCOUNT = "payment_card_historicalpaymentcardaccount"
+
+
+class Counters:
+    def __init__(self, job):
+        self.part = job["job_id"]
+        self.users = []
+        self.services = []
+        self.membership_cards = []
+        self.historical_membership_cards = []
+        self.membership_card_associations = []
+        self.historical_m_card_associations = []
+        self.payment_cards = []
+        self.historical_payment_cards = []
+        self.payment_card_associations = []
+        self.historical_p_card_associations = []
+        self.pll_links = []
+        self.historical_pll_links = []
+        self.vop_activation_dict = {}
+        self.service_start = job["start"]
+        self.mcard_index = job[f"{CardTypes.MCARD}_start"]
+        self.mcard_history_index = job[f"historical_{CardTypes.MCARD}_start"]
+        self.pcard_index = job[f"{CardTypes.PCARD}_start"]
+        self.pcard_history_index = job[f"historical_{CardTypes.PCARD}_start"]
+        self.remaining_service_mcards = job[f"{CardTypes.MCARD}_service_count"]
+        self.remaining_service_pcards = job[f"{CardTypes.PCARD}_service_count"]
+        self.remaining_overflow_mcards = job[f"{CardTypes.MCARD}_overflow_count"]
+        self.remaining_overflow_pcards = job[f"{CardTypes.PCARD}_overflow_count"]
+
+    def clear_entries(self):
+        for entries in (
+                self.users,
+                self.services,
+                self.membership_cards,
+                self.historical_membership_cards,
+                self.historical_payment_cards,
+                self.membership_card_associations,
+                self.historical_m_card_associations,
+                self.payment_cards,
+                self.payment_card_associations,
+                self.historical_p_card_associations,
+                self.pll_links,
+                self.historical_pll_links,
+                self.vop_activation_dict,
+        ):
+            entries.clear()
+
+    def write_part_to_csv(self):
+        write_to_tsv_part(HermesTables.USER, self.part, self.users)
+        write_to_tsv_part(HermesTables.CONSENT, self.part, self.services)
+        write_to_tsv_part(HermesTables.SCHEME_ACCOUNT, self.part, self.membership_cards)
+        write_to_tsv_part(HermesTables.HISTORICAL_SCHEME_ACCOUNT, self.part, self.historical_membership_cards)
+        write_to_tsv_part(HermesTables.SCHEME_ACCOUNT_ENTRY, self.part, self.membership_card_associations)
+        write_to_tsv_part(HermesTables.HISTORICAL_SCHEME_ACCOUNT_ENTRY, self.part, self.historical_m_card_associations)
+        write_to_tsv_part(HermesTables.PAYMENT_ACCOUNT, self.part, self.payment_cards)
+        write_to_tsv_part(HermesTables.HISTORICAL_PAYMENT_CARD_ACCOUNT, self.part, self.historical_payment_cards)
+        write_to_tsv_part(HermesTables.PAYMENT_ACCOUNT_ENTRY, self.part, self.payment_card_associations)
+        write_to_tsv_part(HermesTables.HISTORICAL_PAYMENT_ACCOUNT_ENTRY, self.part, self.historical_p_card_associations)
+        write_to_tsv_part(HermesTables.PAYMENT_MEMBERSHIP_ENTRY, self.part, self.pll_links)
+        write_to_tsv_part(HermesTables.HISTORICAL_PAYMENT_MEMBERSHIP_ENTRY, self.part, self.historical_pll_links)
+        vop_activation_list = list(self.vop_activation_dict.values())
+        write_to_tsv_part(HermesTables.VOP_ACTIVATION, self.part, vop_activation_list)
+
+    def populate_card_history(self, card, card_type):
+        if card_type == CardTypes.MCARD:
+            for _ in range(random.randint(8, 15)):
+                self.historical_membership_cards.append(
+                    create_mcard.historical_membership_card(card, self.mcard_history_index))
+                self.mcard_history_index += 1
+
+        elif card_type == CardTypes.PCARD:
+            for _ in range(random.randint(4, 8)):
+                self.historical_payment_cards.append(
+                    create_pcard.historical_payment_card(card, self.pcard_history_index))
+                self.pcard_history_index += 1
 
 
 class HadesTables(str, Enum):
@@ -176,116 +255,118 @@ def create_service_mcard_and_pcard_tsv_files():
 
 
 def create_service_mcard_and_pcard_job(job):
-    part = job["job_id"]
-    users = []
-    services = []
-    membership_cards = []
-    membership_card_associations = []
-    payment_cards = []
-    payment_card_associations = []
-    pll_links = []
-    vop_activation_dict = {}
-
-    service_start = job["start"]
-    mcard_index = job[f"{CardTypes.MCARD}_start"]
-    pcard_index = job[f"{CardTypes.PCARD}_start"]
-    remaining_service_mcards = job[f"{CardTypes.MCARD}_service_count"]
-    remaining_service_pcards = job[f"{CardTypes.PCARD}_service_count"]
-    remaining_overflow_mcards = job[f"{CardTypes.MCARD}_overflow_count"]
-    remaining_overflow_pcards = job[f"{CardTypes.PCARD}_overflow_count"]
+    counters = Counters(job)
     for service_count in range(0, job["count"]):
-        service_pk = service_start + service_count
-        if len(users) > BULK_SIZE:
-            write_to_tsv_part(HermesTables.USER, part, users)
-            write_to_tsv_part(HermesTables.CONSENT, part, services)
-            write_to_tsv_part(HermesTables.SCHEME_ACCOUNT, part, membership_cards)
-            write_to_tsv_part(HermesTables.SCHEME_ACCOUNT_ENTRY, part, membership_card_associations)
-            write_to_tsv_part(HermesTables.PAYMENT_ACCOUNT, part, payment_cards)
-            write_to_tsv_part(HermesTables.PAYMENT_ACCOUNT_ENTRY, part, payment_card_associations)
-            write_to_tsv_part(HermesTables.PAYMENT_MEMBERSHIP_ENTRY, part, pll_links)
-            vop_activation_list = list(vop_activation_dict.values())
-            write_to_tsv_part(HermesTables.VOP_ACTIVATION, part, vop_activation_list)
-            for entries in (
-                users,
-                services,
-                membership_cards,
-                membership_card_associations,
-                payment_cards,
-                payment_card_associations,
-                pll_links,
-                vop_activation_dict,
-            ):
-                entries.clear()
+        service_pk = counters.service_start + service_count
+        if len(counters.users) > BULK_SIZE:
+            counters.write_part_to_csv()
+            counters.clear_entries()
 
-        users.append(create_service.user(service_pk))
-        services.append(create_service.service(service_pk))
+        counters.users.append(create_service.user(service_pk))
+        counters.services.append(create_service.service(service_pk))
 
         create_pll_link = True
         for mcard_count in range(0, MCARDS_PER_SERVICE):
-            if not remaining_service_mcards:
+            if not counters.remaining_service_mcards:
                 create_pll_link = False
                 break
 
             scheme_id = random.randint(1, MEMBERSHIP_PLANS)
-            membership_cards.append(create_mcard.membership_card(mcard_index, scheme_id, TRANSACTIONS_PER_MCARD))
-            membership_card_associations.append(create_association.scheme_account(mcard_index, mcard_index, service_pk))
-            mcard_index += 1
-            remaining_service_mcards -= 1
+
+            mcard = create_mcard.membership_card(counters.mcard_index, scheme_id, TRANSACTIONS_PER_MCARD)
+            counters.membership_cards.append(mcard)
+            link = create_association.scheme_account(counters.mcard_index, counters.mcard_index, service_pk)
+            counters.membership_card_associations.append(link)
+            counters.historical_m_card_associations.append(
+                create_association.historical_scheme_account(link, counters.mcard_index))
+
+            counters.populate_card_history(mcard, CardTypes.MCARD)
+            counters.mcard_index += 1
+            counters.remaining_service_mcards -= 1
 
         for pcard_count in range(0, PCARDS_PER_SERVICE):
-            if not remaining_service_pcards:
+            if not counters.remaining_service_pcards:
                 create_pll_link = False
                 break
 
-            payment_cards.append(create_pcard.payment_card(pcard_index))
-            payment_card_associations.append(create_association.payment_card(pcard_index, pcard_index, service_pk))
-            pcard_index += 1
-            remaining_service_pcards -= 1
+            pcard = create_pcard.payment_card(counters.pcard_index)
+            counters.payment_cards.append(pcard)
+            link = create_association.payment_card(counters.pcard_index, counters.pcard_index, service_pk)
+            counters.payment_card_associations.append(link)
+            counters.historical_p_card_associations.append(
+                create_association.historical_payment_card(link, counters.pcard_index))
+
+            counters.populate_card_history(pcard, CardTypes.PCARD)
+            counters.pcard_index += 1
+            counters.remaining_service_pcards -= 1
 
         if create_pll_link:
-            pll_links.append(create_association.pll_link(pcard_index - 1, pcard_index - 1, mcard_index - 1))
+            link = create_association.pll_link(counters.pcard_index - 1, counters.pcard_index - 1,
+                                               counters.mcard_index - 1)
+            counters.pll_links.append(link)
+            counters.historical_pll_links.append(create_association.historical_pll_link(link, counters.pcard_index - 1))
             scheme_id = random.randint(1, MEMBERSHIP_PLANS)
-            vop_activation = create_association.vop_activation(pcard_index - 1, pcard_index - 1, scheme_id)
-            vop_activation_dict[pcard_index - 1] = vop_activation
+            vop_activation = create_association.vop_activation(counters.pcard_index - 1, counters.pcard_index - 1,
+                                                               scheme_id)
+            counters.vop_activation_dict[counters.pcard_index - 1] = vop_activation
 
         if service_pk % 100000 == 0:
             logger.info(f"Generated {service_pk} users")
 
-    overflow_mcard_start = job[f"{CardTypes.MCARD}_start"] + len(membership_cards)
-    overflow_pcard_start = job[f"{CardTypes.PCARD}_start"] + len(payment_cards)
-    overflow_mcards, overflow_pcards = create_remaining_mcards_and_pcards(
-        overflow_mcard_start, overflow_pcard_start, remaining_overflow_mcards, remaining_overflow_pcards
+    overflow_mcard_start = job[f"{CardTypes.MCARD}_start"] + len(counters.membership_cards)
+    overflow_pcard_start = job[f"{CardTypes.PCARD}_start"] + len(counters.payment_cards)
+    (
+        overflow_mcards,
+        overflow_historical_mcard,
+        overflow_pcards,
+        overflow_historical_pcards
+    ) = create_remaining_mcards_and_pcards(
+        overflow_mcard_start,
+        counters.mcard_history_index,
+        overflow_pcard_start,
+        counters.pcard_history_index,
+        counters.remaining_overflow_mcards,
+        counters.remaining_overflow_pcards
     )
-    membership_cards.extend(overflow_mcards)
-    payment_cards.extend(overflow_pcards)
 
-    write_to_tsv_part(HermesTables.USER, part, users)
-    write_to_tsv_part(HermesTables.CONSENT, part, services)
-    write_to_tsv_part(HermesTables.SCHEME_ACCOUNT, part, membership_cards)
-    write_to_tsv_part(HermesTables.SCHEME_ACCOUNT_ENTRY, part, membership_card_associations)
-    write_to_tsv_part(HermesTables.PAYMENT_ACCOUNT, part, payment_cards)
-    write_to_tsv_part(HermesTables.PAYMENT_ACCOUNT_ENTRY, part, payment_card_associations)
-    write_to_tsv_part(HermesTables.PAYMENT_MEMBERSHIP_ENTRY, part, pll_links)
-    vop_activation_list = list(vop_activation_dict.values())
-    write_to_tsv_part(HermesTables.VOP_ACTIVATION, part, vop_activation_list)
+    counters.membership_cards.extend(overflow_mcards)
+    counters.historical_membership_cards.extend(overflow_historical_mcard)
+    counters.payment_cards.extend(overflow_pcards)
+    counters.historical_payment_cards.extend(overflow_historical_pcards)
 
-    logger.info(f"Finished {part}")
+    counters.write_part_to_csv()
+
+    logger.info(f"Finished {counters.part}")
 
 
-def create_remaining_mcards_and_pcards(mcard_start, pcard_start, mcard_count, pcard_count):
+def create_remaining_mcards_and_pcards(
+        mcard_start, mcard_history_index, pcard_start, pcard_history_index, mcard_count, pcard_count
+):
     logger.debug(f"Creating overflow cards - mcards: {mcard_count}, pcards: {pcard_count}")
     membership_cards = []
+    overflow_historical_mcard = []
     for x in range(0, mcard_count):
         mcard_pk = x + mcard_start
         scheme_id = random.randint(1, MEMBERSHIP_PLANS)
-        membership_cards.append(create_mcard.membership_card(mcard_pk, scheme_id, TRANSACTIONS_PER_MCARD))
+        mcard = create_mcard.membership_card(mcard_pk, scheme_id, TRANSACTIONS_PER_MCARD)
+        membership_cards.append(mcard)
+
+        for _ in range(random.randint(8, 15)):
+            overflow_historical_mcard.append(create_mcard.historical_membership_card(mcard, mcard_history_index))
+            mcard_history_index += 1
 
     payment_cards = []
+    overflow_historical_pcard = []
     for x in range(0, pcard_count):
         pcard_pk = x + pcard_start
-        payment_cards.append(create_pcard.payment_card(pcard_pk))
+        pcard = create_pcard.payment_card(pcard_pk)
+        payment_cards.append(pcard)
 
-    return membership_cards, payment_cards
+        for _ in range(random.randint(4, 8)):
+            overflow_historical_pcard.append(create_pcard.historical_payment_card(pcard, pcard_history_index))
+            pcard_history_index += 1
+
+    return membership_cards, overflow_historical_mcard, payment_cards, overflow_historical_pcard
 
 
 def create_membership_card_answers():

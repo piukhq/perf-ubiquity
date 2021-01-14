@@ -56,7 +56,7 @@ def membership_plan(scheme_id, name, slug):
         "barcode redeem",  # barcode_redeem_instructions
         "register info",  # plan_register_info
         {"ADD", "REGISTRATION", "ENROL"},  # linking_support
-        False,  # test_scheme,
+        # False,  # test_scheme,
         json.dumps(
             {
                 "0": {

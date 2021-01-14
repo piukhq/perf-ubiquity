@@ -28,5 +28,6 @@ def channel_scheme_whitelist(whitelist_id, fixture, scheme_id):
         whitelist_id,
         fixture['status'],
         fixture['id'],
-        scheme_id
+        scheme_id,
+        False  # test scheme
     ]

@@ -114,7 +114,7 @@ class Counters:
         write_to_tsv_part(HermesTables.PAYMENT_ACCOUNT_ENTRY, self.part, self.payment_card_associations)
         write_to_tsv_part(HermesTables.HISTORICAL_PAYMENT_ACCOUNT_ENTRY, self.part, self.historical_p_card_associations)
         write_to_tsv_part(HermesTables.PAYMENT_MEMBERSHIP_ENTRY, self.part, self.pll_links)
-        write_to_tsv_part(HermesTables.HISTORICAL_PAYMENT_MEMBERSHIP_ENTRY, self.part, self.historical_pll_links)
+        # write_to_tsv_part(HermesTables.HISTORICAL_PAYMENT_MEMBERSHIP_ENTRY, self.part, self.historical_pll_links)
         vop_activation_list = list(self.vop_activation_dict.values())
         write_to_tsv_part(HermesTables.VOP_ACTIVATION, self.part, vop_activation_list)
 
@@ -304,7 +304,8 @@ def create_service_mcard_and_pcard_job(job):
             link = create_association.pll_link(counters.pcard_index - 1, counters.pcard_index - 1,
                                                counters.mcard_index - 1)
             counters.pll_links.append(link)
-            counters.historical_pll_links.append(create_association.historical_pll_link(link, counters.pcard_index - 1))
+            # counters.historical_pll_links.append(create_association.historical_pll_link(
+            # link, counters.pcard_index - 1))
             scheme_id = random.randint(1, MEMBERSHIP_PLANS)
             vop_activation = create_association.vop_activation(counters.pcard_index - 1, counters.pcard_index - 1,
                                                                scheme_id)

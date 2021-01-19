@@ -54,17 +54,17 @@ def membership_card(card_id, scheme_id, transaction_total):
     ]
 
 
-def historical_membership_card(original_m_card: list, history_id: int) -> list:
-    m_card = original_m_card.copy()
-    scheme_id = m_card.pop(5)
+def historical_membership_card(m_card: list, history_id: int) -> list:
     return [
-        *m_card,
-        history_id,
-        "2019-03-12 15:51:36.390742+00",  # history_date
-        "NULL",  # history_change_reason
-        "~",  # history_type ~ == update
-        "NULL",  # history_user_id,
-        scheme_id
+        history_id,  # id
+        "2019-03-12 15:51:36.390742+00",  # created
+        "created",  # change_type
+        m_card[0],  # instance_id
+        "internal_service",  # channel
+        "n/a",  # user_id
+        json.dumps(m_card),  # body
+        "",  # change_details
+        "add",  # journey
     ]
 
 

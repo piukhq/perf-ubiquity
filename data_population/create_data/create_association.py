@@ -27,7 +27,7 @@ def pll_link(pk, pcard_id, mcard_id):
 def vop_activation(pk, pcard_id, scheme):
     return [
         pk,  # id
-        uuid.uuid4(),  # activation_id
+        str(uuid.uuid4()),  # activation_id
         3,  # status
         pcard_id,  # payment_card_account
         scheme,  # scheme

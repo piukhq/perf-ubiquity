@@ -19,7 +19,7 @@ def generate_transactions(transaction_total):
 
 
 def membership_card(card_id, scheme_id, transaction_total):
-    card_number = uuid.uuid4()
+    card_number = str(uuid.uuid4())
     transactions = generate_transactions(transaction_total)
 
     return [
@@ -71,7 +71,7 @@ def historical_membership_card(m_card: list, history_id: int) -> list:
 def card_number_answer(answer_id, scheme_account_id, question_id):
     return [
         answer_id,  # id
-        uuid.uuid4(),  # answer
+        str(uuid.uuid4()),  # answer
         scheme_account_id,  # scheme_account_id
         question_id,  # question_id
     ]
@@ -80,7 +80,7 @@ def card_number_answer(answer_id, scheme_account_id, question_id):
 def password_answer(answer_id, scheme_account_id, question_id):
     return [
         answer_id,  # id
-        uuid.uuid4(),  # answer
+        str(uuid.uuid4()),  # answer
         scheme_account_id,  # scheme_account_id
         question_id,  # question_id
     ]
@@ -96,6 +96,6 @@ def transaction(pk, scheme_account_id):
         "performanceland",  # location
         3.0,  # points
         "NULL",  # value
-        uuid.uuid4(),  # hash
+        str(uuid.uuid4()),  # hash
         "NULL",  # user_set
     ]

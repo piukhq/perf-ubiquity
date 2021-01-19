@@ -248,7 +248,7 @@ def voucher_scheme(pk, scheme_id):
         "body text issued",  # body_text_issued
         "body text redeemed",  # body_text_redeemed
         "https://bink.com",  # terms_and_conditions_url
-        "NULL",  # earn_target_value
+        4,  # earn_target_value
         "",  # body_text_cancelled
         "",  # headline_cancelled
     ]

@@ -9,19 +9,19 @@ def pll_link(pk, pcard_id, mcard_id):
         mcard_id,  # scheme_account_id
     ]
 
-
-def historical_pll_link(pll_link, history_id):
-    return [
-        pll_link[0],  # id
-        False,  # active_link
-        history_id,
-        "2019-03-12 15:51:36.390742+00",  # history_date
-        "NULL",  # history_change_reason
-        "~",  # history_type ~ == update
-        "NULL",  # history_user_id
-        pll_link[2],  # payment_card_account_id
-        pll_link[3],  # scheme_account_id
-    ]
+# Not implemented yet
+# def historical_pll_link(pll_link, history_id):
+#     return [
+#         history_id,  # id
+#         "2019-03-12 15:51:36.390742+00",  # created
+#         "created",  # change_type
+#         pll_link[0],  # instance_id
+#         "internal_service",  # channel
+#         pll_link[2],  # payment_card_account_id
+#         pll_link[1],  # scheme_account_id
+#         False,  # active_link
+#         "",  # change_details
+#     ]
 
 
 def vop_activation(pk, pcard_id, scheme):
@@ -42,16 +42,16 @@ def scheme_account(pk, scheme_account_id, user_id):
     ]
 
 
-def historical_scheme_account(scheme_account, history_id):
+def historical_scheme_account(scheme_account_entry, history_id):
     return [
-        scheme_account[0],  # id
-        history_id,
-        "2019-03-12 15:51:36.390742+00",  # history_date
-        "NULL",  # history_change_reason
-        "+",  # history_type + == create
-        "NULL",  # history_user_id
-        scheme_account[1],  # scheme_account_id
-        scheme_account[2],  # user_id
+        history_id,  # id
+        "2019-03-12 15:51:36.390742+00",  # created
+        "created",  # change_type
+        scheme_account_entry[0],  # instance_id
+        "internal_service",  # channel
+        scheme_account_entry[2],  # user_id
+        scheme_account_entry[1],  # scheme_account_id
+        "",  # change_details
     ]
 
 
@@ -63,14 +63,14 @@ def payment_card(pk, payment_card_id, user_id):
     ]
 
 
-def historical_payment_card(payment_card, history_id):
+def historical_payment_card(payment_card_entry, history_id):
     return [
-        payment_card[0],  # id
-        history_id,
-        "2019-03-12 15:51:36.390742+00",  # history_date
-        "NULL",  # history_change_reason
-        "+",  # history_type + == create
-        "NULL",  # history_user_id
-        payment_card[1],  # payment_card_account_id
-        payment_card[2],  # user_id
+        history_id,  # id
+        "2019-03-12 15:51:36.390742+00",  # created
+        "created",  # change_type
+        payment_card_entry[0],  # instance_id
+        "internal_service",  # channel
+        payment_card_entry[2],  # user_id
+        payment_card_entry[1],  # payment_card_account_id
+        "",  # change_details
     ]

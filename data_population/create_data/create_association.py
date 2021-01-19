@@ -27,7 +27,7 @@ def pll_link(pk, pcard_id, mcard_id):
 def vop_activation(pk, pcard_id, scheme):
     return [
         pk,  # id
-        uuid.uuid4(),  # activation_id
+        str(uuid.uuid4()),  # activation_id
         3,  # status
         pcard_id,  # payment_card_account
         scheme,  # scheme
@@ -46,7 +46,7 @@ def historical_scheme_account(scheme_account_entry, history_id):
     return [
         history_id,  # id
         "2019-03-12 15:51:36.390742+00",  # created
-        "created",  # change_type
+        "create",  # change_type
         scheme_account_entry[0],  # instance_id
         "internal_service",  # channel
         scheme_account_entry[2],  # user_id
@@ -67,7 +67,7 @@ def historical_payment_card(payment_card_entry, history_id):
     return [
         history_id,  # id
         "2019-03-12 15:51:36.390742+00",  # created
-        "created",  # change_type
+        "create",  # change_type
         payment_card_entry[0],  # instance_id
         "internal_service",  # channel
         payment_card_entry[2],  # user_id

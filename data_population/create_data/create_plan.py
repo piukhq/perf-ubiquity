@@ -127,7 +127,7 @@ def scheme_consent(pk, scheme_id):
         False,  # required
         0,  # order
         1,  # journey (link)
-        uuid.uuid4(),  # slug
+        str(uuid.uuid4()),  # slug
         "2020-01-01 00:00:00",  # created on
         "2020-01-01 00:00:00",  # modified on
         scheme_id,  # scheme id

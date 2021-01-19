@@ -5,7 +5,7 @@ from data_population.fixtures.client import ALL_CLIENTS
 
 
 def user(user_id):
-    user_uuid = uuid.uuid4()
+    user_uuid = str(uuid.uuid4())
     user_email = f"{user_uuid}@bink.com"
     client = random.choice(ALL_CLIENTS)
     return [

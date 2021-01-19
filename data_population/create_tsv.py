@@ -45,17 +45,18 @@ class HermesTables(str, Enum):
     PAYMENT_CARD_ACCOUNT_IMAGE = "payment_card_paymentcardaccountimage"
     PROVIDER_STATUS_MAPPING = "payment_card_providerstatusmapping"
     SCHEME_ACCOUNT = "scheme_schemeaccount"
+    HISTORICAL_SCHEME_ACCOUNT = "history_historicalschemeaccount"
     ANSWER = "scheme_schemeaccountcredentialanswer"
     PAYMENT_ACCOUNT = "payment_card_paymentcardaccount"
+    HISTORICAL_PAYMENT_CARD_ACCOUNT = "history_historicalpaymentcardaccount"
     PAYMENT_ACCOUNT_ENTRY = "ubiquity_paymentcardaccountentry"
-    HISTORICAL_PAYMENT_ACCOUNT_ENTRY = "ubiquity_historicalpaymentcardaccountentry"
+    HISTORICAL_PAYMENT_ACCOUNT_ENTRY = "history_historicalpaymentcardaccountentry"
     SCHEME_ACCOUNT_ENTRY = "ubiquity_schemeaccountentry"
-    HISTORICAL_SCHEME_ACCOUNT_ENTRY = "ubiquity_historicalschemeaccountentry"
+    HISTORICAL_SCHEME_ACCOUNT_ENTRY = "history_historicalschemeaccountentry"
     PAYMENT_MEMBERSHIP_ENTRY = "ubiquity_paymentcardschemeentry"
-    HISTORICAL_PAYMENT_MEMBERSHIP_ENTRY = "ubiquity_historicalpaymentcardschemeentry"
+    # not implemented yet
+    # HISTORICAL_PAYMENT_MEMBERSHIP_ENTRY = "history_historicalpaymentcardschemeentry"
     VOP_ACTIVATION = "ubiquity_vopactivation"
-    HISTORICAL_SCHEME_ACCOUNT = "scheme_historicalschemeaccount"
-    HISTORICAL_PAYMENT_CARD_ACCOUNT = "payment_card_historicalpaymentcardaccount"
 
 
 class Counters:

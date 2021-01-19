@@ -54,7 +54,8 @@ class HermesTables(str, Enum):
     SCHEME_ACCOUNT_ENTRY = "ubiquity_schemeaccountentry"
     HISTORICAL_SCHEME_ACCOUNT_ENTRY = "history_historicalschemeaccountentry"
     PAYMENT_MEMBERSHIP_ENTRY = "ubiquity_paymentcardschemeentry"
-    HISTORICAL_PAYMENT_MEMBERSHIP_ENTRY = "history_historicalpaymentcardschemeentry"
+    # not implemented yet
+    # HISTORICAL_PAYMENT_MEMBERSHIP_ENTRY = "history_historicalpaymentcardschemeentry"
     VOP_ACTIVATION = "ubiquity_vopactivation"
 
 

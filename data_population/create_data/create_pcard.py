@@ -1,6 +1,7 @@
 import json
 import uuid
 
+from data_population.fixtures.payment_card import STATIC_PCARD_HISTORY_BODY
 from data_population.fixtures.payment_scheme import PAYMENT_SCHEME_INFO
 
 
@@ -146,10 +147,10 @@ def historical_payment_card(p_card: list, history_id: int) -> list:
     return [
         history_id,  # id
         "2019-03-12 15:51:36.390742+00",  # created
-        "created",  # change_type
+        "create",  # change_type
         p_card[0],  # instance_id
         "internal_service",  # channel
-        "n/a",  # user_id
-        json.dumps(p_card),  # body
+        p_card[0],  # user_id
+        STATIC_PCARD_HISTORY_BODY,  # body
         "",  # change_details
     ]

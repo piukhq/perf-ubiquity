@@ -4,6 +4,8 @@ import uuid
 
 import arrow
 
+from data_population.fixtures.membership_card import STATIC_MCARD_HISTORY_BODY
+
 
 def generate_transactions(transaction_total):
     transactions = []
@@ -58,11 +60,11 @@ def historical_membership_card(m_card: list, history_id: int) -> list:
     return [
         history_id,  # id
         "2019-03-12 15:51:36.390742+00",  # created
-        "created",  # change_type
+        "create",  # change_type
         m_card[0],  # instance_id
         "internal_service",  # channel
-        "n/a",  # user_id
-        json.dumps(m_card),  # body
+        m_card[0],  # user_id
+        STATIC_MCARD_HISTORY_BODY,  # body
         "",  # change_details
         "add",  # journey
     ]

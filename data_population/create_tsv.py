@@ -462,6 +462,7 @@ def create_tsv_files():
     start = time.perf_counter()
     logger.debug("Deleting old tsv files...")
     delete_old_tsv_files(HermesTables)
+    delete_old_tsv_files(HistoryTables)
     delete_old_tsv_files(HadesTables)
     logger.debug(f"Completed deletion. Elapsed time: {time.perf_counter() - start}")
     logger.debug("Creating channel tsv files...")

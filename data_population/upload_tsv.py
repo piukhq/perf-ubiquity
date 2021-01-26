@@ -5,8 +5,9 @@ import time
 
 import psycopg2
 
-from data_population.create_tsv import HermesTables, HadesTables, TSV_BASE_DIR
-from settings import DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, HERMES_DB, HADES_DB
+from data_population.create_tsv import HermesTables, HadesTables, TSV_BASE_DIR, HistoryTables
+from settings import (DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, HERMES_DB, HADES_DB, HISTORY_DB_USER,
+                      HISTORY_DB_PASSWORD, HISTORY_DB_HOST, HISTORY_DB_PORT, HISTORY_DB)
 
 logger = logging.getLogger("upload-tsv")
 
@@ -19,6 +20,16 @@ def postgres_connection(db_name):
         "password": DB_PASSWORD,
         "host": DB_HOST,
         "port": DB_PORT,
+        "database": db_name
+    }
+
+
+def history_connection(db_name):
+    return {
+        "user": HISTORY_DB_USER,
+        "password": HISTORY_DB_PASSWORD,
+        "host": HISTORY_DB_HOST,
+        "port": HISTORY_DB_PORT,
         "database": db_name
     }
 
@@ -53,7 +64,11 @@ def format_table_name(table_name):
 
 
 def truncate_and_populate_tables(db_name, tables):
-    connection_info = postgres_connection(db_name)
+    if db_name == HISTORY_DB:
+        connection_info = history_connection(db_name)
+    else:
+        connection_info = postgres_connection(db_name)
+
     with psycopg2.connect(**connection_info) as connection:
         with connection.cursor() as cursor:
             logger.debug(f"Truncating tables defined in `{tables}`")
@@ -72,6 +87,7 @@ def upload_all_tsv_files():
     start = time.perf_counter()
     truncate_and_populate_tables(HERMES_DB, HermesTables)
     truncate_and_populate_tables(HADES_DB, HadesTables)
+    truncate_and_populate_tables(HISTORY_DB, HistoryTables)
     logger.debug(f"Completed upload. Elapsed time: {time.perf_counter() - start}")
 
 

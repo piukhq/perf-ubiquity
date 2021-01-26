@@ -45,18 +45,25 @@ class HermesTables(str, Enum):
     PAYMENT_CARD_ACCOUNT_IMAGE = "payment_card_paymentcardaccountimage"
     PROVIDER_STATUS_MAPPING = "payment_card_providerstatusmapping"
     SCHEME_ACCOUNT = "scheme_schemeaccount"
-    HISTORICAL_SCHEME_ACCOUNT = "history_historicalschemeaccount"
     ANSWER = "scheme_schemeaccountcredentialanswer"
     PAYMENT_ACCOUNT = "payment_card_paymentcardaccount"
-    HISTORICAL_PAYMENT_CARD_ACCOUNT = "history_historicalpaymentcardaccount"
     PAYMENT_ACCOUNT_ENTRY = "ubiquity_paymentcardaccountentry"
-    HISTORICAL_PAYMENT_ACCOUNT_ENTRY = "history_historicalpaymentcardaccountentry"
     SCHEME_ACCOUNT_ENTRY = "ubiquity_schemeaccountentry"
-    HISTORICAL_SCHEME_ACCOUNT_ENTRY = "history_historicalschemeaccountentry"
     PAYMENT_MEMBERSHIP_ENTRY = "ubiquity_paymentcardschemeentry"
+    VOP_ACTIVATION = "ubiquity_vopactivation"
+
+
+class HistoryTables(str, Enum):
+    HISTORICAL_SCHEME_ACCOUNT = "history_historicalschemeaccount"
+    HISTORICAL_PAYMENT_CARD_ACCOUNT = "history_historicalpaymentcardaccount"
+    HISTORICAL_PAYMENT_ACCOUNT_ENTRY = "history_historicalpaymentcardaccountentry"
+    HISTORICAL_SCHEME_ACCOUNT_ENTRY = "history_historicalschemeaccountentry"
     # not implemented yet
     # HISTORICAL_PAYMENT_MEMBERSHIP_ENTRY = "history_historicalpaymentcardschemeentry"
-    VOP_ACTIVATION = "ubiquity_vopactivation"
+
+
+class HadesTables(str, Enum):
+    TRANSACTIONS = "transaction"
 
 
 class Counters:
@@ -131,10 +138,6 @@ class Counters:
                 self.historical_payment_cards.append(
                     create_pcard.historical_payment_card(card, self.pcard_history_index))
                 self.pcard_history_index += 1
-
-
-class HadesTables(str, Enum):
-    TRANSACTIONS = "transaction"
 
 
 def tsv_path(table_name):

@@ -58,8 +58,9 @@ class HistoryTables(str, Enum):
     HISTORICAL_PAYMENT_CARD_ACCOUNT = "history_historicalpaymentcardaccount"
     HISTORICAL_PAYMENT_ACCOUNT_ENTRY = "history_historicalpaymentcardaccountentry"
     HISTORICAL_SCHEME_ACCOUNT_ENTRY = "history_historicalschemeaccountentry"
-    # not implemented yet
-    # HISTORICAL_PAYMENT_MEMBERSHIP_ENTRY = "history_historicalpaymentcardschemeentry"
+    HISTORICAL_PAYMENT_MEMBERSHIP_ENTRY = "history_historicalpaymentcardschemeentry"
+    HISTORICAL_USER = "history_historicalcustomuser"
+    HISTORICAL_VOP_ACTIVATION = "history_historicalvopactivation"
 
 
 class HadesTables(str, Enum):
@@ -70,6 +71,7 @@ class Counters:
     def __init__(self, job):
         self.part = job["job_id"]
         self.users = []
+        self.historical_users = []
         self.services = []
         self.membership_cards = []
         self.historical_membership_cards = []
@@ -82,6 +84,7 @@ class Counters:
         self.pll_links = []
         self.historical_pll_links = []
         self.vop_activation_dict = {}
+        self.historical_vop_activation_dict = {}
         self.service_start = job["start"]
         self.mcard_index = job[f"{CardTypes.MCARD}_start"]
         self.mcard_history_index = job[f"historical_{CardTypes.MCARD}_start"]
@@ -95,6 +98,7 @@ class Counters:
     def clear_entries(self):
         for entries in (
                 self.users,
+                self.historical_users,
                 self.services,
                 self.membership_cards,
                 self.historical_membership_cards,
@@ -107,11 +111,13 @@ class Counters:
                 self.pll_links,
                 self.historical_pll_links,
                 self.vop_activation_dict,
+                self.historical_vop_activation_dict
         ):
             entries.clear()
 
     def write_part_to_csv(self):
         write_to_tsv_part(HermesTables.USER, self.part, self.users)
+        write_to_tsv_part(HistoryTables.HISTORICAL_USER, self.part, self.historical_users)
         write_to_tsv_part(HermesTables.CONSENT, self.part, self.services)
         write_to_tsv_part(HermesTables.SCHEME_ACCOUNT, self.part, self.membership_cards)
         write_to_tsv_part(HistoryTables.HISTORICAL_SCHEME_ACCOUNT, self.part, self.historical_membership_cards)
@@ -123,9 +129,11 @@ class Counters:
         write_to_tsv_part(HistoryTables.HISTORICAL_PAYMENT_ACCOUNT_ENTRY, self.part,
                           self.historical_p_card_associations)
         write_to_tsv_part(HermesTables.PAYMENT_MEMBERSHIP_ENTRY, self.part, self.pll_links)
-        # write_to_tsv_part(HistoryTables.HISTORICAL_PAYMENT_MEMBERSHIP_ENTRY, self.part, self.historical_pll_links)
+        write_to_tsv_part(HistoryTables.HISTORICAL_PAYMENT_MEMBERSHIP_ENTRY, self.part, self.historical_pll_links)
         vop_activation_list = list(self.vop_activation_dict.values())
         write_to_tsv_part(HermesTables.VOP_ACTIVATION, self.part, vop_activation_list)
+        historical_vop_activation_list = list(self.historical_vop_activation_dict.values())
+        write_to_tsv_part(HistoryTables.HISTORICAL_VOP_ACTIVATION, self.part, historical_vop_activation_list)
 
     def populate_card_history(self, card, card_type):
         if card_type == CardTypes.MCARD:
@@ -267,7 +275,10 @@ def create_service_mcard_and_pcard_job(job):
             counters.write_part_to_csv()
             counters.clear_entries()
 
-        counters.users.append(create_service.user(service_pk))
+        new_user = create_service.user(service_pk)
+        historic_user = create_service.historic_user(new_user, service_pk)
+        counters.users.append(new_user)
+        counters.historical_users.append(historic_user)
         counters.services.append(create_service.service(service_pk))
 
         create_pll_link = True
@@ -309,12 +320,14 @@ def create_service_mcard_and_pcard_job(job):
             link = create_association.pll_link(counters.pcard_index - 1, counters.pcard_index - 1,
                                                counters.mcard_index - 1)
             counters.pll_links.append(link)
-            # counters.historical_pll_links.append(create_association.historical_pll_link(
-            # link, counters.pcard_index - 1))
+            counters.historical_pll_links.append(create_association.historical_pll_link(
+                link, counters.pcard_index - 1))
             scheme_id = random.randint(1, MEMBERSHIP_PLANS)
             vop_activation = create_association.vop_activation(counters.pcard_index - 1, counters.pcard_index - 1,
                                                                scheme_id)
+            historic_vop_activation = create_association.historical_vop_activation(vop_activation, vop_activation[0])
             counters.vop_activation_dict[counters.pcard_index - 1] = vop_activation
+            counters.historical_vop_activation_dict[counters.pcard_index - 1] = historic_vop_activation
 
         if service_pk % 100000 == 0:
             logger.info(f"Generated {service_pk} users")

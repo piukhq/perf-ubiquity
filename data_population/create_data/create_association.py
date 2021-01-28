@@ -1,7 +1,7 @@
 import uuid
 
 
-def pll_link(pk, pcard_id, mcard_id):
+def pll_link(pk: int, pcard_id: int, mcard_id: int) -> list:
     return [
         pk,  # id
         True,  # active_link
@@ -9,22 +9,23 @@ def pll_link(pk, pcard_id, mcard_id):
         mcard_id,  # scheme_account_id
     ]
 
-# Not implemented yet
-# def historical_pll_link(pll_link, history_id):
-#     return [
-#         history_id,  # id
-#         "2019-03-12 15:51:36.390742+00",  # created
-#         "created",  # change_type
-#         pll_link[0],  # instance_id
-#         "internal_service",  # channel
-#         pll_link[2],  # payment_card_account_id
-#         pll_link[1],  # scheme_account_id
-#         False,  # active_link
-#         "",  # change_details
-#     ]
+
+def historical_pll_link(pll_link: list, history_id: int) -> list:
+    return [
+        history_id,  # id
+        "2019-03-12 15:51:36.390742+00",  # created
+        "create",  # change_type
+        pll_link[0],  # instance_id
+        "internal_service",  # channel
+        "",  # change_details
+        "NULL",  # user_id
+        pll_link[2],  # payment_card_account_id
+        pll_link[3],  # scheme_account_id
+        False,  # active_link
+    ]
 
 
-def vop_activation(pk, pcard_id, scheme):
+def vop_activation(pk: int, pcard_id: int, scheme: int) -> list:
     return [
         pk,  # id
         str(uuid.uuid4()),  # activation_id
@@ -34,7 +35,23 @@ def vop_activation(pk, pcard_id, scheme):
     ]
 
 
-def scheme_account(pk, scheme_account_id, user_id):
+def historical_vop_activation(vop_activation: list, history_id: int) -> list:
+    return [
+        history_id,  # id
+        "2019-03-12 15:51:36.390742+00",  # created
+        "create",  # change_type
+        vop_activation[0],  # instance_id
+        "internal_service",  # channel
+        "",  # change_details
+        "NULL",  # user_id
+        vop_activation[4],  # scheme_id
+        vop_activation[3],  # payment_card_account_id
+        vop_activation[2],  # status
+        vop_activation[1],  # activation_id
+    ]
+
+
+def scheme_account(pk: int, scheme_account_id: int, user_id: int) -> list:
     return [
         pk,  # id
         scheme_account_id,  # scheme_account_id
@@ -42,7 +59,7 @@ def scheme_account(pk, scheme_account_id, user_id):
     ]
 
 
-def historical_scheme_account(scheme_account_entry, history_id):
+def historical_scheme_account(scheme_account_entry: list, history_id: int) -> list:
     return [
         history_id,  # id
         "2019-03-12 15:51:36.390742+00",  # created
@@ -55,7 +72,7 @@ def historical_scheme_account(scheme_account_entry, history_id):
     ]
 
 
-def payment_card(pk, payment_card_id, user_id):
+def payment_card(pk: int, payment_card_id: int, user_id: int) -> list:
     return [
         pk,  # id
         payment_card_id,  # payment_card_account_id
@@ -63,7 +80,7 @@ def payment_card(pk, payment_card_id, user_id):
     ]
 
 
-def historical_payment_card(payment_card_entry, history_id):
+def historical_payment_card(payment_card_entry: list, history_id: int) -> list:
     return [
         history_id,  # id
         "2019-03-12 15:51:36.390742+00",  # created

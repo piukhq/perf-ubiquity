@@ -2,9 +2,10 @@ import random
 import uuid
 
 from data_population.fixtures.client import ALL_CLIENTS
+from data_population.fixtures.user import STATIC_USER_HISTORY_BODY
 
 
-def user(user_id):
+def user(user_id: int) -> list:
     user_uuid = str(uuid.uuid4())
     user_email = f"{user_uuid}@bink.com"
     client = random.choice(ALL_CLIENTS)
@@ -31,7 +32,21 @@ def user(user_id):
     ]
 
 
-def service(user_id):
+def historic_user(user: list, history_id: int) -> list:
+    return [
+        history_id,  # id
+        "2019-03-12 15:51:36.390742+00",  # created
+        "create",  # change_type
+        user[0],  # instance_id
+        "internal_service",  # channel
+        "",  # change_details
+        STATIC_USER_HISTORY_BODY,  # body
+        "robojeff@testbink.com",  # email
+        "1234567890",  # external_id
+    ]
+
+
+def service(user_id: int) -> list:
     return [
         user_id,  # id
         "NULL",  # latitude

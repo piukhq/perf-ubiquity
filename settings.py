@@ -31,11 +31,11 @@ DB_PORT = env_var("DB_PORT", "5432")
 HERMES_DB = env_var("HERMES_DB", "hermes")
 HADES_DB = env_var("HADES_DB", "hades")
 
-HISTORY_DB_USER = env_var("HISTORY_DB_USER", "postgres")
-HISTORY_DB_PASSWORD = env_var("HISTORY_DB_PASSWORD", "")
-HISTORY_DB_HOST = env_var("HISTORY_DB_HOST", "127.0.0.1")
-HISTORY_DB_PORT = env_var("HISTORY_DB_PORT", "5432")
-HISTORY_DB = env_var("HISTORY_DB", "hermeshistory")
+HISTORY_DB_USER = env_var("DB_USER", "postgres")
+HISTORY_DB_PASSWORD = env_var("DB_PASSWORD", "")
+HISTORY_DB_HOST = env_var("DB_HOST", "127.0.0.1")
+HISTORY_DB_PORT = env_var("DB_PORT", "5432")
+HISTORY_DB = env_var("HERMES_DB", "hermeshistory")
 
 HERMES_URL = env_var("HERMES_URL")
 SERVICE_API_KEY = "F616CE5C88744DD52DB628FAD8B3D"

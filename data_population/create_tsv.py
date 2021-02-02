@@ -51,9 +51,6 @@ class HermesTables(str, Enum):
     SCHEME_ACCOUNT_ENTRY = "ubiquity_schemeaccountentry"
     PAYMENT_MEMBERSHIP_ENTRY = "ubiquity_paymentcardschemeentry"
     VOP_ACTIVATION = "ubiquity_vopactivation"
-
-
-class HistoryTables(str, Enum):
     HISTORICAL_SCHEME_ACCOUNT = "history_historicalschemeaccount"
     HISTORICAL_PAYMENT_CARD_ACCOUNT = "history_historicalpaymentcardaccount"
     HISTORICAL_PAYMENT_ACCOUNT_ENTRY = "history_historicalpaymentcardaccountentry"
@@ -117,23 +114,23 @@ class Counters:
 
     def write_part_to_csv(self):
         write_to_tsv_part(HermesTables.USER, self.part, self.users)
-        write_to_tsv_part(HistoryTables.HISTORICAL_USER, self.part, self.historical_users)
+        write_to_tsv_part(HermesTables.HISTORICAL_USER, self.part, self.historical_users)
         write_to_tsv_part(HermesTables.CONSENT, self.part, self.services)
         write_to_tsv_part(HermesTables.SCHEME_ACCOUNT, self.part, self.membership_cards)
-        write_to_tsv_part(HistoryTables.HISTORICAL_SCHEME_ACCOUNT, self.part, self.historical_membership_cards)
+        write_to_tsv_part(HermesTables.HISTORICAL_SCHEME_ACCOUNT, self.part, self.historical_membership_cards)
         write_to_tsv_part(HermesTables.SCHEME_ACCOUNT_ENTRY, self.part, self.membership_card_associations)
-        write_to_tsv_part(HistoryTables.HISTORICAL_SCHEME_ACCOUNT_ENTRY, self.part, self.historical_m_card_associations)
+        write_to_tsv_part(HermesTables.HISTORICAL_SCHEME_ACCOUNT_ENTRY, self.part, self.historical_m_card_associations)
         write_to_tsv_part(HermesTables.PAYMENT_ACCOUNT, self.part, self.payment_cards)
-        write_to_tsv_part(HistoryTables.HISTORICAL_PAYMENT_CARD_ACCOUNT, self.part, self.historical_payment_cards)
+        write_to_tsv_part(HermesTables.HISTORICAL_PAYMENT_CARD_ACCOUNT, self.part, self.historical_payment_cards)
         write_to_tsv_part(HermesTables.PAYMENT_ACCOUNT_ENTRY, self.part, self.payment_card_associations)
-        write_to_tsv_part(HistoryTables.HISTORICAL_PAYMENT_ACCOUNT_ENTRY, self.part,
+        write_to_tsv_part(HermesTables.HISTORICAL_PAYMENT_ACCOUNT_ENTRY, self.part,
                           self.historical_p_card_associations)
         write_to_tsv_part(HermesTables.PAYMENT_MEMBERSHIP_ENTRY, self.part, self.pll_links)
-        write_to_tsv_part(HistoryTables.HISTORICAL_PAYMENT_MEMBERSHIP_ENTRY, self.part, self.historical_pll_links)
+        write_to_tsv_part(HermesTables.HISTORICAL_PAYMENT_MEMBERSHIP_ENTRY, self.part, self.historical_pll_links)
         vop_activation_list = list(self.vop_activation_dict.values())
         write_to_tsv_part(HermesTables.VOP_ACTIVATION, self.part, vop_activation_list)
         historical_vop_activation_list = list(self.historical_vop_activation_dict.values())
-        write_to_tsv_part(HistoryTables.HISTORICAL_VOP_ACTIVATION, self.part, historical_vop_activation_list)
+        write_to_tsv_part(HermesTables.HISTORICAL_VOP_ACTIVATION, self.part, historical_vop_activation_list)
 
     def populate_card_history(self, card, card_type):
         if card_type == CardTypes.MCARD:
@@ -475,7 +472,6 @@ def create_tsv_files():
     start = time.perf_counter()
     logger.debug("Deleting old tsv files...")
     delete_old_tsv_files(HermesTables)
-    delete_old_tsv_files(HistoryTables)
     delete_old_tsv_files(HadesTables)
     logger.debug(f"Completed deletion. Elapsed time: {time.perf_counter() - start}")
     logger.debug("Creating channel tsv files...")

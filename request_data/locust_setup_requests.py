@@ -11,11 +11,11 @@ from settings import HERMES_URL
 logger = logging.getLogger(__name__)
 
 
-def slow_retry_request(method: str, url: str, headers: dict, params: dict = None):
+def slow_retry_request(method: str, url: str, headers: dict, json: dict = None, params: dict = None):
     for _ in range(10):
         try:
             logger.debug("Attempting setup requests to Hermes to get information like membership_plan total...")
-            resp = requests.request(method, url, headers=headers, params=params)
+            resp = requests.request(method, url, headers=headers, json=json, params=params)
             resp.raise_for_status()
             return resp
         except requests.RequestException as e:
@@ -33,12 +33,13 @@ def request_membership_plan_total():
         logger.debug("No HERMES_URL environment variable set, skipping membership plan total setup")
         return 7
 
-    email = "performance_setup_requests@bink.com"
+    email = "performance-test@bink.com"
     timestamp = int(time.time())
 
     headers = service.generate_auth_header(email, timestamp, CLIENT_ONE, CLIENT_ONE["secret"])
+    body = service.generate_setup_user()
     service_url = f"{HERMES_URL}/ubiquity/service"
-    slow_retry_request("POST", service_url, headers)
+    slow_retry_request("POST", service_url, headers, json=body)
 
     params = {"fields": "id"}
     plan_url = f"{HERMES_URL}/ubiquity/membership_plans"

@@ -4,10 +4,10 @@ from locust import constant, task, HttpUser, SequentialTaskSet
 from locust.exception import StopUser
 from requests import codes
 
-from data_population.create_tsv import MEMBERSHIP_PLANS
 from data_population.fixtures.client import CLIENT_ONE, CLIENT_RESTRICTED, NON_RESTRICTED_CLIENTS
 from locust_config import (check_suite_whitelist, repeat_task, increment_locust_counter, load_secrets, LocustLabel,
-                           TOTAL_CLIENTS, MULTIPLE_PROPERTY_PCARD_INDEX, PATCH_PLANS, NON_PATCH_PLANS, AUTOLINK)
+                           TOTAL_CLIENTS, MULTIPLE_PROPERTY_PCARD_INDEX, PATCH_PLANS, NON_PATCH_PLANS, AUTOLINK,
+                           MEMBERSHIP_PLANS)
 from request_data import service, membership_card, payment_card
 from request_data.hermes import post_scheme_account_status, wait_for_scheme_account_status
 

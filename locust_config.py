@@ -5,7 +5,7 @@ from time import sleep
 import logging
 from shared_config_storage.vault import secrets
 
-from data_population.create_tsv import MEMBERSHIP_PLANS
+from request_data.locust_setup_requests import request_membership_plan_total
 from settings import CHANNEL_VAULT_PATH, LOCAL_SECRETS, LOCAL_SECRETS_PATH, VAULT_TOKEN, VAULT_URL
 
 
@@ -20,6 +20,7 @@ channel_info = None
 
 
 # Change this to specify how many channels the locust tests use
+MEMBERSHIP_PLANS = request_membership_plan_total()
 TOTAL_CLIENTS = 6
 PCARD_DECRYPT_WAIT_TIME = 120
 MULTIPLE_PROPERTY_PCARD_INDEX = 0

@@ -2,9 +2,8 @@ import random
 
 from locust import constant, task, HttpUser, SequentialTaskSet
 
-from data_population.create_tsv import MEMBERSHIP_PLANS
 from data_population.fixtures.client import CLIENT_ONE, NON_RESTRICTED_CLIENTS
-from locust_config import repeat_task, load_secrets, AUTOLINK
+from locust_config import repeat_task, load_secrets, AUTOLINK, MEMBERSHIP_PLANS
 from request_data import service, membership_card, payment_card
 
 

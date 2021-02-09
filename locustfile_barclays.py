@@ -4,9 +4,8 @@ from enum import IntEnum, auto
 from locust import constant, task, HttpUser, SequentialTaskSet
 from locust.exception import StopUser
 
-from data_population.create_tsv import MEMBERSHIP_PLANS
 from data_population.fixtures.client import CLIENT_ONE, NON_RESTRICTED_CLIENTS
-from locust_config import (check_suite_whitelist, repeat_task, load_secrets, AUTOLINK)
+from locust_config import check_suite_whitelist, repeat_task, load_secrets, AUTOLINK, MEMBERSHIP_PLANS
 from request_data import service, membership_card, payment_card
 from request_data.hermes import post_scheme_account_status
 

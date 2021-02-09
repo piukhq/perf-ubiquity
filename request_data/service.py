@@ -30,7 +30,7 @@ def generate_random():
     }
 
 
-def generate_static():
+def generate_setup_user():
     return {
-        "consent": {"email": "performance-test@testbink.com", "timestamp": 1542189471}
+        "consent": {"email": "performance-test@bink.com", "timestamp": int(time.time())}
     }

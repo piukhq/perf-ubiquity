@@ -143,14 +143,14 @@ def payment_card(card_id):
     ]
 
 
-def historical_payment_card(p_card: list, history_id: int) -> list:
+def historical_payment_card(history_id: int) -> list:
     return [
         history_id,  # id
         "2019-03-12 15:51:36.390742+00",  # created
         "create",  # change_type
-        p_card[0],  # instance_id
+        history_id,  # instance_id
         "internal_service",  # channel
-        p_card[0],  # user_id
+        history_id,  # user_id
         STATIC_PCARD_HISTORY_BODY,  # body
         "",  # change_details
     ]

@@ -2,7 +2,7 @@ import uuid
 
 from shared_config_storage.credentials.encryption import RSACipher
 
-from data_population.create_data.create_plan import SENSITIVE_FIELDS
+from data_population.row_generation.create_plan import SENSITIVE_FIELDS
 from data_population.fixtures.membership_plan import CONSENT_LABEL
 from settings import fake
 

@@ -2,11 +2,12 @@ import glob
 import logging
 import os
 import time
+from enum import Enum
 
 import psycopg2
 
-from data_population.create_tsv import HermesTables, HadesTables, TSV_BASE_DIR
-from settings import DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, HERMES_DB, HADES_DB
+from data_population.database_tables import HermesTables, HadesTables, HermesHistoryTables
+from settings import DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, HERMES_DB, HADES_DB, TSV_BASE_DIR
 
 logger = logging.getLogger("upload-tsv")
 
@@ -57,7 +58,7 @@ def truncate_and_populate_tables(db_name, tables):
 
     with psycopg2.connect(**connection_info) as connection:
         with connection.cursor() as cursor:
-            logger.debug(f"Truncating tables defined in `{tables}`")
+            logger.debug(f"Truncating tables defined in '{tables}'")
             for table in tables:
                 truncate_table(cursor, table)
 
@@ -69,18 +70,15 @@ def truncate_and_populate_tables(db_name, tables):
                 update_seq(cursor, table)
 
 
-def upload_all_tsv_files():
+# def upload_all_tsv_files():
+#     start = time.perf_counter()
+#     truncate_and_populate_tables(HERMES_DB, HermesTables)
+#     truncate_and_populate_tables(HERMES_DB, HermesHistoryTables)
+#     truncate_and_populate_tables(HADES_DB, HadesTables)
+#     logger.debug(f"Completed upload. Elapsed time: {time.perf_counter() - start}")
+
+
+def upload_named_group_of_tsv_files(db_name: str, tables: Enum):
     start = time.perf_counter()
-    truncate_and_populate_tables(HERMES_DB, HermesTables)
-    truncate_and_populate_tables(HADES_DB, HadesTables)
-    logger.debug(f"Completed upload. Elapsed time: {time.perf_counter() - start}")
-
-
-def upload_single_tsv_file(db_name, table_name):
-    start = time.perf_counter()
-    truncate_and_populate_tables(db_name, [table_name])
-    logger.debug(f"Completed upload. Elapsed time: {time.perf_counter() - start}")
-
-
-if __name__ == "__main__":
-    upload_all_tsv_files()
+    truncate_and_populate_tables(db_name, tables)
+    logger.debug(f"Completed upload for {str(tables)}. Elapsed time: {time.perf_counter() - start}")

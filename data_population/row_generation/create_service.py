@@ -32,12 +32,12 @@ def user(user_id: int) -> list:
     ]
 
 
-def historic_user(user: list, history_id: int) -> list:
+def historic_user(history_id: int) -> list:
     return [
         history_id,  # id
         "2019-03-12 15:51:36.390742+00",  # created
         "create",  # change_type
-        user[0],  # instance_id
+        history_id,  # instance_id
         "internal_service",  # channel
         "",  # change_details
         STATIC_USER_HISTORY_BODY,  # body

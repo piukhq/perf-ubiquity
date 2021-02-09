@@ -6,8 +6,8 @@ from enum import Enum
 
 import psycopg2
 
-from data_population.database_tables import HermesTables, HadesTables, HermesHistoryTables
-from settings import DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, HERMES_DB, HADES_DB, TSV_BASE_DIR
+from data_population.database_tables import HermesTables
+from settings import DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, TSV_BASE_DIR
 
 logger = logging.getLogger("upload-tsv")
 
@@ -68,14 +68,6 @@ def truncate_and_populate_tables(db_name, tables):
                     logger.debug(f"Uploading file {tsv} to table {table}")
                     upload_tsv(cursor, table, tsv)
                 update_seq(cursor, table)
-
-
-# def upload_all_tsv_files():
-#     start = time.perf_counter()
-#     truncate_and_populate_tables(HERMES_DB, HermesTables)
-#     truncate_and_populate_tables(HERMES_DB, HermesHistoryTables)
-#     truncate_and_populate_tables(HADES_DB, HadesTables)
-#     logger.debug(f"Completed upload. Elapsed time: {time.perf_counter() - start}")
 
 
 def upload_named_group_of_tsv_files(db_name: str, tables: Enum):

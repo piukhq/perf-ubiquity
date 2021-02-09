@@ -43,25 +43,22 @@ data_mapping = {
             {"database": HADES_DB, "tables": HadesTables}
         ]
     },
-    DataGroups.ALL:
-        {
-            "data_creation_modules": [hermes, hermes_history, hades],
-            "upload_lists": [
-                {"database": HERMES_DB, "tables": HermesTables},
-                {"database": HERMES_DB, "tables": HermesHistoryTables},
-                {"database": HADES_DB, "tables": HadesTables}
-            ]
-        }
+    DataGroups.ALL: {
+        "data_creation_modules": [hermes, hermes_history, hades],
+        "upload_lists": [
+            {"database": HERMES_DB, "tables": HermesTables},
+            {"database": HERMES_DB, "tables": HermesHistoryTables},
+            {"database": HADES_DB, "tables": HadesTables}
+        ]
+    }
 }
 
 
 @click.command()
 @click.option("-g", "--group-config", default="all", help=GROUP_CONFIG_HELP)
 @click.option("-s", "--size-config", default="test", help=SIZE_CONFIG_HELP)
-def create_tsv(group_config: str, size_config:str):
-    """Creates the requested tsv files
-
-    """
+def create_tsv(group_config: str, size_config: str):
+    """Creates the requested tsv files"""
     if group_config not in list(DataGroups):
         raise ValueError(BAD_GROUP_CONFIG_ERROR)
     if size_config not in data_population_config.all_config_names:

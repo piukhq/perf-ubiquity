@@ -29,16 +29,22 @@ def slow_retry_request(method: str, url: str, headers: dict, params: dict = None
 
 
 def request_membership_plan_total():
+    if not HERMES_URL:
+        logger.debug("No HERMES_URL environment variable set, skipping membership plan total setup")
+        return 7
+
     email = "performance_setup_requests@bink.com"
     timestamp = int(time.time())
 
     headers = service.generate_auth_header(email, timestamp, CLIENT_ONE, CLIENT_ONE["secret"])
-    service_url = f"{HERMES_URL}/service"
+    service_url = f"{HERMES_URL}/ubiquity/service"
     slow_retry_request("POST", service_url, headers)
 
     params = {"fields": "id"}
-    plan_url = f"{HERMES_URL}/membership_plans"
+    plan_url = f"{HERMES_URL}/ubiquity/membership_plans"
     resp = slow_retry_request("GET", plan_url, headers, params=params)
     membership_plan_total = len(resp.json())
 
+    logger.debug("Obtained membership plan total from ubiquity, "
+                 f"setting number of membership plans to use in tests to: {membership_plan_total}")
     return membership_plan_total

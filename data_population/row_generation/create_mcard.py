@@ -56,14 +56,14 @@ def membership_card(card_id, scheme_id, transaction_total):
     ]
 
 
-def historical_membership_card(m_card: list, history_id: int) -> list:
+def historical_membership_card(history_id: int) -> list:
     return [
         history_id,  # id
         "2019-03-12 15:51:36.390742+00",  # created
         "create",  # change_type
-        m_card[0],  # instance_id
+        history_id,  # instance_id
         "internal_service",  # channel
-        m_card[0],  # user_id
+        history_id,  # user_id
         STATIC_MCARD_HISTORY_BODY,  # body
         "",  # change_details
         "add",  # journey

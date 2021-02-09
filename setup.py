@@ -8,8 +8,7 @@ setup(
         "console_scripts": (
             "create-tsv=cli.commands:create_tsv",
             "populate-db=cli.commands:populate_db",
-            "upload-all=cli.commands:upload_tsv_files",
-            "upload-single=cli.commands:upload_tsv_file",
+            "upload-tsv=cli.commands:upload_tsv",
         )
     },
 )

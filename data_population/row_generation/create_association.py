@@ -10,17 +10,17 @@ def pll_link(pk: int, pcard_id: int, mcard_id: int) -> list:
     ]
 
 
-def historical_pll_link(pll_link: list, history_id: int) -> list:
+def historical_pll_link(history_id: int) -> list:
     return [
         history_id,  # id
         "2019-03-12 15:51:36.390742+00",  # created
         "create",  # change_type
-        pll_link[0],  # instance_id
+        history_id,  # instance_id
         "internal_service",  # channel
         "",  # change_details
         "NULL",  # user_id
-        pll_link[2],  # payment_card_account_id
-        pll_link[3],  # scheme_account_id
+        history_id,  # payment_card_account_id
+        history_id,  # scheme_account_id
         False,  # active_link
     ]
 
@@ -35,19 +35,19 @@ def vop_activation(pk: int, pcard_id: int, scheme: int) -> list:
     ]
 
 
-def historical_vop_activation(vop_activation: list, history_id: int) -> list:
+def historical_vop_activation(history_id: int) -> list:
     return [
         history_id,  # id
         "2019-03-12 15:51:36.390742+00",  # created
         "create",  # change_type
-        vop_activation[0],  # instance_id
+        history_id,  # instance_id
         "internal_service",  # channel
         "",  # change_details
         "NULL",  # user_id
-        vop_activation[4],  # scheme_id
-        vop_activation[3],  # payment_card_account_id
-        vop_activation[2],  # status
-        vop_activation[1],  # activation_id
+        history_id,  # scheme_id
+        history_id,  # payment_card_account_id
+        history_id,  # status
+        history_id,  # activation_id
     ]
 
 
@@ -59,15 +59,15 @@ def scheme_account(pk: int, scheme_account_id: int, user_id: int) -> list:
     ]
 
 
-def historical_scheme_account(scheme_account_entry: list, history_id: int) -> list:
+def historical_scheme_account(history_id: int) -> list:
     return [
         history_id,  # id
         "2019-03-12 15:51:36.390742+00",  # created
         "create",  # change_type
-        scheme_account_entry[0],  # instance_id
+        history_id,  # instance_id
         "internal_service",  # channel
-        scheme_account_entry[2],  # user_id
-        scheme_account_entry[1],  # scheme_account_id
+        history_id,  # user_id
+        history_id,  # scheme_account_id
         "",  # change_details
     ]
 
@@ -80,14 +80,14 @@ def payment_card(pk: int, payment_card_id: int, user_id: int) -> list:
     ]
 
 
-def historical_payment_card(payment_card_entry: list, history_id: int) -> list:
+def historical_payment_card(history_id: int) -> list:
     return [
         history_id,  # id
         "2019-03-12 15:51:36.390742+00",  # created
         "create",  # change_type
-        payment_card_entry[0],  # instance_id
+        history_id,  # instance_id
         "internal_service",  # channel
-        payment_card_entry[2],  # user_id
-        payment_card_entry[1],  # payment_card_account_id
+        history_id,  # user_id
+        history_id,  # payment_card_account_id
         "",  # change_details
     ]

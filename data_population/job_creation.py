@@ -1,55 +1,6 @@
 import multiprocessing
-import os
 from enum import Enum
 
-# temp change from 6 to 7 until https://hellobink.atlassian.net/browse/DS-854 is implemented
-MEMBERSHIP_PLANS = int(os.environ.get("MEMBERSHIP_PLANS", "7"))
-TOTAL_USERS = int(os.environ.get("TOTAL_USERS", "500"))
-TOTAL_MCARDS = int(os.environ.get("TOTAL_MCARDS", "5000"))
-TOTAL_PCARDS = int(os.environ.get("TOTAL_PCARDS", "2000"))
-TOTAL_TRANSACTIONS = int(os.environ.get("TOTAL_TRANSACTIONS", "10000"))
-
-# Barclays configuration
-# MEMBERSHIP_PLANS = int(os.environ.get("MEMBERSHIP_PLANS", "3"))
-# TOTAL_USERS = int(os.environ.get("TOTAL_USERS", "5000"))
-# TOTAL_MCARDS = int(os.environ.get("TOTAL_MCARDS", "5000"))
-# TOTAL_PCARDS = int(os.environ.get("TOTAL_PCARDS", "2000"))
-# TOTAL_TRANSACTIONS = int(os.environ.get("TOTAL_TRANSACTIONS", "10000"))
-
-# Benchmark Test (6 channels)
-# MEMBERSHIP_PLANS = int(os.environ.get("MEMBERSHIP_PLANS", "7"))
-# TOTAL_USERS = int(os.environ.get("TOTAL_USERS", "449333"))
-# TOTAL_MCARDS = int(os.environ.get("TOTAL_MCARDS", "3082426"))
-# TOTAL_PCARDS = int(os.environ.get("TOTAL_PCARDS", "674000"))
-# TOTAL_TRANSACTIONS = int(os.environ.get("TOTAL_TRANSACTIONS", "30824266"))
-
-# Barclays Day One 2021 Cycle One and Two (6 Channels)
-# MEMBERSHIP_PLANS = int(os.environ.get("MEMBERSHIP_PLANS", "18"))
-# TOTAL_USERS = int(os.environ.get("TOTAL_USERS", "5392000"))
-# TOTAL_MCARDS = int(os.environ.get("TOTAL_MCARDS", "36989120"))
-# TOTAL_PCARDS = int(os.environ.get("TOTAL_PCARDS", "8088000"))
-# TOTAL_TRANSACTIONS = int(os.environ.get("TOTAL_TRANSACTIONS", "369891200"))
-
-# Barclays 2022 (8 channels)
-# MEMBERSHIP_PLANS = int(os.environ.get("MEMBERSHIP_PLANS", "26"))
-# TOTAL_USERS = int(os.environ.get("TOTAL_USERS", "8192000"))
-# TOTAL_MCARDS = int(os.environ.get("TOTAL_MCARDS", "56197120"))
-# TOTAL_PCARDS = int(os.environ.get("TOTAL_PCARDS", "12288000"))
-# TOTAL_TRANSACTIONS = int(os.environ.get("TOTAL_TRANSACTIONS", "561971200"))
-
-# Barclays 2023 (10 channels)
-# MEMBERSHIP_PLANS = int(os.environ.get("MEMBERSHIP_PLANS", "35"))
-# TOTAL_USERS = int(os.environ.get("TOTAL_USERS", "11011000"))
-# TOTAL_MCARDS = int(os.environ.get("TOTAL_MCARDS", "75535460"))
-# TOTAL_PCARDS = int(os.environ.get("TOTAL_PCARDS", "16516500"))
-# TOTAL_TRANSACTIONS = int(os.environ.get("TOTAL_TRANSACTIONS", "755354600"))
-
-# Barclays 2024 (12 channels)
-# MEMBERSHIP_PLANS = int(os.environ.get("MEMBERSHIP_PLANS", "50"))
-# TOTAL_USERS = int(os.environ.get("TOTAL_USERS", "13593000"))
-# TOTAL_MCARDS = int(os.environ.get("TOTAL_MCARDS", "93247980"))
-# TOTAL_PCARDS = int(os.environ.get("TOTAL_PCARDS", "20389500"))
-# TOTAL_TRANSACTIONS = int(os.environ.get("TOTAL_TRANSACTIONS", "932479800"))
 
 MCARDS_PER_SERVICE = 7
 PCARDS_PER_SERVICE = 2
@@ -63,18 +14,18 @@ class CardTypes(str, Enum):
 cores = multiprocessing.cpu_count()
 
 
-def create_tsv_jobs():
-    jobs = init_jobs()
-    jobs = add_card_info_to_jobs(jobs, CardTypes.PCARD, TOTAL_PCARDS, PCARDS_PER_SERVICE)
-    jobs = add_card_info_to_jobs(jobs, CardTypes.MCARD, TOTAL_MCARDS, MCARDS_PER_SERVICE)
+def create_tsv_jobs(total_pcards: int, total_mcards: int, total_users: int):
+    jobs = init_jobs(total_users)
+    jobs = add_card_info_to_jobs(jobs, CardTypes.PCARD, total_pcards, PCARDS_PER_SERVICE, total_users)
+    jobs = add_card_info_to_jobs(jobs, CardTypes.MCARD, total_mcards, MCARDS_PER_SERVICE, total_users)
     return jobs
 
 
-def init_jobs():
+def init_jobs(total_users: int):
     jobs = []
     job_id = 0
     service_index = 1
-    services_per_job, services_remainder = divmod(TOTAL_USERS, cores)
+    services_per_job, services_remainder = divmod(total_users, cores)
     for job in range(0, cores):
         jobs.append({
             "job_id": job_id,
@@ -93,7 +44,7 @@ def init_jobs():
     return jobs
 
 
-def fix_indexes_for_card_jobs(jobs, card_type, history_per_card):
+def fix_indexes_for_card_jobs(jobs: list[dict], card_type: str, history_per_card: int):
     fixed_card_start_index = 1
     card_history_index = 1
     for job in jobs:
@@ -105,7 +56,8 @@ def fix_indexes_for_card_jobs(jobs, card_type, history_per_card):
     return jobs
 
 
-def process_not_enough_cards_per_service(jobs, card_type, remaining_cards, cards_per_service):
+def process_not_enough_cards_per_service(jobs: list[dict], card_type: str, remaining_cards: int,
+                                         cards_per_service: int):
     for job in jobs:
         job[f"{card_type}_start"] = 0
         job[f"{card_type}_service_count"] = 0
@@ -130,8 +82,8 @@ def process_not_enough_cards_per_service(jobs, card_type, remaining_cards, cards
     return jobs, remaining_cards
 
 
-def process_enough_cards_per_service(jobs, card_type, remaining_cards, total_cards, remaining_service_cards,
-                                     cards_per_service):
+def process_enough_cards_per_service(jobs: list[dict], card_type: str, remaining_cards: int, total_cards: int,
+                                     remaining_service_cards: int, cards_per_service: int):
     card_index = 1
     for job in jobs:
         card_start = card_index
@@ -153,9 +105,9 @@ def process_enough_cards_per_service(jobs, card_type, remaining_cards, total_car
     return jobs, remaining_cards
 
 
-def add_card_info_to_jobs(jobs, card_type, total_cards, cards_per_service):
+def add_card_info_to_jobs(jobs: list[dict], card_type: str, total_cards: int, cards_per_service: int, total_users: int):
     remaining_cards = total_cards
-    remaining_service_cards = TOTAL_USERS * cards_per_service
+    remaining_service_cards = total_users * cards_per_service
     history_per_card = 15 if card_type == CardTypes.MCARD else 8
     enough_cards_per_service = True
     if remaining_service_cards > total_cards:

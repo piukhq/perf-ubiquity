@@ -1,8 +1,5 @@
 JWT_SECRET = "testsecret"
-ENCRYPTION_TEST_KEYS = {
-    "private_key": "replace me with private key",
-    "public_key": "replace me with public key"
-}
+
 
 CLIENT_ONE = {
     'bundle_id': 'performance.bundle.one',

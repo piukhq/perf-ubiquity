@@ -208,7 +208,7 @@ def create_service_mcard_and_pcard_job(total_plans: int, transactions_per_mcard:
             counters.vop_activation_dict[counters.pcard_index - 1] = vop_activation
 
         if service_pk % 100000 == 0:
-            logger.info(f"Generated 100000 users")
+            logger.info("Generated 100000 users")
 
     overflow_mcard_start = job[f"{CardTypes.MCARD}_start"] + len(counters.membership_cards)
     overflow_pcard_start = job[f"{CardTypes.PCARD}_start"] + len(counters.payment_cards)

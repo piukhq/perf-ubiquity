@@ -1,12 +1,8 @@
-TODO:
-* Finish readme with below topics:
-  * setting up local secrets
-
 # Running Performance Tests:
 ### On Sandbox:
 * Make sure your kube config is pointing towards the performance sandbox:
-  * Context: `uksouth-sandbox`
-  * Namespace: `performance`
+  * Context: `uksouth-perf0`
+  * Namespace: `default`
 * Port forward to sandbox locust web ui:
   * `kubectl port-forward <locust master pod name> 8089`
 * Open up web ui by going to below link:
@@ -28,26 +24,57 @@ TODO:
 
 # Environment Setup:
 ### Database Population:
-* Set the correct fixture totals in `data_population/create_tsv.py`
-* Run the data population script:
-  * `pipenv run data_population/create_tsv.py`
-* Make sure your kube config is pointing towards the performance sandbox:
-  * Context: `uksouth-sandbox`
-  * Namespace: `performance`
-* Setup `.env` with sandbox db connection details
-* Port forward to the sandbox db:
-  * `kubectl port-forward <hermes api pod name> 5432`
-* Upload the created data to the db (WARNING: this will start 
-  by deleting all data in the environment):
-  * `pipenv run data_population/upload_tsv.py`
+To populate the Hermes and Hades database with test data, you can run the below CLI commands.
+They will create TSV files, then upload those to the correct postgres tables.
 
-### Vault Setup:
-This only has to happen once per environment, unless you want to change 
-the performance client secrets in an existing environment.
-* Copy the vault secrets from 1password (`Performance Vault Secrets`)
-* Paste these secrets to replace the examples in `data_population/fixtures/client.py`
-* Port forward to the vault:
-  * `kubectl port-forward vault-0 8200` 
-* Make sure your `.env` has the `VAULT_URL` and `VAULT_TOKEN` env vars populated
-* Run the vault setup script:
-  * `pipenv run data_population/vault_setup.py`
+Commands can take two arguments (except `upload-tsv` which only takes one, see below)
+* `--group-config`: Defaults to `all`, defines what type of data will be created and / or uploaded. 
+This allows us to spin up multiple uploader pods and perform multiple uploads at once (e.g. one pod 
+uploading hermes data, one pod uploading hermes history data, one pod uploading hades transactions). 
+See below for options:
+  * `hermes`
+  * `hermeshistory`
+  * `hades`
+  * `all`
+
+* `--size-config`: Defaults to `test`, defines how many test data is going to be generate. 
+See `data_populdate/data_population_config.py` for how much data each option creates. See below 
+for options:
+  * `test`
+  * `benchmark`
+  * `barclays_2021`
+  * `barclays_2022`
+  * `barclays_2023`
+  * `barclays_2024`
+  * `barclays_internal_test`
+
+**populate-db:**  
+Used to both create and upload the tsv files.  
+```
+populate-db -g <group config> -s <size config>
+populate-db --group-config <group config> -size-config <size config>
+
+example:
+populate-db -g all -s benchmark
+```
+
+**create-tsv:**  
+Used to only create the TSV files  
+```
+create-tsv -g <group config> -s <size config>
+create-tsv --group-config <group config> -size-config <size config>
+
+example:
+create-tsv --group-config hermes -size-config barclays_2021
+```
+
+**upload-tsv:**  
+Used to only upload existing TSV files for a given group-config, allows us to retry if an upload fails
+without having to regenerate the TSV files
+```
+upload-tsv -g <group config>
+upload-tsv --group-config <group config>
+
+example:
+upload-tsv -g hades
+```

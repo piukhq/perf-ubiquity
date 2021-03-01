@@ -19,11 +19,10 @@ def create_history_tsv_job(table_name: str, row_generation_func: Callable[int], 
     start_pk = job["start"]
     count = job["count"]
     finish_pk = start_pk + count
-    total_history = count - start_pk
 
     history = []
     for pk in range(start_pk, finish_pk):
-        # write to tsv every 10000 transactions generated, then clear the previously generated values and continue
+        # write to tsv every 10000 history rows generated, then clear the previously generated values and continue
         if len(history) > 10000:
             write_to_tsv_part(table_name, job_id, history)
             history.clear()
@@ -31,10 +30,9 @@ def create_history_tsv_job(table_name: str, row_generation_func: Callable[int], 
         history.append(row_generation_func(pk))
 
         if pk % 500000 == 0:
-            logger.info(f"Job ID: {job_id} - Generated {pk} transactions, "
-                        f"{pk/total_history}% complete...")
+            logger.info(f"Job ID: {job_id} - Generated 500000 history rows")
 
-    # write remaining transactions to tsv after above loop has finished
+    # write remaining history rows to tsv after above loop has finished
     write_to_tsv_part(table_name, job_id, history)
     logger.info(f"Finished job ID: {job_id}")
 

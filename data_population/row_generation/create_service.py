@@ -29,6 +29,7 @@ def user(user_id: int) -> list:
         False,  # is_tester
         "NULL",  # apple
         "",  # delete_token
+        "NULL",  # magic_link_verified
     ]
 
 

@@ -28,6 +28,6 @@ build-master:
   script:
     - export CTAG="develop-$(date +%F-%H%M%S)"
     - docker build --pull -t "$CI_REGISTRY/ubiquity-performance:$CTAG" .
-    - docker push "$CI_REGISTRY/ubiquity-performance:master-$CTAG"
+    - docker push "$CI_REGISTRY/ubiquity-performance:$CTAG"
   only:
     - master

@@ -22,6 +22,7 @@ def client_application_bundle(fixture):
         fixture["client_id"],
         60,  # magic_lifetime
         "",  # magic_link_url
+        "",  # external_name
     ]
 
 

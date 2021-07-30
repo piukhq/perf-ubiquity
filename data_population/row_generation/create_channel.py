@@ -17,12 +17,15 @@ def client_application(fixture):
 
 def client_application_bundle(fixture):
     return [
-        fixture["id"],
-        fixture["bundle_id"],
-        fixture["client_id"],
+        fixture["id"],  # id
+        fixture["bundle_id"],  # bundle_id
+        fixture["client_id"],  # client_id
         60,  # magic_lifetime
         "",  # magic_link_url
         "",  # external_name
+        "",  # email_from
+        "",  # subject
+        "",  # template
     ]
 
 

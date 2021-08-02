@@ -16,7 +16,7 @@ def generate_auth_header(user_email, iat, client_fixture, secret):
 
     return {
         "Authorization": f"Bearer {token}",
-        "Accept": "application/json;v=1.3"
+        "Accept": "application/json;v=1.2"
     }
 
 

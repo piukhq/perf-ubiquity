@@ -56,6 +56,7 @@ def scheme_account(pk: int, scheme_account_id: int, user_id: int) -> list:
         pk,  # id
         scheme_account_id,  # scheme_account_id
         user_id,  # user_id
+        True,  # auth_provided
     ]
 
 

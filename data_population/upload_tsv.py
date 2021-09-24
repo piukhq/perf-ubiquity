@@ -25,7 +25,7 @@ def postgres_connection(db_name):
 
 
 def truncate_table(cur, table_name):
-    truncate_statement = f"TRUNCATE {table_name} CASCADE"
+    truncate_statement = f'TRUNCATE "{table_name}" CASCADE'
     cur.execute(truncate_statement)
 
 
@@ -39,7 +39,7 @@ def update_seq(cur, table_name):
         return
 
     setval_statement = (
-        f"SELECT setval('{table_name}_id_seq', max(id)) FROM {table_name}"
+        f'SELECT setval("{table_name}_id_seq", max(id)) FROM "{table_name}"'
     )
     cur.execute(setval_statement)
 

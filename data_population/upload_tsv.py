@@ -25,32 +25,23 @@ def postgres_connection(db_name):
 
 
 def truncate_table(cur, table_name):
-    formatted_name = format_table_name(table_name)
-    truncate_statement = f"TRUNCATE {formatted_name} CASCADE"
+    truncate_statement = f"TRUNCATE {table_name} CASCADE"
     cur.execute(truncate_statement)
 
 
 def upload_tsv(cur, table_name, tsv):
     with open(tsv) as f:
-        formatted_name = format_table_name(table_name)
-        cur.copy_from(f, formatted_name, sep="\t", null="NULL")
+        cur.copy_from(f, table_name, sep="\t", null="NULL")
 
 
 def update_seq(cur, table_name):
     if table_name in NO_SEQ_TABLES:
         return
 
-    formatted_name = format_table_name(table_name)
     setval_statement = (
-        f"SELECT setval('{table_name}_id_seq', max(id)) FROM {formatted_name}"
+        f"SELECT setval('{table_name}_id_seq', max(id)) FROM {table_name}"
     )
     cur.execute(setval_statement)
-
-
-def format_table_name(table_name):
-    if table_name == "user":
-        return '"user"'
-    return table_name
 
 
 def truncate_and_populate_tables(db_name, tables):

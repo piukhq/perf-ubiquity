@@ -39,7 +39,7 @@ def update_seq(cur, table_name):
         return
 
     setval_statement = (
-        f'SELECT setval("{table_name}_id_seq", max(id)) FROM "{table_name}"'
+        f'SELECT setval(\'{table_name}_id_seq\', max(id)) FROM "{table_name}"'
     )
     cur.execute(setval_statement)
 

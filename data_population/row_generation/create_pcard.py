@@ -140,6 +140,8 @@ def payment_card(card_id):
         "{}",  # formatted_images
         json.dumps([]),  # PLL_links
         "{}",  # agent_data
+        "",  # card_nickname
+        "",  # issuer_name
     ]
 
 

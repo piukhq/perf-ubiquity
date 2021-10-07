@@ -7,21 +7,11 @@ from enum import Enum
 import psycopg2
 
 from data_population.database_tables import HermesTables
-from settings import DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, TSV_BASE_DIR
+from settings import DB_CONNECTION_URI, TSV_BASE_DIR
 
 logger = logging.getLogger("upload-tsv")
 
 NO_SEQ_TABLES = [HermesTables.CLIENT_APP, HermesTables.CONSENT]
-
-
-def postgres_connection(db_name):
-    return {
-        "user": DB_USER,
-        "password": DB_PASSWORD,
-        "host": DB_HOST,
-        "port": DB_PORT,
-        "database": db_name
-    }
 
 
 def truncate_table(cur, table_name):
@@ -45,9 +35,9 @@ def update_seq(cur, table_name):
 
 
 def truncate_and_populate_tables(db_name, tables):
-    connection_info = postgres_connection(db_name)
+    connection_string = DB_CONNECTION_URI.replace("/postgres", f"/{db_name}")
 
-    with psycopg2.connect(**connection_info) as connection:
+    with psycopg2.connect(connection_string) as connection:
         with connection.cursor() as cursor:
             logger.debug(f"Truncating tables defined in '{tables}'")
             for table in tables:

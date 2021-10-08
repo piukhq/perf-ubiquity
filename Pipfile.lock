@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "e74408510bf3af9102d2cb83cc645451bea5af2caf93f10e7a6f55a80828cd79"
+            "sha256": "55f44682ebc1a728b2277d59d07f26b0e561b8cef6bc8ae3cfb4c326af9b31d0"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -122,11 +122,11 @@
         },
         "flask": {
             "hashes": [
-                "sha256:7b2fb8e934ddd50731893bdcdb00fc8c0315916f9fcd50d22c7cc1a95ab634e2",
-                "sha256:cb90f62f1d8e4dc4621f52106613488b5ba826b2e1e10a33eac92f723093ab6a"
+                "sha256:4efa1ae2d7c9865af48986de8aeb8504bf32c7f3d6fdc9353d34b21f4b127060",
+                "sha256:8a4fdd8936eba2512e9c85df320a37e694c93945b33ef33c89946a340a238557"
             ],
-            "markers": "python_version >= '3.6'",
-            "version": "==2.0.2"
+            "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'",
+            "version": "==1.1.2"
         },
         "flask-basicauth": {
             "hashes": [
@@ -357,11 +357,11 @@
         },
         "locust": {
             "hashes": [
-                "sha256:1ed5b74b6944130bd84969abeca6aee609a5c49d7e342a014993413946b519b0",
-                "sha256:9bfe5bc6246484c3589fcf30918d3213e652012b02db534581dc9a8e11f4e8eb"
+                "sha256:30c25f31de51ebf32dc3d7fdd6985fd2f2a6e853bb09761c325de9c987826b9a",
+                "sha256:4a16735882fb9f2f6863c423b0b46f71d223cfa1b149b631da1711dc2b047c51"
             ],
             "index": "pypi",
-            "version": "==1.4.4"
+            "version": "==1.5.2"
         },
         "markupsafe": {
             "hashes": [

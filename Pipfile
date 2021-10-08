@@ -18,7 +18,7 @@ xenon = "*"
 
 [packages]
 ubiquity-performance = {editable = true,path = "."}
-locust = "==1.4.4"
+locust = "==1.5.2"
 geventhttpclient-wheels = "*"
 faker = "*"
 pyjwt = "*"

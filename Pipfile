@@ -10,11 +10,15 @@ verify_ssl = true
 
 [dev-packages]
 flake8 = "*"
-black = "*"
+black = "==21.8b0"
+mypy = "*"
+pytest = "*"
+ptpython = "*"
+xenon = "*"
 
 [packages]
 ubiquity-performance = {editable = true,path = "."}
-locust = "*"
+locust = "==1.4.4"
 geventhttpclient-wheels = "*"
 faker = "*"
 pyjwt = "*"

@@ -75,12 +75,12 @@ def create_tsv_files(data_config: DataConfig):
 
     logger.debug("Creating historic payment card account tsv files (3/6)...")
     create_history_tsv_files(HermesHistoryTables.HISTORICAL_PAYMENT_CARD_ACCOUNT,
-                             create_pcard.historical_payment_card, data_config.payment_cards)
+                             create_pcard.historical_payment_card, data_config.payment_cards_history)
     logger.debug(f"Completed historic payment card accounts (3/6). Elapsed time: {time.perf_counter() - start}")
 
     logger.debug("Creating historic payment card account entry tsv files (4/6)...")
     create_history_tsv_files(HermesHistoryTables.HISTORICAL_PAYMENT_ACCOUNT_ENTRY,
-                             create_association.historical_payment_card, data_config.payment_cards_history)
+                             create_association.historical_payment_card, data_config.payment_cards)
     logger.debug(f"Completed historic payment card account entries (4/6). Elapsed time: {time.perf_counter() - start}")
 
     logger.debug("Creating historic user tsv files (5/6)...")

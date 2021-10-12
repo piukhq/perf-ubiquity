@@ -147,7 +147,14 @@ def create_membership_plan_tsv_files(total_plans: int):
 
 
 def create_service_mcard_and_pcard_tsv_files(data_config: DataConfig):
-    jobs = create_tsv_jobs(data_config.payment_cards, data_config.membership_cards, data_config.users)
+    jobs = create_tsv_jobs(
+        data_config.payment_cards,
+        data_config.payment_cards_history,
+        data_config.membership_cards,
+        data_config.membership_cards_history,
+        data_config.users,
+        data_config.users_history
+    )
     logger.info(f"Starting {len(jobs)} jobs for hermes user data...")
     pool = multiprocessing.Pool(processes=cores)
     transactions_per_mcard = data_config.transactions // data_config.membership_cards

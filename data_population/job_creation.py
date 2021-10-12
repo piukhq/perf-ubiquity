@@ -14,44 +14,58 @@ class CardTypes(str, Enum):
 cores = multiprocessing.cpu_count()
 
 
-def create_tsv_jobs(total_pcards: int, total_mcards: int, total_users: int):
-    jobs = init_jobs(total_users)
+def create_tsv_jobs(total_pcards: int, total_pcard_history: int, total_mcards: int, total_mcard_history: int,
+                    total_users: int, total_users_history: int):
+    jobs = init_jobs(total_users, total_users_history, total_pcard_history, total_mcard_history)
     jobs = add_card_info_to_jobs(jobs, CardTypes.PCARD, total_pcards, PCARDS_PER_SERVICE, total_users)
     jobs = add_card_info_to_jobs(jobs, CardTypes.MCARD, total_mcards, MCARDS_PER_SERVICE, total_users)
     return jobs
 
 
-def init_jobs(total_users: int):
+def init_jobs(total_users: int, total_users_history: int, total_pcard_history: int, total_mcard_history: int):
     jobs = []
     job_id = 0
-    service_index = 1
-    services_per_job, services_remainder = divmod(total_users, cores)
+    user_index = 1
+    users_per_job, users_remainder = divmod(total_users, cores)
+    user_history_index = 1
+    users_history_per_job, users_history_remainder = divmod(total_users_history, cores)
+    pcard_history_per_job, pcard_history_remainder = divmod(total_pcard_history, cores)
+    mcard_history_per_job, mcard_history_remainder = divmod(total_mcard_history, cores)
+
     for job in range(0, cores):
         jobs.append({
             "job_id": job_id,
-            "start": service_index,
-            "count": services_per_job,
+            "start": user_index,
+            "history_start": user_history_index,
+            "count": users_per_job,
+            "user_history_count": users_history_per_job,
+            "pcard_history_count": pcard_history_per_job,
+            "mcard_history_count": mcard_history_per_job
         })
-        service_index += services_per_job
+        user_index += users_per_job
         job_id += 1
 
     jobs.append({
         "job_id": job_id,
-        "start": service_index,
-        "count": services_remainder,
+        "start": user_index,
+        "history_start": user_history_index,
+        "count": users_remainder,
+        "user_history_count": users_history_remainder,
+        "pcard_history_count": pcard_history_remainder,
+        "mcard_history_count": mcard_history_remainder
     })
 
     return jobs
 
 
-def fix_indexes_for_card_jobs(jobs: list[dict], card_type: str, history_per_card: int):
+def fix_indexes_for_card_jobs(jobs: list[dict], card_type: str):
     fixed_card_start_index = 1
     card_history_index = 1
     for job in jobs:
         job[f"{card_type}_start"] = fixed_card_start_index
         job[f"historical_{card_type}_start"] = card_history_index
         fixed_card_start_index += job[f"{card_type}_service_count"] + job[f"{card_type}_overflow_count"]
-        card_history_index += fixed_card_start_index * history_per_card
+        card_history_index += fixed_card_start_index * job[f"{card_type}_history_count"]
 
     return jobs
 
@@ -108,7 +122,6 @@ def process_enough_cards_per_service(jobs: list[dict], card_type: str, remaining
 def add_card_info_to_jobs(jobs: list[dict], card_type: str, total_cards: int, cards_per_service: int, total_users: int):
     remaining_cards = total_cards
     remaining_service_cards = total_users * cards_per_service
-    history_per_card = 15 if card_type == CardTypes.MCARD else 8
     enough_cards_per_service = True
     if remaining_service_cards > total_cards:
         remaining_service_cards = total_cards
@@ -134,5 +147,5 @@ def add_card_info_to_jobs(jobs: list[dict], card_type: str, total_cards: int, ca
         job[f"{card_type}_overflow_count"] = overflow_count
         remaining_cards -= overflow_count
 
-    jobs = fix_indexes_for_card_jobs(jobs, card_type, history_per_card)
+    jobs = fix_indexes_for_card_jobs(jobs, card_type)
     return jobs

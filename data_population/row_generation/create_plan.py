@@ -221,6 +221,7 @@ def membership_plan_documents(pk, scheme_id):
         "{ADD,REGISTRATION,ENROL}",  # display
         True,  # checkbox
         scheme_id,  # scheme id
+        0,  # order
     ]
 
 

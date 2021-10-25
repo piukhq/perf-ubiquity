@@ -1,18 +1,9 @@
 def organisation(fixture):
-    return [
-        fixture["id"],
-        fixture["organisation_name"],
-        "organisation terms and conditions"
-    ]
+    return [fixture["id"], fixture["organisation_name"], "organisation terms and conditions"]
 
 
 def client_application(fixture):
-    return [
-        fixture["client_id"],
-        fixture["client_name"],
-        fixture["id"],
-        fixture["secret"]
-    ]
+    return [fixture["client_id"], fixture["client_name"], fixture["id"], fixture["secret"]]
 
 
 def client_application_bundle(fixture):
@@ -32,10 +23,4 @@ def client_application_bundle(fixture):
 
 
 def channel_scheme_whitelist(whitelist_id, fixture, scheme_id):
-    return [
-        whitelist_id,
-        fixture["status"],
-        fixture["id"],
-        scheme_id,
-        False  # test scheme
-    ]
+    return [whitelist_id, fixture["status"], fixture["id"], scheme_id, False]  # test scheme

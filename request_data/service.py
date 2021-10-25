@@ -14,10 +14,7 @@ def generate_auth_header(user_email, iat, client_fixture, secret):
     }
     token = jwt.encode(claims, secret, algorithm="HS512")
 
-    return {
-        "Authorization": f"Bearer {token}",
-        "Accept": "application/json;v=1.2"
-    }
+    return {"Authorization": f"Bearer {token}", "Accept": "application/json;v=1.2"}
 
 
 def generate_random():
@@ -31,6 +28,4 @@ def generate_random():
 
 
 def generate_setup_user():
-    return {
-        "consent": {"email": "performance-test@bink.com", "timestamp": int(time.time())}
-    }
+    return {"consent": {"email": "performance-test@bink.com", "timestamp": int(time.time())}}

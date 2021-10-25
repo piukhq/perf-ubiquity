@@ -3,8 +3,12 @@ from enum import Enum
 import click
 
 from data_population import data_population_config
-from data_population.database_tables import HermesTables, HermesHistoryTables, HadesTables
-from data_population.tsv_generation import hermes, hermes_history, hades
+from data_population.database_tables import (
+    HadesTables,
+    HermesHistoryTables,
+    HermesTables,
+)
+from data_population.tsv_generation import hades, hermes, hermes_history
 from data_population.upload_tsv import upload_named_group_of_tsv_files
 from settings import HADES_DB, HERMES_DB
 
@@ -16,10 +20,13 @@ class DataGroups(str, Enum):
     HADES = "hades"
 
 
-GROUP_CONFIG_HELP = (f"Group of data you wish to interact with, defaults to 'all', "
-                     f"please choose from: {[group.value for group in DataGroups]}")
-SIZE_CONFIG_HELP = (f"Size of data population, defaults to 'test', "
-                    f"please choose from: {data_population_config.all_config_names}")
+GROUP_CONFIG_HELP = (
+    f"Group of data you wish to interact with, defaults to 'all', "
+    f"please choose from: {[group.value for group in DataGroups]}"
+)
+SIZE_CONFIG_HELP = (
+    f"Size of data population, defaults to 'test', " f"please choose from: {data_population_config.all_config_names}"
+)
 BAD_GROUP_CONFIG_ERROR = f"Invalid group config entered, please enter one from: {[group.value for group in DataGroups]}"
 BAD_SIZE_CONFIG_ERROR = f"Invalid size config entered, please enter one from {data_population_config.all_config_names}"
 
@@ -27,30 +34,24 @@ BAD_SIZE_CONFIG_ERROR = f"Invalid size config entered, please enter one from {da
 data_mapping = {
     DataGroups.HERMES: {
         "data_creation_modules": [hermes],
-        "upload_lists": [
-            {"database": HERMES_DB, "tables": HermesTables}
-        ]
+        "upload_lists": [{"database": HERMES_DB, "tables": HermesTables}],
     },
     DataGroups.HERMESHISTORY: {
         "data_creation_modules": [hermes_history],
-        "upload_lists": [
-            {"database": HERMES_DB, "tables": HermesHistoryTables}
-        ]
+        "upload_lists": [{"database": HERMES_DB, "tables": HermesHistoryTables}],
     },
     DataGroups.HADES: {
         "data_creation_modules": [hades],
-        "upload_lists": [
-            {"database": HADES_DB, "tables": HadesTables}
-        ]
+        "upload_lists": [{"database": HADES_DB, "tables": HadesTables}],
     },
     DataGroups.ALL: {
         "data_creation_modules": [hermes, hermes_history, hades],
         "upload_lists": [
             {"database": HERMES_DB, "tables": HermesTables},
             {"database": HERMES_DB, "tables": HermesHistoryTables},
-            {"database": HADES_DB, "tables": HadesTables}
-        ]
-    }
+            {"database": HADES_DB, "tables": HadesTables},
+        ],
+    },
 }
 
 

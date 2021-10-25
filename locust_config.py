@@ -1,12 +1,19 @@
 import json
+import logging
 from enum import Enum
 from functools import wraps
 from time import sleep
-import logging
+
 from shared_config_storage.vault import secrets
 
 from request_data.locust_setup_requests import request_membership_plan_total
-from settings import CHANNEL_VAULT_PATH, LOCAL_SECRETS, LOCAL_SECRETS_PATH, VAULT_TOKEN, VAULT_URL
+from settings import (
+    CHANNEL_VAULT_PATH,
+    LOCAL_SECRETS,
+    LOCAL_SECRETS_PATH,
+    VAULT_TOKEN,
+    VAULT_URL,
+)
 
 
 class VaultException(Exception):

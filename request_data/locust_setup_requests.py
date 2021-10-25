@@ -7,7 +7,6 @@ from data_population.fixtures.client import CLIENT_ONE
 from request_data import service
 from settings import HERMES_URL
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -23,9 +22,11 @@ def slow_retry_request(method: str, url: str, headers: dict, json: dict = None, 
             time.sleep(30)
             pass
 
-    raise RuntimeError("Locust failed to start due to a requests failure which locust runs on startup"
-                       "to get some setup information e.g. membership_plan total. Please make sure data population is "
-                       "run to make sure the right clients are set up, and the Hermes pods are running fine")
+    raise RuntimeError(
+        "Locust failed to start due to a requests failure which locust runs on startup"
+        "to get some setup information e.g. membership_plan total. Please make sure data population is "
+        "run to make sure the right clients are set up, and the Hermes pods are running fine"
+    )
 
 
 def request_membership_plan_total():
@@ -46,6 +47,8 @@ def request_membership_plan_total():
     resp = slow_retry_request("GET", plan_url, headers, params=params)
     membership_plan_total = len(resp.json())
 
-    logger.debug("Obtained membership plan total from ubiquity, "
-                 f"setting number of membership plans to use in tests to: {membership_plan_total}")
+    logger.debug(
+        "Obtained membership plan total from ubiquity, "
+        f"setting number of membership plans to use in tests to: {membership_plan_total}"
+    )
     return membership_plan_total

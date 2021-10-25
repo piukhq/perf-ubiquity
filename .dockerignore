@@ -1,5 +1,1 @@
 .git
-.gitlab-ci.yml
-.gitignore
-.flake8
-.dockerignore

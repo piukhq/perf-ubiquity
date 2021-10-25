@@ -8,13 +8,7 @@ from data_population.data_population_config import DataConfig
 from data_population.database_tables import HermesTables
 from data_population.fixtures.client import ALL_CLIENTS, NON_RESTRICTED_CLIENTS
 from data_population.fixtures.payment_scheme import ALL_PAYMENT_PROVIDER_STATUS_MAPPINGS
-from data_population.job_creation import (
-    MCARDS_PER_SERVICE,
-    PCARDS_PER_SERVICE,
-    CardTypes,
-    cores,
-    create_tsv_jobs,
-)
+from data_population.job_creation import MCARDS_PER_SERVICE, PCARDS_PER_SERVICE, CardTypes, cores, create_tsv_jobs
 from data_population.row_generation import (
     create_association,
     create_channel,
@@ -23,10 +17,7 @@ from data_population.row_generation import (
     create_plan,
     create_service,
 )
-from data_population.tsv_generation.common import (
-    delete_old_tsv_files,
-    write_to_tsv_part,
-)
+from data_population.tsv_generation.common import delete_old_tsv_files, write_to_tsv_part
 
 BULK_SIZE = 10000
 

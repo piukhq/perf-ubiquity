@@ -1,7 +1,6 @@
 import multiprocessing
 from enum import Enum
 
-
 MCARDS_PER_SERVICE = 7
 PCARDS_PER_SERVICE = 2
 
@@ -14,8 +13,14 @@ class CardTypes(str, Enum):
 cores = multiprocessing.cpu_count()
 
 
-def create_tsv_jobs(total_pcards: int, total_pcard_history: int, total_mcards: int, total_mcard_history: int,
-                    total_users: int, total_users_history: int):
+def create_tsv_jobs(
+    total_pcards: int,
+    total_pcard_history: int,
+    total_mcards: int,
+    total_mcard_history: int,
+    total_users: int,
+    total_users_history: int,
+):
     jobs = init_jobs(total_users, total_users_history, total_pcard_history, total_mcard_history)
     jobs = add_card_info_to_jobs(jobs, CardTypes.PCARD, total_pcards, PCARDS_PER_SERVICE, total_users)
     jobs = add_card_info_to_jobs(jobs, CardTypes.MCARD, total_mcards, MCARDS_PER_SERVICE, total_users)
@@ -33,27 +38,31 @@ def init_jobs(total_users: int, total_users_history: int, total_pcard_history: i
     mcard_history_per_job, mcard_history_remainder = divmod(total_mcard_history, cores)
 
     for job in range(0, cores):
-        jobs.append({
-            "job_id": job_id,
-            "start": user_index,
-            "history_start": user_history_index,
-            "count": users_per_job,
-            "user_history_count": users_history_per_job,
-            "pcard_history_count": pcard_history_per_job,
-            "mcard_history_count": mcard_history_per_job
-        })
+        jobs.append(
+            {
+                "job_id": job_id,
+                "start": user_index,
+                "history_start": user_history_index,
+                "count": users_per_job,
+                "user_history_count": users_history_per_job,
+                "pcard_history_count": pcard_history_per_job,
+                "mcard_history_count": mcard_history_per_job,
+            }
+        )
         user_index += users_per_job
         job_id += 1
 
-    jobs.append({
-        "job_id": job_id,
-        "start": user_index,
-        "history_start": user_history_index,
-        "count": users_remainder,
-        "user_history_count": users_history_remainder,
-        "pcard_history_count": pcard_history_remainder,
-        "mcard_history_count": mcard_history_remainder
-    })
+    jobs.append(
+        {
+            "job_id": job_id,
+            "start": user_index,
+            "history_start": user_history_index,
+            "count": users_remainder,
+            "user_history_count": users_history_remainder,
+            "pcard_history_count": pcard_history_remainder,
+            "mcard_history_count": mcard_history_remainder,
+        }
+    )
 
     return jobs
 
@@ -70,8 +79,9 @@ def fix_indexes_for_card_jobs(jobs: list[dict], card_type: str):
     return jobs
 
 
-def process_not_enough_cards_per_service(jobs: list[dict], card_type: str, remaining_cards: int,
-                                         cards_per_service: int):
+def process_not_enough_cards_per_service(
+    jobs: list[dict], card_type: str, remaining_cards: int, cards_per_service: int
+):
     for job in jobs:
         job[f"{card_type}_start"] = 0
         job[f"{card_type}_service_count"] = 0
@@ -96,12 +106,18 @@ def process_not_enough_cards_per_service(jobs: list[dict], card_type: str, remai
     return jobs, remaining_cards
 
 
-def process_enough_cards_per_service(jobs: list[dict], card_type: str, remaining_cards: int, total_cards: int,
-                                     remaining_service_cards: int, cards_per_service: int):
+def process_enough_cards_per_service(
+    jobs: list[dict],
+    card_type: str,
+    remaining_cards: int,
+    total_cards: int,
+    remaining_service_cards: int,
+    cards_per_service: int,
+):
     card_index = 1
     for job in jobs:
         card_start = card_index
-        card_count = job['count'] * cards_per_service
+        card_count = job["count"] * cards_per_service
         if card_start >= total_cards:
             card_count = 0
         elif card_start + card_count > total_cards:
@@ -128,12 +144,14 @@ def add_card_info_to_jobs(jobs: list[dict], card_type: str, total_cards: int, ca
         enough_cards_per_service = False
 
     if not enough_cards_per_service:
-        jobs, remaining_cards = process_not_enough_cards_per_service(jobs, card_type, remaining_cards,
-                                                                     cards_per_service)
+        jobs, remaining_cards = process_not_enough_cards_per_service(
+            jobs, card_type, remaining_cards, cards_per_service
+        )
 
     else:
-        jobs, remaining_cards = process_enough_cards_per_service(jobs, card_type, remaining_cards, total_cards,
-                                                                 remaining_service_cards, cards_per_service)
+        jobs, remaining_cards = process_enough_cards_per_service(
+            jobs, card_type, remaining_cards, total_cards, remaining_service_cards, cards_per_service
+        )
 
     overflow_cards_per_job = 0
     if remaining_cards:

@@ -23,7 +23,7 @@ def user(user_id: int) -> list:
         "NULL",  # twitter
         "NULL",  # reset_token
         "NULL",  # marketing_code_id
-        client['client_id'],  # client_id
+        client["client_id"],  # client_id
         "abcdefgh",  # salt
         user_email,  # external_id
         False,  # is_tester
@@ -48,9 +48,4 @@ def historic_user(history_id: int) -> list:
 
 
 def service(user_id: int) -> list:
-    return [
-        user_id,  # id
-        "NULL",  # latitude
-        "NULL",  # longitude
-        "2020-03-09 12:42:15+00"  # timestamp
-    ]
+    return [user_id, "NULL", "NULL", "2020-03-09 12:42:15+00"]  # id  # latitude  # longitude  # timestamp

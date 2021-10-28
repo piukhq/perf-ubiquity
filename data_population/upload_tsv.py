@@ -28,9 +28,7 @@ def update_seq(cur, table_name):
     if table_name in NO_SEQ_TABLES:
         return
 
-    setval_statement = (
-        f'SELECT setval(\'{table_name}_id_seq\', max(id)) FROM "{table_name}"'
-    )
+    setval_statement = f"SELECT setval('{table_name}_id_seq', max(id)) FROM \"{table_name}\""
     cur.execute(setval_statement)
 
 

@@ -23,7 +23,7 @@ test = DataConfig(
     membership_cards_history=6000,
     payment_cards=2000,
     payment_cards_history=3000,
-    transactions=10000
+    transactions=10000,
 )
 
 
@@ -36,7 +36,7 @@ benchmark_old = DataConfig(
     membership_cards_history=3082426,
     payment_cards=674000,
     payment_cards_history=674000,
-    transactions=30824266
+    transactions=30824266,
 )
 
 
@@ -49,7 +49,7 @@ benchmark = DataConfig(
     membership_cards_history=7493900,
     payment_cards=410250,
     payment_cards_history=615375,
-    transactions=6153750
+    transactions=6153750,
 )
 
 
@@ -62,7 +62,7 @@ barclays_2021_old = DataConfig(
     membership_cards_history=36989120,
     payment_cards=8088000,
     payment_cards_history=8088000,
-    transactions=369891200
+    transactions=369891200,
 )
 
 
@@ -75,7 +75,7 @@ barclays_2021 = DataConfig(
     membership_cards_history=29975600,
     payment_cards=1641000,
     payment_cards_history=2461500,
-    transactions=24615000
+    transactions=24615000,
 )
 
 
@@ -88,7 +88,7 @@ barclays_2022_old = DataConfig(
     membership_cards_history=56197120,
     payment_cards=12288000,
     payment_cards_history=12288000,
-    transactions=561971200
+    transactions=561971200,
 )
 
 
@@ -101,7 +101,7 @@ barclays_2022 = DataConfig(
     membership_cards_history=171770600,
     payment_cards=9403500,
     payment_cards_history=14105250,
-    transactions=141052500
+    transactions=141052500,
 )
 
 
@@ -114,7 +114,7 @@ barclays_2023_old = DataConfig(
     membership_cards_history=75535460,
     payment_cards=16516500,
     payment_cards_history=16516500,
-    transactions=755354600
+    transactions=755354600,
 )
 
 
@@ -127,7 +127,7 @@ barclays_2023 = DataConfig(
     membership_cards_history=400451000,
     payment_cards=21922500,
     payment_cards_history=32883750,
-    transactions=328837500
+    transactions=328837500,
 )
 
 
@@ -140,7 +140,7 @@ barclays_2024_old = DataConfig(
     membership_cards_history=93247980,
     payment_cards=20389500,
     payment_cards_history=20389500,
-    transactions=932479800
+    transactions=932479800,
 )
 
 
@@ -153,7 +153,7 @@ barclays_2024 = DataConfig(
     membership_cards_history=706180200,
     payment_cards=38659500,
     payment_cards_history=57989250,
-    transactions=579892500
+    transactions=579892500,
 )
 
 
@@ -166,9 +166,21 @@ barclays_internal_test = DataConfig(
     membership_cards_history=5000,
     payment_cards=2000,
     payment_cards_history=2000,
-    transactions=10000
+    transactions=10000,
 )
 
-all_configs = [test, benchmark, barclays_2021, barclays_2022, barclays_2023, barclays_2024, barclays_internal_test,
-               benchmark_old, barclays_2021_old, barclays_2022_old, barclays_2023_old, barclays_2024_old]
+all_configs = [
+    test,
+    benchmark,
+    barclays_2021,
+    barclays_2022,
+    barclays_2023,
+    barclays_2024,
+    barclays_internal_test,
+    benchmark_old,
+    barclays_2021_old,
+    barclays_2022_old,
+    barclays_2023_old,
+    barclays_2024_old,
+]
 all_config_names = [config.name for config in all_configs]

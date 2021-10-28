@@ -10,11 +10,12 @@ verify_ssl = true
 
 [dev-packages]
 flake8 = "*"
-black = "==21.8b0"
+black = "==21.9b0"
 mypy = "*"
 pytest = "*"
 ptpython = "*"
 xenon = "*"
+isort = "*"
 
 [packages]
 ubiquity-performance = {editable = true,path = "."}

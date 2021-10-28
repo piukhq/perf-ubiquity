@@ -6,13 +6,18 @@ from functools import partial
 
 from data_population.data_population_config import DataConfig
 from data_population.database_tables import HermesTables
-from data_population.row_generation import (create_association, create_mcard, create_pcard, create_channel, create_plan,
-                                            create_service)
 from data_population.fixtures.client import ALL_CLIENTS, NON_RESTRICTED_CLIENTS
 from data_population.fixtures.payment_scheme import ALL_PAYMENT_PROVIDER_STATUS_MAPPINGS
-from data_population.job_creation import create_tsv_jobs, cores, CardTypes, MCARDS_PER_SERVICE, PCARDS_PER_SERVICE
+from data_population.job_creation import MCARDS_PER_SERVICE, PCARDS_PER_SERVICE, CardTypes, cores, create_tsv_jobs
+from data_population.row_generation import (
+    create_association,
+    create_channel,
+    create_mcard,
+    create_pcard,
+    create_plan,
+    create_service,
+)
 from data_population.tsv_generation.common import delete_old_tsv_files, write_to_tsv_part
-
 
 BULK_SIZE = 10000
 
@@ -41,14 +46,14 @@ class Counters:
 
     def clear_entries(self):
         for entries in (
-                self.users,
-                self.services,
-                self.membership_cards,
-                self.membership_card_associations,
-                self.payment_cards,
-                self.payment_card_associations,
-                self.pll_links,
-                self.vop_activation_dict,
+            self.users,
+            self.services,
+            self.membership_cards,
+            self.membership_card_associations,
+            self.payment_cards,
+            self.payment_card_associations,
+            self.pll_links,
+            self.vop_activation_dict,
         ):
             entries.clear()
 
@@ -153,7 +158,7 @@ def create_service_mcard_and_pcard_tsv_files(data_config: DataConfig):
         data_config.membership_cards,
         data_config.membership_cards_history,
         data_config.users,
-        data_config.users_history
+        data_config.users_history,
     )
     logger.info(f"Starting {len(jobs)} jobs for hermes user data...")
     pool = multiprocessing.Pool(processes=cores)
@@ -206,12 +211,14 @@ def create_service_mcard_and_pcard_job(total_plans: int, transactions_per_mcard:
             counters.remaining_service_pcards -= 1
 
         if create_pll_link:
-            link = create_association.pll_link(counters.pcard_index - 1, counters.pcard_index - 1,
-                                               counters.mcard_index - 1)
+            link = create_association.pll_link(
+                counters.pcard_index - 1, counters.pcard_index - 1, counters.mcard_index - 1
+            )
             counters.pll_links.append(link)
             scheme_id = random.randint(1, total_plans)
-            vop_activation = create_association.vop_activation(counters.pcard_index - 1, counters.pcard_index - 1,
-                                                               scheme_id)
+            vop_activation = create_association.vop_activation(
+                counters.pcard_index - 1, counters.pcard_index - 1, scheme_id
+            )
             counters.vop_activation_dict[counters.pcard_index - 1] = vop_activation
 
         if service_pk % 100000 == 0:
@@ -219,16 +226,13 @@ def create_service_mcard_and_pcard_job(total_plans: int, transactions_per_mcard:
 
     overflow_mcard_start = job[f"{CardTypes.MCARD}_start"] + len(counters.membership_cards)
     overflow_pcard_start = job[f"{CardTypes.PCARD}_start"] + len(counters.payment_cards)
-    (
-        overflow_mcards,
-        overflow_pcards,
-    ) = create_remaining_mcards_and_pcards(
+    (overflow_mcards, overflow_pcards,) = create_remaining_mcards_and_pcards(
         overflow_mcard_start,
         overflow_pcard_start,
         counters.remaining_overflow_mcards,
         counters.remaining_overflow_pcards,
         total_plans,
-        transactions_per_mcard
+        transactions_per_mcard,
     )
 
     counters.membership_cards.extend(overflow_mcards)
@@ -239,8 +243,14 @@ def create_service_mcard_and_pcard_job(total_plans: int, transactions_per_mcard:
     logger.info(f"Finished {counters.part}")
 
 
-def create_remaining_mcards_and_pcards(mcard_start: int, pcard_start: int, mcard_count: int, pcard_count: int,
-                                       total_plans: int, transactions_per_mcard: int):
+def create_remaining_mcards_and_pcards(
+    mcard_start: int,
+    pcard_start: int,
+    mcard_count: int,
+    pcard_count: int,
+    total_plans: int,
+    transactions_per_mcard: int,
+):
     logger.debug(f"Creating overflow cards - mcards: {mcard_count}, pcards: {pcard_count}")
     membership_cards = []
     for x in range(0, mcard_count):

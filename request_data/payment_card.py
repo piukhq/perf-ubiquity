@@ -6,13 +6,7 @@ from shared_config_storage.credentials.encryption import RSACipher
 
 from settings import fake
 
-FIELDS_TO_ENCRYPT = (
-    'first_six_digits',
-    'last_four_digits',
-    'month',
-    'year',
-    'hash'
-)
+FIELDS_TO_ENCRYPT = ("first_six_digits", "last_four_digits", "month", "year", "hash")
 
 
 class PaymentProvider(str, Enum):
@@ -33,9 +27,7 @@ def generate_unencrypted_static():
             "year": 2059,
             "fingerprint": "33df7b61-b908-4496-847c-c4bd280b26ef",
         },
-        "account": {
-            "consents": []
-        },
+        "account": {"consents": []},
     }
 
 
@@ -53,21 +45,19 @@ def generate_unencrypted_random():
             "year": 2059,
             "fingerprint": str(uuid.uuid4()),
         },
-        "account": {
-            "consents": []
-        },
+        "account": {"consents": []},
     }
 
 
 def encrypt(pcard, pub_key):
     for field in FIELDS_TO_ENCRYPT:
-        cred = pcard['card'].get(field)
+        cred = pcard["card"].get(field)
         if not cred:
             raise ValueError(f"Missing credential {field}")
         try:
             encrypted_val = RSACipher().encrypt(cred, pub_key=pub_key)
         except Exception as e:
             raise ValueError(f"Value: {cred}") from e
-        pcard['card'][field] = encrypted_val
+        pcard["card"][field] = encrypted_val
 
     return pcard

@@ -5,7 +5,7 @@ import time
 from data_population.data_population_config import DataConfig
 from data_population.database_tables import HadesTables
 from data_population.row_generation import create_mcard
-from data_population.tsv_generation.common import write_to_tsv_part, delete_old_tsv_files
+from data_population.tsv_generation.common import delete_old_tsv_files, write_to_tsv_part
 
 logger = logging.getLogger(__name__)
 cores = multiprocessing.cpu_count()
@@ -28,8 +28,7 @@ def create_transaction_tsv_job(job: dict):
         transactions.append(create_mcard.transaction(pk, pk))
 
         if pk % 500000 == 0:
-            logger.info(f"Job ID: {job_id} - Generated {pk} transactions, "
-                        f"{pk/total_transactions}% complete...")
+            logger.info(f"Job ID: {job_id} - Generated {pk} transactions, " f"{pk/total_transactions}% complete...")
 
     # write remaining transactions to tsv after above loop has finished
     write_to_tsv_part(HadesTables.TRANSACTIONS, job_id, transactions)

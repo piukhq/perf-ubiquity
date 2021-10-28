@@ -6,10 +6,9 @@ from functools import partial
 
 from data_population.data_population_config import DataConfig
 from data_population.database_tables import HermesHistoryTables
-from data_population.row_generation import create_association, create_mcard, create_pcard, create_service
 from data_population.job_creation import cores
+from data_population.row_generation import create_association, create_mcard, create_pcard, create_service
 from data_population.tsv_generation.common import delete_old_tsv_files, write_to_tsv_part
-
 
 logger = logging.getLogger(__name__)
 
@@ -64,23 +63,35 @@ def create_tsv_files(data_config: DataConfig):
     logger.debug(f"Completed deletion. Elapsed time: {time.perf_counter() - start}")
 
     logger.debug("Creating historic scheme account tsv files (1/6)...")
-    create_history_tsv_files(HermesHistoryTables.HISTORICAL_SCHEME_ACCOUNT,
-                             create_mcard.historical_membership_card, data_config.membership_cards_history)
+    create_history_tsv_files(
+        HermesHistoryTables.HISTORICAL_SCHEME_ACCOUNT,
+        create_mcard.historical_membership_card,
+        data_config.membership_cards_history,
+    )
     logger.debug(f"Completed historic scheme accounts (1/6). Elapsed time: {time.perf_counter() - start}")
 
     logger.debug("Creating historic scheme account entry tsv files (2/6)...")
-    create_history_tsv_files(HermesHistoryTables.HISTORICAL_SCHEME_ACCOUNT_ENTRY,
-                             create_association.historical_scheme_account, data_config.membership_cards)
+    create_history_tsv_files(
+        HermesHistoryTables.HISTORICAL_SCHEME_ACCOUNT_ENTRY,
+        create_association.historical_scheme_account,
+        data_config.membership_cards,
+    )
     logger.debug(f"Completed historic scheme account entries (2/6). Elapsed time: {time.perf_counter() - start}")
 
     logger.debug("Creating historic payment card account tsv files (3/6)...")
-    create_history_tsv_files(HermesHistoryTables.HISTORICAL_PAYMENT_CARD_ACCOUNT,
-                             create_pcard.historical_payment_card, data_config.payment_cards_history)
+    create_history_tsv_files(
+        HermesHistoryTables.HISTORICAL_PAYMENT_CARD_ACCOUNT,
+        create_pcard.historical_payment_card,
+        data_config.payment_cards_history,
+    )
     logger.debug(f"Completed historic payment card accounts (3/6). Elapsed time: {time.perf_counter() - start}")
 
     logger.debug("Creating historic payment card account entry tsv files (4/6)...")
-    create_history_tsv_files(HermesHistoryTables.HISTORICAL_PAYMENT_ACCOUNT_ENTRY,
-                             create_association.historical_payment_card, data_config.payment_cards)
+    create_history_tsv_files(
+        HermesHistoryTables.HISTORICAL_PAYMENT_ACCOUNT_ENTRY,
+        create_association.historical_payment_card,
+        data_config.payment_cards,
+    )
     logger.debug(f"Completed historic payment card account entries (4/6). Elapsed time: {time.perf_counter() - start}")
 
     logger.debug("Creating historic user tsv files (5/6)...")
@@ -90,6 +101,9 @@ def create_tsv_files(data_config: DataConfig):
     logger.debug(f"Completed historic users (5/6). Elapsed time: {time.perf_counter() - start}")
 
     logger.debug("Creating historic vop activation tsv files (6/6)...")
-    create_history_tsv_files(HermesHistoryTables.HISTORICAL_VOP_ACTIVATION,
-                             create_association.historical_vop_activation, data_config.payment_cards)
+    create_history_tsv_files(
+        HermesHistoryTables.HISTORICAL_VOP_ACTIVATION,
+        create_association.historical_vop_activation,
+        data_config.payment_cards,
+    )
     logger.debug(f"Completed historic vop activations (6/6). Elapsed time: {time.perf_counter() - start}")

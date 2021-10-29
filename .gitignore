@@ -188,3 +188,10 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+
+# Data generated TSV files
+tsv/
+*.tsv
+
+# Jet brains settings files
+.idea/

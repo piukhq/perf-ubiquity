@@ -29,6 +29,8 @@ urllib3 = "*"
 click = "*"
 arrow = "*"
 shared-config-storage = {index = "bink-pypi", version = "*"}
+azure-keyvault-secrets = "*"
+azure-identity = "*"
 
 [requires]
 python_version = "3.9"

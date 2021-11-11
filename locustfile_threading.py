@@ -3,7 +3,8 @@ import random
 from locust import HttpUser, SequentialTaskSet, constant, task
 
 from data_population.fixtures.client import CLIENT_ONE, NON_RESTRICTED_CLIENTS
-from locust_config import AUTOLINK, MEMBERSHIP_PLANS, load_secrets, repeat_task
+from locust_config import AUTOLINK, MEMBERSHIP_PLANS, repeat_task
+from vault import load_secrets
 from request_data import membership_card, payment_card, service
 
 

@@ -1,24 +1,11 @@
-import json
 import logging
 from enum import Enum
 from functools import wraps
-from time import sleep
-
-from shared_config_storage.vault import secrets
 
 from request_data.locust_setup_requests import request_membership_plan_total
-from settings import CHANNEL_VAULT_PATH, LOCAL_SECRETS, LOCAL_SECRETS_PATH, VAULT_TOKEN, VAULT_URL
-
-
-class VaultException(Exception):
-    pass
-
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
-
-channel_info = None
-
 
 # Change this to specify how many channels the locust tests use
 MEMBERSHIP_PLANS = request_membership_plan_total()
@@ -97,32 +84,3 @@ class LocustLabel(str, Enum):
 def increment_locust_counter(count, max_count):
     new_count = (count % max_count) + 1
     return new_count
-
-
-def _read_vault_with_retry() -> dict:
-    for i in range(1, 3):
-        try:
-            channel_info = secrets.read_vault(CHANNEL_VAULT_PATH, VAULT_URL, VAULT_TOKEN)
-            if not channel_info:
-                raise secrets.VaultError("Vault returned empty channel_info")
-
-        except secrets.VaultError:
-            logger.warning("VaultError: failed to read from vault.")
-            sleep(3 * i)
-        else:
-            logger.info("collected channel_info: {channel_info}")
-            return channel_info
-
-    raise VaultException("Failed to read from the Vault even after 3 retries.")
-
-
-def load_secrets():
-    global channel_info
-    if channel_info is None:
-        if LOCAL_SECRETS:
-            with open(LOCAL_SECRETS_PATH) as fp:
-                channel_info = json.load(fp)
-        else:
-            channel_info = _read_vault_with_retry()
-
-    return channel_info

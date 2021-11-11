@@ -15,11 +15,11 @@ from locust_config import (
     LocustLabel,
     check_suite_whitelist,
     increment_locust_counter,
-    load_secrets,
     repeat_task,
 )
 from request_data import membership_card, payment_card, service
 from request_data.hermes import post_scheme_account_status, wait_for_scheme_account_status
+from vault import load_secrets
 
 
 class UserBehavior(SequentialTaskSet):

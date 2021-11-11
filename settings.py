@@ -17,9 +17,8 @@ TSV_BASE_DIR = env_var("TSV_BASE_DIR", "tsv")
 LOCAL_SECRETS = env_var("LOCAL_SECRETS", "False")
 LOCAL_SECRETS_PATH = env_var("LOCAL_SECRETS_PATH", "local_secrets.json")
 
-CHANNEL_VAULT_PATH = env_var("CHANNEL_VAULT_PATH", "/channels")
+CHANNEL_SECRET_NAME = env_var("CHANNEL_SECRET_NAME", "channels")
 VAULT_URL = env_var("VAULT_URL")
-VAULT_TOKEN = env_var("VAULT_TOKEN")
 
 DB_CONNECTION_URI = env_var("DB_CONNECTION_URI")
 HERMES_DB = env_var("HERMES_DB", "hermes")

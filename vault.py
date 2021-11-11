@@ -4,7 +4,7 @@ from azure.core.exceptions import HttpResponseError, ResourceNotFoundError, Serv
 from azure.identity import DefaultAzureCredential
 from azure.keyvault.secrets import SecretClient
 
-from settings import LOCAL_SECRETS, LOCAL_SECRETS_PATH, VAULT_URL, CHANNEL_SECRET_NAME
+from settings import CHANNEL_SECRET_NAME, LOCAL_SECRETS, LOCAL_SECRETS_PATH, VAULT_URL
 
 channel_info = None
 

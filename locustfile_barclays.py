@@ -6,9 +6,9 @@ from locust.exception import StopUser
 
 from data_population.fixtures.client import CLIENT_ONE, NON_RESTRICTED_CLIENTS
 from locust_config import AUTOLINK, MEMBERSHIP_PLANS, check_suite_whitelist, repeat_task
-from vault import load_secrets
 from request_data import membership_card, payment_card, service
 from request_data.hermes import post_scheme_account_status
+from vault import load_secrets
 
 
 class MembershipCardJourney(IntEnum):

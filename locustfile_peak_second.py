@@ -17,9 +17,9 @@ from locust_config import (
     increment_locust_counter,
     repeat_task,
 )
-from vault import load_secrets
 from request_data import membership_card, payment_card, service
 from request_data.hermes import post_scheme_account_status, wait_for_scheme_account_status
+from vault import load_secrets
 
 
 class UserBehavior(SequentialTaskSet):

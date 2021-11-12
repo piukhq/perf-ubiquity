@@ -34,6 +34,7 @@ def load_secrets():
                 channel_info = json.load(fp)
         else:
             vault = KeyVault(vault_url=VAULT_URL)
-            channel_info = vault.get_secret(CHANNEL_SECRET_NAME)
+            channel_secret = vault.get_secret(CHANNEL_SECRET_NAME)
+            channel_info = json.loads(channel_secret)
 
     return channel_info

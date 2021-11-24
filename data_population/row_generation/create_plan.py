@@ -70,7 +70,7 @@ def membership_plan(scheme_id, name, slug):
         ),  # formatted_images
         "#fc03e3",  # secondary_colour
         0,  # plan_popularity
-        "000000"  # text_colour
+        "000000",  # text_colour
     ]
 
 

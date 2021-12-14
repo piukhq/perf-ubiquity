@@ -38,7 +38,7 @@ class UserBehavior(SequentialTaskSet):
         self.ghost_cards = []
         self.service_counter = 0
         self.plan_counter = 1
-        self.client_secrets = load_secrets()
+        self.client_secrets = load_secrets()['channel_secrets']
         self.pub_key = self.client_secrets[CLIENT_ONE["bundle_id"]]["public_key"]
         self.url_prefix = "/ubiquity"
         super(UserBehavior, self).__init__(parent)

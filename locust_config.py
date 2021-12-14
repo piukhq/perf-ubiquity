@@ -20,6 +20,7 @@ AUTOLINK = {"autolink": "true"}
 
 
 TEST_SUITE = {
+    # ubiquity tests
     "get_service": True,
     "post_membership_cards_single_property_join": True,
     "post_membership_cards_restricted_property_join": True,
@@ -48,9 +49,12 @@ TEST_SUITE = {
     "delete_payment_card_single_property": True,
     "delete_membership_card": True,
     "delete_service": True,
-    "stop_locust_after_test_suite": True,
     # barclays specific tests
     "post_membership_cards": True,
+    # angelia tests
+    "post_token": True,
+    # config functions
+    "stop_locust_after_test_suite": True,
 }
 
 

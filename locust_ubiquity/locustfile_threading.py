@@ -16,7 +16,7 @@ class UserBehavior(SequentialTaskSet):
         self.payment_cards = []
         self.membership_cards = []
         self.service_counter = 0
-        self.client_secrets = load_secrets()
+        self.client_secrets = load_secrets()['channel_secrets']
         self.url_prefix = "/ubiquity"
         self.pub_key = self.client_secrets[CLIENT_ONE["bundle_id"]]["public_key"]
         self.mcard_params = {

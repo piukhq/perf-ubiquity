@@ -17,6 +17,7 @@ class UserBehavior(SequentialTaskSet):
         self.membership_cards = []
         self.service_counter = 0
         self.client_secrets = load_secrets()
+        self.url_prefix = "/ubiquity"
         self.pub_key = self.client_secrets[CLIENT_ONE["bundle_id"]]["public_key"]
         self.mcard_params = {
             "fields": [
@@ -54,7 +55,7 @@ class UserBehavior(SequentialTaskSet):
     def post_service(self):
         self.service_counter += 1
         self.client.post(
-            "/service", json=self.consent, headers=self.single_prop_header, name="LC001 - Register customer with Bink"
+            f"{self.url_prefix}/service", json=self.consent, headers=self.single_prop_header, name="LC001 - Register customer with Bink"
         )
 
     @task
@@ -65,7 +66,7 @@ class UserBehavior(SequentialTaskSet):
             "fields": ["id", "status", "feature_set", "account", "images", "balances", "card", "content"],
         }
         resp = self.client.get(
-            "/membership_plans",
+            f"{self.url_prefix}/membership_plans",
             params=plan_filters,
             headers=self.single_prop_header,
             name="LC002 - Retrieve loyalty plans",
@@ -80,7 +81,7 @@ class UserBehavior(SequentialTaskSet):
         pcard = payment_card.generate_unencrypted_random()
         pcard_json = payment_card.encrypt(pcard, self.pub_key)
         resp = self.client.post(
-            "/payment_cards",
+            f"{self.url_prefix}/payment_cards",
             json=pcard_json,
             headers=self.single_prop_header,
             name="LC003 - Register payment cards with BINK",
@@ -94,7 +95,7 @@ class UserBehavior(SequentialTaskSet):
     @repeat_task(20)
     def get_payment_cards_2_no_thread(self):
         self.client.get(
-            "/payment_cards",
+            f"{self.url_prefix}/payment_cards",
             headers=self.single_prop_header,
             params={"threading_threshold": 20},
             name="/payment_cards 2 no thread",
@@ -104,7 +105,7 @@ class UserBehavior(SequentialTaskSet):
     @repeat_task(20)
     def get_payment_cards_2(self):
         self.client.get(
-            "/payment_cards",
+            f"{self.url_prefix}/payment_cards",
             headers=self.single_prop_header,
             params={"threading_threshold": 1},
             name="/payment_cards 2 yes thread",
@@ -116,7 +117,7 @@ class UserBehavior(SequentialTaskSet):
         pcard = payment_card.generate_unencrypted_random()
         pcard_json = payment_card.encrypt(pcard, self.pub_key)
         resp = self.client.post(
-            "/payment_cards",
+            f"{self.url_prefix}/payment_cards",
             json=pcard_json,
             headers=self.single_prop_header,
             name="LC003 - Register payment cards with BINK",
@@ -130,7 +131,7 @@ class UserBehavior(SequentialTaskSet):
     @repeat_task(20)
     def get_payment_cards_3_no_thread(self):
         self.client.get(
-            "/payment_cards",
+            f"{self.url_prefix}/payment_cards",
             headers=self.single_prop_header,
             params={"threading_threshold": 20},
             name="/payment_cards 3 no thread",
@@ -140,7 +141,7 @@ class UserBehavior(SequentialTaskSet):
     @repeat_task(20)
     def get_payment_cards_3(self):
         self.client.get(
-            "/payment_cards",
+            f"{self.url_prefix}/payment_cards",
             headers=self.single_prop_header,
             params={"threading_threshold": 1},
             name="/payment_cards 3 yes thread",
@@ -152,7 +153,7 @@ class UserBehavior(SequentialTaskSet):
         pcard = payment_card.generate_unencrypted_random()
         pcard_json = payment_card.encrypt(pcard, self.pub_key)
         resp = self.client.post(
-            "/payment_cards",
+            f"{self.url_prefix}/payment_cards",
             json=pcard_json,
             headers=self.single_prop_header,
             name="LC003 - Register payment cards with BINK",
@@ -166,7 +167,7 @@ class UserBehavior(SequentialTaskSet):
     @repeat_task(20)
     def get_payment_cards_4_no_thread(self):
         self.client.get(
-            "/payment_cards",
+            f"{self.url_prefix}/payment_cards",
             headers=self.single_prop_header,
             params={"threading_threshold": 20},
             name="/payment_cards 4 no thread",
@@ -176,7 +177,7 @@ class UserBehavior(SequentialTaskSet):
     @repeat_task(20)
     def get_payment_cards_4(self):
         self.client.get(
-            "/payment_cards",
+            f"{self.url_prefix}/payment_cards",
             headers=self.single_prop_header,
             params={"threading_threshold": 1},
             name="/payment_cards 4 yes thread",
@@ -189,7 +190,7 @@ class UserBehavior(SequentialTaskSet):
         plan_id = random.choice(range(1, self.membership_plan_total + 1))
         add_json = membership_card.random_add_json(plan_id, self.pub_key)
         resp = self.client.post(
-            "/membership_cards",
+            f"{self.url_prefix}/membership_cards",
             params=AUTOLINK,
             json=add_json,
             headers=self.single_prop_header,
@@ -206,7 +207,7 @@ class UserBehavior(SequentialTaskSet):
     def get_membership_cards_2_no_thread(self):
         self.mcard_params["threading_threshold"] = 20
         self.client.get(
-            "/membership_cards",
+            f"{self.url_prefix}/membership_cards",
             params=self.mcard_params,
             headers=self.single_prop_header,
             name="/membership_cards 2 no thread",
@@ -218,7 +219,7 @@ class UserBehavior(SequentialTaskSet):
     def get_membership_cards_2(self):
         self.mcard_params["threading_threshold"] = 1
         self.client.get(
-            "/membership_cards",
+            f"{self.url_prefix}/membership_cards",
             params=self.mcard_params,
             headers=self.single_prop_header,
             name="/membership_cards 2 yes thread",
@@ -230,7 +231,7 @@ class UserBehavior(SequentialTaskSet):
         plan_id = random.choice(range(1, self.membership_plan_total + 1))
         add_json = membership_card.random_add_json(plan_id, self.pub_key)
         resp = self.client.post(
-            "/membership_cards",
+            f"{self.url_prefix}/membership_cards",
             params=AUTOLINK,
             json=add_json,
             headers=self.single_prop_header,
@@ -247,7 +248,7 @@ class UserBehavior(SequentialTaskSet):
     def get_membership_cards_3_no_thread(self):
         self.mcard_params["threading_threshold"] = 20
         self.client.get(
-            "/membership_cards",
+            f"{self.url_prefix}/membership_cards",
             params=self.mcard_params,
             headers=self.single_prop_header,
             name="/membership_cards 3 no thread",
@@ -259,7 +260,7 @@ class UserBehavior(SequentialTaskSet):
     def get_membership_cards_3(self):
         self.mcard_params["threading_threshold"] = 1
         self.client.get(
-            "/membership_cards",
+            f"{self.url_prefix}/membership_cards",
             params=self.mcard_params,
             headers=self.single_prop_header,
             name="/membership_cards 3 yes thread",
@@ -271,7 +272,7 @@ class UserBehavior(SequentialTaskSet):
         plan_id = random.choice(range(1, self.membership_plan_total + 1))
         add_json = membership_card.random_add_json(plan_id, self.pub_key)
         resp = self.client.post(
-            "/membership_cards",
+            f"{self.url_prefix}/membership_cards",
             params=AUTOLINK,
             json=add_json,
             headers=self.single_prop_header,
@@ -288,7 +289,7 @@ class UserBehavior(SequentialTaskSet):
     def get_membership_cards_4_no_thread(self):
         self.mcard_params["threading_threshold"] = 20
         self.client.get(
-            "/membership_cards",
+            f"{self.url_prefix}/membership_cards",
             params=self.mcard_params,
             headers=self.single_prop_header,
             name="/membership_cards 4 no thread",
@@ -300,7 +301,7 @@ class UserBehavior(SequentialTaskSet):
     def get_membership_cards_4(self):
         self.mcard_params["threading_threshold"] = 1
         self.client.get(
-            "/membership_cards",
+            f"{self.url_prefix}/membership_cards",
             params=self.mcard_params,
             headers=self.single_prop_header,
             name="/membership_cards 4 yes thread",

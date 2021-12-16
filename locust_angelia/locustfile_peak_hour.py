@@ -1,5 +1,6 @@
 import jwt
 import datetime
+from locust.exception import StopUser
 
 from locust import HttpUser, SequentialTaskSet, constant, task
 
@@ -48,12 +49,17 @@ class UserBehavior(SequentialTaskSet):
         with self.client.post(
             f"{self.url_prefix}/token",
             json={"grant_type": "b2b", "scope": ["user"]},
-            headers=f"bearer {self.b2b_token}",
+            headers={"Authorization": f"bearer {self.b2b_token}"},
             name=f"{self.url_prefix}/token"
         ) as response:
             data = response.json()
             self.access_token = data["access_token"]
             self.refresh_token = data["refresh_token"]
+
+    @check_suite_whitelist
+    @task
+    def stop_locust_after_test_suite(self):
+        raise StopUser()
 
 
 class WebsiteUser(HttpUser):

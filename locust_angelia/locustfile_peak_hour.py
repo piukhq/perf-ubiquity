@@ -1,3 +1,5 @@
+import random
+
 import jwt
 import datetime
 from locust.exception import StopUser
@@ -21,11 +23,6 @@ class UserBehavior(SequentialTaskSet):
         self.refresh_token = ""
         super(UserBehavior, self).__init__(parent)
 
-    @task
-    def setup_headers(self):
-        if not self.private_key:
-            self.private_key = load_secrets()
-
     def generate_b2b_token(self):
         access_life_time = 400
         iat = datetime.datetime.utcnow()
@@ -43,7 +40,6 @@ class UserBehavior(SequentialTaskSet):
 
     @check_suite_whitelist
     @task
-    @repeat_task(2)
     def post_token(self):
 
         with self.client.post(
@@ -58,10 +54,31 @@ class UserBehavior(SequentialTaskSet):
 
     @check_suite_whitelist
     @task
+    @repeat_task(2)
+    def get_new_token(self):
+
+        token_task = random.choice([self.post_token_refresh, self.post_token])
+        token_task()
+
+    def post_token_refresh(self):
+        with self.client.post(
+                f"{self.url_prefix}/token",
+                json={"grant_type": "refresh_token", "scope": ["user"]},
+                headers={"Authorization": f"bearer {self.refresh_token}"},
+                name=f"{self.url_prefix}/token (refresh)"
+        ) as response:
+            data = response.json()
+            self.access_token = data["access_token"]
+            self.refresh_token = data["refresh_token"]
+
+    @check_suite_whitelist
+    @task
     def stop_locust_after_test_suite(self):
         raise StopUser()
 
 
 class WebsiteUser(HttpUser):
+
+    load_secrets()
     tasks = [UserBehavior]
     wait_time = constant(0)

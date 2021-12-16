@@ -53,6 +53,7 @@ TEST_SUITE = {
     "post_membership_cards": True,
     # angelia tests
     "post_token": True,
+    "get_new_token": True,
     # config functions
     "stop_locust_after_test_suite": True,
 }

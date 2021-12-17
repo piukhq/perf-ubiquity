@@ -4,15 +4,23 @@ import jwt
 import datetime
 from locust.exception import StopUser
 
-from locust import HttpUser, SequentialTaskSet, constant, task
+from locust import HttpUser, SequentialTaskSet, constant
 
 from request_data import angelia
 
 from vault import load_secrets
-from locust_config import check_suite_whitelist, repeat_task
+from locust_config import check_suite_whitelist, repeatable_task
 
 
 class UserBehavior(SequentialTaskSet):
+    """
+    User behaviours for the Angelia performance test suite.
+    N.b. Tasks here use a preconfigured 'repeatable_task' decorator, which extends the locust @task decorator and allows
+    each task to be repeated a number of times, as defined in the locustfile which creates this class. All functions to
+    be called by the User MUST have the @repeatable_task() decorator. Any function with this decorator which is not
+    explicitly defined in the locustfile will default to one execution.
+    """
+
     def __init__(self, parent):
         self.email, self.external_id = angelia.generate_random_email_and_sub()
         self.client_name = 'performanceone'
@@ -39,7 +47,7 @@ class UserBehavior(SequentialTaskSet):
         return b2b_token
 
     @check_suite_whitelist
-    @task
+    @repeatable_task()
     def post_token(self):
 
         with self.client.post(
@@ -53,8 +61,7 @@ class UserBehavior(SequentialTaskSet):
             self.refresh_token = data["refresh_token"]
 
     @check_suite_whitelist
-    @task
-    @repeat_task(2)
+    @repeatable_task()
     def get_new_token(self):
 
         token_task = random.choice([self.post_token_refresh, self.post_token])
@@ -72,7 +79,7 @@ class UserBehavior(SequentialTaskSet):
             self.refresh_token = data["refresh_token"]
 
     @check_suite_whitelist
-    @task
+    @repeatable_task()
     def stop_locust_after_test_suite(self):
         raise StopUser()
 

@@ -1,6 +1,7 @@
 import logging
 from enum import Enum
 from functools import wraps
+from locust import task
 
 from request_data.locust_setup_requests import request_membership_plan_total
 
@@ -72,6 +73,21 @@ def repeat_task(num: int):
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
+            for _ in range(num):
+                func(*args, **kwargs)
+            return True
+
+        return wrapper
+
+    return decorator
+
+
+def repeatable_task():
+    def decorator(func):
+        @wraps(func)
+        @task
+        def wrapper(*args, **kwargs):
+            num = repeat_tasks.get(func.__name__, 1)
             for _ in range(num):
                 func(*args, **kwargs)
             return True

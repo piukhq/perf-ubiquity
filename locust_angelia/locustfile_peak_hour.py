@@ -82,3 +82,4 @@ class WebsiteUser(HttpUser):
     load_secrets()
     tasks = [UserBehavior]
     wait_time = constant(0)
+

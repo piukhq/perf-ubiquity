@@ -58,6 +58,8 @@ TEST_SUITE = {
     "stop_locust_after_test_suite": True,
 }
 
+repeat_tasks = {}   # values assigned by locustfile
+
 
 def check_suite_whitelist(test_func):
     if TEST_SUITE.get(test_func.__name__):
@@ -89,3 +91,8 @@ class LocustLabel(str, Enum):
 def increment_locust_counter(count, max_count):
     new_count = (count % max_count) + 1
     return new_count
+
+
+def configure_task_repeats(repeats: dict):
+    global repeat_tasks
+    repeat_tasks = repeats

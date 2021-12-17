@@ -111,7 +111,7 @@ class UserBehavior(SequentialTaskSet):
                 response.success()
 
         resp = self.client.post(
-            f"/{self.url_prefix}membership_cards",
+            f"{self.url_prefix}/membership_cards",
             json=mcard_json,
             headers=self.single_prop_header,
             name=f"{self.url_prefix}/membership_cards {LocustLabel.SINGLE_PROPERTY}",

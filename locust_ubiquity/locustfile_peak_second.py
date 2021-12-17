@@ -93,7 +93,7 @@ class UserBehavior(SequentialTaskSet):
 
     @check_suite_whitelist
     @task
-    @repeat_task(3)
+    @repeat_task(2)
     def post_membership_cards_single_property_join(self):
         plan_id = self.plan_counter
         mcard_json = membership_card.random_join_json(plan_id, self.pub_key)

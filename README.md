@@ -9,8 +9,9 @@
   * `localhost:8089`
 * Enter required users and push `Start swarming`
   * `Total users`: How many users you want running the test at once
-  * `Hate rate`: How many users are spun up per second until it reaches 
+  * `Spawn rate`: How many users are spun up per second until it reaches 
                  total users
+
 
 ### Local: 
 *  **Note: The above setup works by sending a request from OUTSIDE our systems, which will result in a slower performance.
@@ -36,11 +37,11 @@
   * `localhost:8089`
 * Enter required users and push `Start swarming`
   * `Total users`: How many users you want running the test at once
-  * `Hate rate`: How many users are spun up per second until it reaches 
+  * `Spawn rate`: How many users are spun up per second until it reaches 
                  total users
 
-# Environment Setup:
-### Database Population:
+
+# Database Population:
 To populate the Hermes and Hades database with test data, you can run the below CLI commands.
 They will create TSV files, then upload those to the correct postgres tables.
 
@@ -95,3 +96,7 @@ upload-tsv --group-config <group config>
 example:
 upload-tsv -g hades
 ```
+
+# More Information:
+
+* For more on this, including how to configure locust files in-code, see: https://hellobink.atlassian.net/wiki/spaces/BD/pages/1666056320/Ubiquity+Angelia+Performance+Testing

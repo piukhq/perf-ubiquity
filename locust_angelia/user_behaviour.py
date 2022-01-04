@@ -4,21 +4,21 @@ import jwt
 import datetime
 from locust.exception import StopUser
 
-from locust import HttpUser, SequentialTaskSet, constant
+from locust import SequentialTaskSet
 
 from request_data import angelia
 
 from vault import load_secrets
-from locust_config import check_suite_whitelist, repeatable_task
+from locust_config import repeatable_task
 
 
 class UserBehavior(SequentialTaskSet):
     """
     User behaviours for the Angelia performance test suite.
     N.b. Tasks here use a preconfigured 'repeatable_task' decorator, which extends the locust @task decorator and allows
-    each task to be repeated a number of times, as defined in the locustfile which creates this class. All functions to
-    be called by the User MUST have the @repeatable_task() decorator. Any function with this decorator which is not
-    explicitly defined in the locustfile will default to one execution.
+    each task to be run a number of times, as defined in the locustfile which creates this class. All functions to
+    be called by the User MUST have the @repeatable_task() decorator, and must also be included in the 'repeats'
+    dictionary in the parent locustfile.
     """
 
     def __init__(self, parent):
@@ -46,7 +46,6 @@ class UserBehavior(SequentialTaskSet):
 
         return b2b_token
 
-    @check_suite_whitelist
     @repeatable_task()
     def post_token(self):
 
@@ -57,10 +56,9 @@ class UserBehavior(SequentialTaskSet):
             name=f"{self.url_prefix}/token"
         ) as response:
             data = response.json()
-            self.access_token = data["access_token"]
-            self.refresh_token = data["refresh_token"]
+            self.access_token = data.get("access_token")
+            self.refresh_token = data.get("refresh_token")
 
-    @check_suite_whitelist
     @repeatable_task()
     def get_new_token(self):
 
@@ -75,18 +73,9 @@ class UserBehavior(SequentialTaskSet):
                 name=f"{self.url_prefix}/token (refresh)"
         ) as response:
             data = response.json()
-            self.access_token = data["access_token"]
-            self.refresh_token = data["refresh_token"]
+            self.access_token = data.get("access_token")
+            self.refresh_token = data.get("refresh_token")
 
-    @check_suite_whitelist
     @repeatable_task()
     def stop_locust_after_test_suite(self):
         raise StopUser()
-
-
-class WebsiteUser(HttpUser):
-
-    load_secrets()
-    tasks = [UserBehavior]
-    wait_time = constant(0)
-

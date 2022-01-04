@@ -52,9 +52,6 @@ TEST_SUITE = {
     "delete_service": True,
     # barclays specific tests
     "post_membership_cards": True,
-    # angelia tests
-    "post_token": True,
-    "get_new_token": True,
     # config functions
     "stop_locust_after_test_suite": True,
 }
@@ -87,7 +84,7 @@ def repeatable_task():
         @wraps(func)
         @task
         def wrapper(*args, **kwargs):
-            num = repeat_tasks.get(func.__name__, 1)
+            num = repeat_tasks.get(func.__name__, 0)
             for _ in range(num):
                 func(*args, **kwargs)
             return True
@@ -109,6 +106,6 @@ def increment_locust_counter(count, max_count):
     return new_count
 
 
-def configure_task_repeats(repeats: dict):
+def set_task_repeats(repeats: dict):
     global repeat_tasks
     repeat_tasks = repeats

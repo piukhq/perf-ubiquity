@@ -1,6 +1,7 @@
 import logging
 from enum import Enum
 from functools import wraps
+
 from locust import task
 
 from request_data.locust_setup_requests import request_membership_plan_total
@@ -56,7 +57,7 @@ TEST_SUITE = {
     "stop_locust_after_test_suite": True,
 }
 
-repeat_tasks = {}   # values assigned by locustfile
+repeat_tasks = {}  # values assigned by locustfile
 
 
 def check_suite_whitelist(test_func):

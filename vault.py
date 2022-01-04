@@ -35,14 +35,13 @@ def load_secrets():
         if LOCAL_SECRETS:
             with open(LOCAL_SECRETS_PATH) as fp:
                 secrets = json.load(fp)
-                channel_info = secrets['channel_secrets']
+                channel_info = secrets["channel_secrets"]
         else:
             vault = KeyVault(vault_url=VAULT_CONFIG["VAULT_URL"])
             channel_secrets = vault.get_secret(VAULT_CONFIG["CHANNEL_SECRET_NAME"])
             api2_private_keys = vault.get_secret(VAULT_CONFIG["API2_PRIVATE_KEYS_NAME"])
-            channel_info.update({
-                'channel_secrets': json.loads(channel_secrets),
-                'api2_private_keys': json.loads(api2_private_keys)
-            })
+            channel_info.update(
+                {"channel_secrets": json.loads(channel_secrets), "api2_private_keys": json.loads(api2_private_keys)}
+            )
 
     return channel_info

@@ -25,7 +25,7 @@ class UserBehavior(SequentialTaskSet):
         self.payment_cards = []
         self.membership_cards = []
         self.service_counter = 0
-        self.client_secrets = load_secrets()['channel_secrets']
+        self.client_secrets = load_secrets()["channel_secrets"]
         self.url_prefix = "/ubiquity"
         self.pub_key = self.client_secrets[CLIENT_ONE["bundle_id"]]["public_key"]
         super(UserBehavior, self).__init__(parent)
@@ -54,7 +54,7 @@ class UserBehavior(SequentialTaskSet):
             f"{self.url_prefix}/service",
             json=self.consent,
             headers=self.single_prop_header,
-            name="LC001 - Register customer with Bink"
+            name="LC001 - Register customer with Bink",
         )
 
     @check_suite_whitelist
@@ -111,7 +111,7 @@ class UserBehavior(SequentialTaskSet):
             f"{self.url_prefix}/membership_cards",
             json=enrol_json,
             headers=self.single_prop_header,
-            name="LC005 - Register loyalty card"
+            name="LC005 - Register loyalty card",
         )
 
         mcard = {
@@ -198,7 +198,7 @@ class UserBehavior(SequentialTaskSet):
             self.client.delete(
                 f"{self.url_prefix}/membership_card/{mcard['id']}",
                 headers=self.single_prop_header,
-                name="LC006 - Delete loyalty card"
+                name="LC006 - Delete loyalty card",
             )
 
     @check_suite_whitelist

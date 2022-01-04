@@ -1,15 +1,13 @@
+import datetime
 import random
 
 import jwt
-import datetime
+from locust import SequentialTaskSet
 from locust.exception import StopUser
 
-from locust import SequentialTaskSet
-
-from request_data import angelia
-
-from vault import load_secrets
 from locust_config import repeatable_task
+from request_data import angelia
+from vault import load_secrets
 
 
 class UserBehavior(SequentialTaskSet):
@@ -23,8 +21,8 @@ class UserBehavior(SequentialTaskSet):
 
     def __init__(self, parent):
         self.email, self.external_id = angelia.generate_random_email_and_sub()
-        self.client_name = 'performanceone'
-        self.private_key = load_secrets()['api2_private_keys'][self.client_name]
+        self.client_name = "performanceone"
+        self.private_key = load_secrets()["api2_private_keys"][self.client_name]
         self.url_prefix = "/v2"
         self.b2b_token = self.generate_b2b_token()
         self.access_token = ""
@@ -42,7 +40,7 @@ class UserBehavior(SequentialTaskSet):
         # hardcoded.
         key = self.private_key
 
-        b2b_token = jwt.encode(payload=payload, key=key, algorithm='RS512', headers=headers)
+        b2b_token = jwt.encode(payload=payload, key=key, algorithm="RS512", headers=headers)
 
         return b2b_token
 
@@ -53,7 +51,7 @@ class UserBehavior(SequentialTaskSet):
             f"{self.url_prefix}/token",
             json={"grant_type": "b2b", "scope": ["user"]},
             headers={"Authorization": f"bearer {self.b2b_token}"},
-            name=f"{self.url_prefix}/token"
+            name=f"{self.url_prefix}/token",
         ) as response:
             data = response.json()
             self.access_token = data.get("access_token")
@@ -67,10 +65,10 @@ class UserBehavior(SequentialTaskSet):
 
     def post_token_refresh(self):
         with self.client.post(
-                f"{self.url_prefix}/token",
-                json={"grant_type": "refresh_token", "scope": ["user"]},
-                headers={"Authorization": f"bearer {self.refresh_token}"},
-                name=f"{self.url_prefix}/token (refresh)"
+            f"{self.url_prefix}/token",
+            json={"grant_type": "refresh_token", "scope": ["user"]},
+            headers={"Authorization": f"bearer {self.refresh_token}"},
+            name=f"{self.url_prefix}/token (refresh)",
         ) as response:
             data = response.json()
             self.access_token = data.get("access_token")

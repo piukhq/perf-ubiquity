@@ -11,7 +11,6 @@ class WebsiteUser(HttpUser):
     """
     Repeats is a dictionary representing the total number of runs per task. i.e. 2 = task is run 2 times
     in total. 
-    
     ALL tasks to be run must be in this list and have the @repeatable_task decorator.
     """
 

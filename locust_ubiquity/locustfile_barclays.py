@@ -51,7 +51,10 @@ class UserBehavior(SequentialTaskSet):
     def post_service(self):
         self.service_counter += 1
         self.client.post(
-            f"{self.url_prefix}/service", json=self.consent, headers=self.single_prop_header, name="LC001 - Register customer with Bink"
+            f"{self.url_prefix}/service",
+            json=self.consent,
+            headers=self.single_prop_header,
+            name="LC001 - Register customer with Bink"
         )
 
     @check_suite_whitelist
@@ -105,7 +108,10 @@ class UserBehavior(SequentialTaskSet):
     def post_membership_cards_enrol(self, plan_id):
         enrol_json = membership_card.random_join_json(plan_id, self.pub_key)
         resp = self.client.post(
-            f"{self.url_prefix}/membership_cards", json=enrol_json, headers=self.single_prop_header, name="LC005 - Register loyalty card"
+            f"{self.url_prefix}/membership_cards",
+            json=enrol_json,
+            headers=self.single_prop_header,
+            name="LC005 - Register loyalty card"
         )
 
         mcard = {
@@ -190,7 +196,9 @@ class UserBehavior(SequentialTaskSet):
         if check_counter % 5 == 0:
             mcard = self.membership_cards[0]
             self.client.delete(
-                f"{self.url_prefix}/membership_card/{mcard['id']}", headers=self.single_prop_header, name="LC006 - Delete loyalty card"
+                f"{self.url_prefix}/membership_card/{mcard['id']}",
+                headers=self.single_prop_header,
+                name="LC006 - Delete loyalty card"
             )
 
     @check_suite_whitelist

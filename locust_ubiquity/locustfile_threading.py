@@ -55,7 +55,10 @@ class UserBehavior(SequentialTaskSet):
     def post_service(self):
         self.service_counter += 1
         self.client.post(
-            f"{self.url_prefix}/service", json=self.consent, headers=self.single_prop_header, name="LC001 - Register customer with Bink"
+            f"{self.url_prefix}/service",
+            json=self.consent,
+            headers=self.single_prop_header,
+            name="LC001 - Register customer with Bink"
         )
 
     @task

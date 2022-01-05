@@ -1,5 +1,4 @@
 import datetime
-import random
 
 import jwt
 from locust import SequentialTaskSet

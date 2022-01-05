@@ -9,21 +9,39 @@
   * `localhost:8089`
 * Enter required users and push `Start swarming`
   * `Total users`: How many users you want running the test at once
-  * `Hate rate`: How many users are spun up per second until it reaches 
+  * `Spawn rate`: How many users are spun up per second until it reaches 
                  total users
 
+
 ### Local: 
+*  **Note: The above setup works by sending a request from OUTSIDE our systems, which will result in a slower performance.
+   For more accurate performance measurements, the locust_files should be run directly from the performance sandbox 
+   (as above).**
+* You will need to have your .env file set up correctly in order to run locust locally:
+  * `VAULT_URL=https://bink-uksouth-perf-com.vault.azure.net `
+  * `CHANNEL_VAULT_PATH=channels`
+  * `HERMES_URL=https://performance.sandbox.gb.bink.com` 
+  * `DB_CONNECTION_URI=***`
+  * `LOCAL_SECRETS=False`
+    
+* If running data population, the `DB_CONNECTION_URI` env variable will need to be set to the current Postgres flexible server db connection string.
+  * To get this, run `kubectl port-forward deploy/proxy-postgres 5432`
+  * Then `echo $(kubectl get secret azure-pgfs -o json | jq -r .data.common_postgres | base64 --decode)`
+  * set the `DB_CONNECTION_URI` env variable to the echoed value.
+  * (N.b. This is a rolling variable, so you may need to update this variable later on)
+
 * Run locust web ui pointing at sandbox:
-  * `pipenv run locust --host=https://performance.sandbox.k8s.uksouth.bink.sh/ubiquity`
+  * `pipenv run locust --host=https://performance.sandbox.gb.bink.com --locustfile=PATH_TO_FILE` (where PATH_TO_FILE is 
+    the path to the locustfile you would like to run (e.g. `locust_angelia/locustfile_peak_hour.py`))
 * Open up web ui by going to below link:
   * `localhost:8089`
 * Enter required users and push `Start swarming`
   * `Total users`: How many users you want running the test at once
-  * `Hate rate`: How many users are spun up per second until it reaches 
+  * `Spawn rate`: How many users are spun up per second until it reaches 
                  total users
 
-# Environment Setup:
-### Database Population:
+
+# Database Population:
 To populate the Hermes and Hades database with test data, you can run the below CLI commands.
 They will create TSV files, then upload those to the correct postgres tables.
 
@@ -78,3 +96,7 @@ upload-tsv --group-config <group config>
 example:
 upload-tsv -g hades
 ```
+
+# More Information:
+
+* For more on this, including how to configure locust files in-code, see: https://hellobink.atlassian.net/wiki/spaces/BD/pages/1666056320/Ubiquity+Angelia+Performance+Testing

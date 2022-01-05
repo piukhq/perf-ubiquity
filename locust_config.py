@@ -2,6 +2,8 @@ import logging
 from enum import Enum
 from functools import wraps
 
+from locust import task
+
 from request_data.locust_setup_requests import request_membership_plan_total
 
 logger = logging.getLogger(__name__)
@@ -20,6 +22,7 @@ AUTOLINK = {"autolink": "true"}
 
 
 TEST_SUITE = {
+    # ubiquity tests
     "get_service": True,
     "post_membership_cards_single_property_join": True,
     "post_membership_cards_restricted_property_join": True,
@@ -48,10 +51,13 @@ TEST_SUITE = {
     "delete_payment_card_single_property": True,
     "delete_membership_card": True,
     "delete_service": True,
-    "stop_locust_after_test_suite": True,
     # barclays specific tests
     "post_membership_cards": True,
+    # config functions
+    "stop_locust_after_test_suite": True,
 }
+
+repeat_tasks = {}  # values assigned by locustfile
 
 
 def check_suite_whitelist(test_func):
@@ -74,6 +80,21 @@ def repeat_task(num: int):
     return decorator
 
 
+def repeatable_task():
+    def decorator(func):
+        @wraps(func)
+        @task
+        def wrapper(*args, **kwargs):
+            num = repeat_tasks.get(func.__name__, 0)
+            for _ in range(num):
+                func(*args, **kwargs)
+            return True
+
+        return wrapper
+
+    return decorator
+
+
 class LocustLabel(str, Enum):
     SINGLE_PROPERTY = "- Single property"
     MULTI_PROPERTY = "- Multi property"
@@ -84,3 +105,8 @@ class LocustLabel(str, Enum):
 def increment_locust_counter(count, max_count):
     new_count = (count % max_count) + 1
     return new_count
+
+
+def set_task_repeats(repeats: dict):
+    global repeat_tasks
+    repeat_tasks = repeats

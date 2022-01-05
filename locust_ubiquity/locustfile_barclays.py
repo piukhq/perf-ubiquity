@@ -25,7 +25,8 @@ class UserBehavior(SequentialTaskSet):
         self.payment_cards = []
         self.membership_cards = []
         self.service_counter = 0
-        self.client_secrets = load_secrets()
+        self.client_secrets = load_secrets()["channel_secrets"]
+        self.url_prefix = "/ubiquity"
         self.pub_key = self.client_secrets[CLIENT_ONE["bundle_id"]]["public_key"]
         super(UserBehavior, self).__init__(parent)
 
@@ -50,7 +51,10 @@ class UserBehavior(SequentialTaskSet):
     def post_service(self):
         self.service_counter += 1
         self.client.post(
-            "/service", json=self.consent, headers=self.single_prop_header, name="LC001 - Register customer with Bink"
+            f"{self.url_prefix}/service",
+            json=self.consent,
+            headers=self.single_prop_header,
+            name="LC001 - Register customer with Bink",
         )
 
     @check_suite_whitelist
@@ -62,7 +66,7 @@ class UserBehavior(SequentialTaskSet):
             "fields": ["id", "status", "feature_set", "account", "images", "balances", "card", "content"],
         }
         resp = self.client.get(
-            "/membership_plans",
+            f"{self.url_prefix}/membership_plans",
             params=plan_filters,
             headers=self.single_prop_header,
             name="LC002 - Retrieve loyalty plans",
@@ -77,7 +81,7 @@ class UserBehavior(SequentialTaskSet):
         pcard = payment_card.generate_unencrypted_random()
         pcard_json = payment_card.encrypt(pcard, self.pub_key)
         resp = self.client.post(
-            "/payment_cards",
+            f"{self.url_prefix}/payment_cards",
             json=pcard_json,
             headers=self.single_prop_header,
             name="LC003 - Register payment cards with BINK",
@@ -90,7 +94,7 @@ class UserBehavior(SequentialTaskSet):
     def post_membership_card_add_auth(self, plan_id):
         add_json = membership_card.random_add_json(plan_id, self.pub_key)
         resp = self.client.post(
-            "/membership_cards",
+            f"{self.url_prefix}/membership_cards",
             params=AUTOLINK,
             json=add_json,
             headers=self.single_prop_header,
@@ -104,7 +108,10 @@ class UserBehavior(SequentialTaskSet):
     def post_membership_cards_enrol(self, plan_id):
         enrol_json = membership_card.random_join_json(plan_id, self.pub_key)
         resp = self.client.post(
-            "/membership_cards", json=enrol_json, headers=self.single_prop_header, name="LC005 - Register loyalty card"
+            f"{self.url_prefix}/membership_cards",
+            json=enrol_json,
+            headers=self.single_prop_header,
+            name="LC005 - Register loyalty card",
         )
 
         mcard = {
@@ -115,7 +122,7 @@ class UserBehavior(SequentialTaskSet):
     def post_and_patch_membership_cards_register(self, plan_id):
         ghost_card_add_json = membership_card.random_add_ghost_card_json(plan_id, self.pub_key)
         resp = self.client.post(
-            "/membership_cards",
+            f"{self.url_prefix}/membership_cards",
             params=AUTOLINK,
             json=ghost_card_add_json,
             headers=self.single_prop_header,
@@ -131,7 +138,7 @@ class UserBehavior(SequentialTaskSet):
         post_scheme_account_status(membership_card.PRE_REGISTERED_CARD_STATUS, mcard_id)
         register_json = membership_card.random_registration_json(self.pub_key)
         self.client.patch(
-            f"/membership_card/{mcard_id}",
+            f"{self.url_prefix}/membership_card/{mcard_id}",
             json=register_json,
             headers=self.single_prop_header,
             name="LC005 - Register loyalty card",
@@ -175,7 +182,7 @@ class UserBehavior(SequentialTaskSet):
             ],
         }
         self.client.get(
-            "/membership_cards",
+            f"{self.url_prefix}/membership_cards",
             params=mcard_filters,
             headers=self.single_prop_header,
             name="LC004 - Retrieve linked loyalty cards",
@@ -189,7 +196,9 @@ class UserBehavior(SequentialTaskSet):
         if check_counter % 5 == 0:
             mcard = self.membership_cards[0]
             self.client.delete(
-                f"/membership_card/{mcard['id']}", headers=self.single_prop_header, name="LC006 - Delete loyalty card"
+                f"{self.url_prefix}/membership_card/{mcard['id']}",
+                headers=self.single_prop_header,
+                name="LC006 - Delete loyalty card",
             )
 
     @check_suite_whitelist

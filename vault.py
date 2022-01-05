@@ -4,7 +4,7 @@ from azure.core.exceptions import HttpResponseError, ResourceNotFoundError, Serv
 from azure.identity import DefaultAzureCredential
 from azure.keyvault.secrets import SecretClient
 
-from settings import CHANNEL_SECRET_NAME, LOCAL_SECRETS, LOCAL_SECRETS_PATH, VAULT_URL
+from settings import LOCAL_SECRETS, LOCAL_SECRETS_PATH, VAULT_CONFIG
 
 channel_info = None
 
@@ -29,12 +29,19 @@ class KeyVault:
 def load_secrets():
     global channel_info
     if channel_info is None:
+
+        channel_info = {}
+
         if LOCAL_SECRETS:
             with open(LOCAL_SECRETS_PATH) as fp:
-                channel_info = json.load(fp)
+                secrets = json.load(fp)
+                channel_info = secrets["channel_secrets"]
         else:
-            vault = KeyVault(vault_url=VAULT_URL)
-            channel_secret = vault.get_secret(CHANNEL_SECRET_NAME)
-            channel_info = json.loads(channel_secret)
+            vault = KeyVault(vault_url=VAULT_CONFIG["VAULT_URL"])
+            channel_secrets = vault.get_secret(VAULT_CONFIG["CHANNEL_SECRET_NAME"])
+            api2_private_keys = vault.get_secret(VAULT_CONFIG["API2_PRIVATE_KEYS_NAME"])
+            channel_info.update(
+                {"channel_secrets": json.loads(channel_secrets), "api2_private_keys": json.loads(api2_private_keys)}
+            )
 
     return channel_info

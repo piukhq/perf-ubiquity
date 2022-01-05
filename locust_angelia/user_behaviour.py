@@ -1,5 +1,4 @@
 import datetime
-import random
 
 import jwt
 from locust import SequentialTaskSet
@@ -58,17 +57,16 @@ class UserBehavior(SequentialTaskSet):
             self.refresh_token = data.get("refresh_token")
 
     @repeatable_task()
-    def get_new_token(self):
+    def post_get_new_access_token_via_b2b(self):
+        self.post_token()
 
-        token_task = random.choice([self.post_token_refresh, self.post_token])
-        token_task()
-
-    def post_token_refresh(self):
+    @repeatable_task()
+    def post_get_new_access_token_via_refresh(self):
         with self.client.post(
             f"{self.url_prefix}/token",
             json={"grant_type": "refresh_token", "scope": ["user"]},
             headers={"Authorization": f"bearer {self.refresh_token}"},
-            name=f"{self.url_prefix}/token (refresh)",
+            name=f"{self.url_prefix}/token (via refresh)",
         ) as response:
             data = response.json()
             self.access_token = data.get("access_token")

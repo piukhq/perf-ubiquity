@@ -17,7 +17,8 @@ class WebsiteUser(HttpUser):
 
     repeats = {
         "post_token": 1,
-        "get_new_token": 4,  # Randomly chooses between calling post_token endpoint again as above, or via refresh.
+        "post_get_new_access_token_via_refresh": 1,
+        "post_get_new_access_token_via_b2b": 1,
         "stop_locust_after_test_suite": 1,
     }
 

@@ -73,5 +73,28 @@ class UserBehavior(SequentialTaskSet):
             self.refresh_token = data.get("refresh_token")
 
     @repeatable_task()
+    def post_get_new_access_token_via_refresh(self):
+        with self.client.post(
+                f"{self.url_prefix}/token",
+                json={"grant_type": "refresh_token", "scope": ["user"]},
+                headers={"Authorization": f"bearer {self.refresh_token}"},
+                name=f"{self.url_prefix}/token (via refresh)",
+        ) as response:
+            data = response.json()
+            self.access_token = data.get("access_token")
+            self.refresh_token = data.get("refresh_token")
+
+    @repeatable_task()
+    def get_loyalty_plans(self):
+        with self.client.get(
+                f"{self.url_prefix}/loyalty_plans",
+                headers={"Authorization": f"bearer {self.access_token}"},
+                name=f"{self.url_prefix}/loyalty_plans",
+        ) as response:
+            data = response.json()
+            self.access_token = data.get("access_token")
+            self.refresh_token = data.get("refresh_token")
+
+    @repeatable_task()
     def stop_locust_after_test_suite(self):
         raise StopUser()

@@ -26,6 +26,7 @@ class UserBehavior(SequentialTaskSet):
         self.b2b_token = self.generate_b2b_token()
         self.access_token = ""
         self.refresh_token = ""
+        self.loyalty_plan_id = 1
         super(UserBehavior, self).__init__(parent)
 
     def generate_b2b_token(self):
@@ -42,6 +43,8 @@ class UserBehavior(SequentialTaskSet):
         b2b_token = jwt.encode(payload=payload, key=key, algorithm="RS512", headers=headers)
 
         return b2b_token
+
+# ---------------------------------TOKEN TASKS---------------------------------
 
     @repeatable_task()
     def post_token(self):
@@ -84,16 +87,41 @@ class UserBehavior(SequentialTaskSet):
             self.access_token = data.get("access_token")
             self.refresh_token = data.get("refresh_token")
 
+    # ---------------------------------LOYALTY PLAN TASKS---------------------------------
+
     @repeatable_task()
     def get_loyalty_plans(self):
-        with self.client.get(
+        self.client.get(
                 f"{self.url_prefix}/loyalty_plans",
                 headers={"Authorization": f"bearer {self.access_token}"},
                 name=f"{self.url_prefix}/loyalty_plans",
-        ) as response:
-            data = response.json()
-            self.access_token = data.get("access_token")
-            self.refresh_token = data.get("refresh_token")
+        )
+
+    @repeatable_task()
+    def get_loyalty_plans_by_id(self):
+        self.client.get(
+            f"{self.url_prefix}/loyalty_plans/{self.loyalty_plan_id}",
+            headers={"Authorization": f"bearer {self.access_token}"},
+            name=f"{self.url_prefix}/loyalty_plans/[id]",
+        )
+
+    @repeatable_task()
+    def get_loyalty_plans_journey_fields_by_id(self):
+        self.client.get(
+            f"{self.url_prefix}/loyalty_plans/{self.loyalty_plan_id}/journey_fields",
+            headers={"Authorization": f"bearer {self.access_token}"},
+            name=f"{self.url_prefix}/loyalty_plans/[id]/journey_fields",
+        )
+
+    @repeatable_task()
+    def get_loyalty_plans_overview(self):
+        self.client.get(
+            f"{self.url_prefix}/loyalty_plans_overview",
+            headers={"Authorization": f"bearer {self.access_token}"},
+            name=f"{self.url_prefix}/loyalty_plans_overview",
+        )
+
+    # ---------------------------------SPECIAL TASKS---------------------------------
 
     @repeatable_task()
     def stop_locust_after_test_suite(self):

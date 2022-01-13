@@ -20,6 +20,9 @@ class WebsiteUser(HttpUser):
         "post_get_new_access_token_via_refresh": 1,
         "post_get_new_access_token_via_b2b": 1,
         "get_loyalty_plans": 1,
+        "get_loyalty_plans_by_id": 1,
+        "get_loyalty_plans_journey_fields_by_id": 1,
+        "get_loyalty_plans_overview": 1,
         "stop_locust_after_test_suite": 1,
     }
 

@@ -1,10 +1,12 @@
 import datetime
 
 import jwt
+import random
+
 from locust import SequentialTaskSet
 from locust.exception import StopUser
 
-from locust_config import repeatable_task
+from locust_config import repeatable_task, MEMBERSHIP_PLANS
 from request_data import angelia
 from vault import load_secrets
 
@@ -26,7 +28,7 @@ class UserBehavior(SequentialTaskSet):
         self.b2b_token = self.generate_b2b_token()
         self.access_token = ""
         self.refresh_token = ""
-        self.loyalty_plan_id = 1
+        self.loyalty_plan_count = MEMBERSHIP_PLANS
         super(UserBehavior, self).__init__(parent)
 
     def generate_b2b_token(self):
@@ -44,7 +46,7 @@ class UserBehavior(SequentialTaskSet):
 
         return b2b_token
 
-# ---------------------------------TOKEN TASKS---------------------------------
+    # ---------------------------------TOKEN TASKS---------------------------------
 
     @repeatable_task()
     def post_token(self):
@@ -99,16 +101,20 @@ class UserBehavior(SequentialTaskSet):
 
     @repeatable_task()
     def get_loyalty_plans_by_id(self):
+        plan_id = random.choice(range(1, self.loyalty_plan_count))
+
         self.client.get(
-            f"{self.url_prefix}/loyalty_plans/{self.loyalty_plan_id}",
+            f"{self.url_prefix}/loyalty_plans/{plan_id}",
             headers={"Authorization": f"bearer {self.access_token}"},
             name=f"{self.url_prefix}/loyalty_plans/[id]",
         )
 
     @repeatable_task()
     def get_loyalty_plans_journey_fields_by_id(self):
+        plan_id = random.choice(range(1, self.loyalty_plan_count))
+
         self.client.get(
-            f"{self.url_prefix}/loyalty_plans/{self.loyalty_plan_id}/journey_fields",
+            f"{self.url_prefix}/loyalty_plans/{plan_id}/journey_fields",
             headers={"Authorization": f"bearer {self.access_token}"},
             name=f"{self.url_prefix}/loyalty_plans/[id]/journey_fields",
         )

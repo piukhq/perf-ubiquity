@@ -127,6 +127,16 @@ class UserBehavior(SequentialTaskSet):
             name=f"{self.url_prefix}/loyalty_plans_overview",
         )
 
+    # ---------------------------------DELETE ME---------------------------------
+
+    @repeatable_task()
+    def delete_me(self):
+        self.client.delete(
+            f"{self.url_prefix}/me",
+            headers={"Authorization": f"bearer {self.access_token}"},
+            name=f"{self.url_prefix}/me",
+        )
+    
     # ---------------------------------SPECIAL TASKS---------------------------------
 
     @repeatable_task()

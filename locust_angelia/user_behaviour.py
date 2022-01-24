@@ -4,6 +4,7 @@ import random
 import jwt
 from locust import SequentialTaskSet
 from locust.exception import StopUser
+from faker import Faker
 
 from locust_config import MEMBERSHIP_PLANS, repeatable_task
 from request_data import angelia
@@ -37,6 +38,7 @@ class UserBehavior(SequentialTaskSet):
         self.refresh_tokens = {}
         self.loyalty_plan_count = MEMBERSHIP_PLANS
         self.loyalty_cards = []
+        self.fake = Faker()
         super(UserBehavior, self).__init__(parent)
 
     def generate_b2b_token(self):
@@ -175,6 +177,92 @@ class UserBehavior(SequentialTaskSet):
             loyalty_card_id = response.json()["id"]
             if loyalty_card_id not in [item["loyalty_card_id"] for item in self.loyalty_cards]:
                 response.failure()
+
+    @repeatable_task()
+    def post_loyalty_cards_add_and_auth(self):
+
+        # ADD_AND_AUTH with primary user - creates new card
+
+        plan_id = random.choice(range(1, self.loyalty_plan_count))
+
+        data = {
+            "loyalty_plan_id": plan_id,
+            "account": {
+                "add_fields": {
+                    "credentials": [{"credential_slug": "card_number", "value": self.fake.credit_card_number()}]
+                },
+                "authorise_fields": {
+                    "credentials": [
+                        {"credential_slug": "password", "value": self.fake.password()}],
+                    "consents": [{
+                        "consent_slug": f"consent_slug_{plan_id}",
+                        "value": "true"
+                    }]
+                }
+            },
+        }
+
+        with self.client.post(
+                f"{self.url_prefix}/loyalty_cards/add_and_authorise",
+                headers={"Authorization": f"bearer {self.access_tokens['primary_user']}"},
+                name=f"{self.url_prefix}/loyalty_cards/add_and_authorise",
+                json=data,
+        ) as response:
+            loyalty_card_id = response.json()["id"]
+
+        self.loyalty_cards.append({"loyalty_card_id": loyalty_card_id, "data": data})
+
+        #  ADD with secondary user (Multiuser) - links secondary user to just-created card
+
+        with self.client.post(
+                f"{self.url_prefix}/loyalty_cards/add_and_authorise",
+                headers={"Authorization": f"bearer {self.access_tokens['secondary_user']}"},
+                name=f"{self.url_prefix}/loyalty_cards/add_and_authorise (MULTIUSER)",
+                json=data,
+        ) as response:
+            loyalty_card_id = response.json()["id"]
+            if loyalty_card_id not in [item["loyalty_card_id"] for item in self.loyalty_cards]:
+                response.failure()
+
+    @repeatable_task()
+    def post_loyalty_cards_join(self):
+
+        # JOIN only with primary user
+
+        plan_id = random.choice(range(1, self.loyalty_plan_count))
+
+        data = {
+            "loyalty_plan_id": plan_id,
+            "account": {
+                "join_fields": {
+                    "credentials": [
+                        {"credential_slug": "card_number", "value": self.fake.credit_card_number()},
+                        {"credential_slug": "password", "value": self.fake.password()}],
+                }
+            },
+        }
+
+        self.client.post(
+                f"{self.url_prefix}/loyalty_cards/join",
+                headers={"Authorization": f"bearer {self.access_tokens['primary_user']}"},
+                name=f"{self.url_prefix}/loyalty_cards/join",
+                json=data,
+        )
+
+    @repeatable_task()
+    def delete_loyalty_card_by_id(self):
+
+        if self.loyalty_cards:
+            card_id = self.loyalty_cards[0]['loyalty_card_id']
+        else:
+            card_id = 'NO_CARD'
+
+        with self.client.delete(
+            f"{self.url_prefix}/loyalty_cards/{card_id}",
+            headers={"Authorization": f"bearer {self.access_tokens['primary_user']}"},
+            name=f"{self.url_prefix}/loyalty_cards/[id]",
+        ):
+            self.loyalty_cards.pop(0)
 
     # ---------------------------------USER TASKS---------------------------------
 

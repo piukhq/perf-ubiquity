@@ -25,6 +25,9 @@ class WebsiteUser(HttpUser):
         "get_loyalty_plans_journey_fields_by_id": 1,
         "get_loyalty_plans_overview": 1,
         "post_loyalty_cards_add": 1,  # Single and Multiuser (1 each)
+        "post_loyalty_cards_add_and_auth": 1,
+        "post_loyalty_cards_join": 1,
+        "delete_loyalty_card_by_id": 1,  # Should be less than total loyalty_cards added (or will 404)
         "delete_me": 1,
         "stop_locust_after_test_suite": 1,
     }

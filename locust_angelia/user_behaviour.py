@@ -1,10 +1,11 @@
 import datetime
+import random
 
 import jwt
 from locust import SequentialTaskSet
 from locust.exception import StopUser
 
-from locust_config import repeatable_task
+from locust_config import MEMBERSHIP_PLANS, repeatable_task
 from request_data import angelia
 from vault import load_secrets
 
@@ -16,6 +17,14 @@ class UserBehavior(SequentialTaskSet):
     each task to be run a number of times, as defined in the locustfile which creates this class. All functions to
     be called by the User MUST have the @repeatable_task() decorator, and must also be included in the 'repeats'
     dictionary in the parent locustfile.
+
+    Some terminology:
+
+    'multiuser': used to denote a task performed by a secondary user. This is usually in the case that a user is
+    performing an action on a resource which they did not themselves create. E.g. linking to an existing loyalty card or
+     payment card account. Unless otherwise stated, this assumes the channel to be the same in all cases.
+
+    'multichannel': effectively used to denote a 'multiuser' task as above, but where the channel is also different.
     """
 
     def __init__(self, parent):
@@ -23,9 +32,11 @@ class UserBehavior(SequentialTaskSet):
         self.client_name = "performanceone"
         self.private_key = load_secrets()["api2_private_keys"][self.client_name]
         self.url_prefix = "/v2"
-        self.b2b_token = self.generate_b2b_token()
-        self.access_token = ""
-        self.refresh_token = ""
+        self.b2b_tokens = {"primary_user": self.generate_b2b_token(), "secondary_user": self.generate_b2b_token()}
+        self.access_tokens = {}
+        self.refresh_tokens = {}
+        self.loyalty_plan_count = MEMBERSHIP_PLANS
+        self.loyalty_cards = []
         super(UserBehavior, self).__init__(parent)
 
     def generate_b2b_token(self):
@@ -43,18 +54,33 @@ class UserBehavior(SequentialTaskSet):
 
         return b2b_token
 
+    # ---------------------------------TOKEN TASKS---------------------------------
+
     @repeatable_task()
     def post_token(self):
 
         with self.client.post(
             f"{self.url_prefix}/token",
             json={"grant_type": "b2b", "scope": ["user"]},
-            headers={"Authorization": f"bearer {self.b2b_token}"},
+            headers={"Authorization": f"bearer {self.b2b_tokens['primary_user']}"},
             name=f"{self.url_prefix}/token",
         ) as response:
             data = response.json()
-            self.access_token = data.get("access_token")
-            self.refresh_token = data.get("refresh_token")
+            self.access_tokens["primary_user"] = data.get("access_token")
+            self.refresh_tokens["primary_user"] = data.get("refresh_token")
+
+    @repeatable_task()
+    def post_token_secondary_user(self):
+
+        with self.client.post(
+            f"{self.url_prefix}/token",
+            json={"grant_type": "b2b", "scope": ["user"]},
+            headers={"Authorization": f"bearer {self.b2b_tokens['secondary_user']}"},
+            name=f"{self.url_prefix}/token (secondary user)",
+        ) as response:
+            data = response.json()
+            self.access_tokens["secondary_user"] = data.get("access_token")
+            self.refresh_tokens["secondary_user"] = data.get("refresh_token")
 
     @repeatable_task()
     def post_get_new_access_token_via_b2b(self):
@@ -65,12 +91,102 @@ class UserBehavior(SequentialTaskSet):
         with self.client.post(
             f"{self.url_prefix}/token",
             json={"grant_type": "refresh_token", "scope": ["user"]},
-            headers={"Authorization": f"bearer {self.refresh_token}"},
+            headers={"Authorization": f"bearer {self.refresh_tokens['primary_user']}"},
             name=f"{self.url_prefix}/token (via refresh)",
         ) as response:
             data = response.json()
-            self.access_token = data.get("access_token")
-            self.refresh_token = data.get("refresh_token")
+            self.access_tokens["primary_user"] = data.get("access_token")
+            self.refresh_tokens["primary_user"] = data.get("refresh_token")
+
+    # ---------------------------------LOYALTY PLAN TASKS---------------------------------
+
+    @repeatable_task()
+    def get_loyalty_plans(self):
+        self.client.get(
+            f"{self.url_prefix}/loyalty_plans",
+            headers={"Authorization": f"bearer {self.access_tokens['primary_user']}"},
+            name=f"{self.url_prefix}/loyalty_plans",
+        )
+
+    @repeatable_task()
+    def get_loyalty_plans_by_id(self):
+        plan_id = random.choice(range(1, self.loyalty_plan_count))
+
+        self.client.get(
+            f"{self.url_prefix}/loyalty_plans/{plan_id}",
+            headers={"Authorization": f"bearer {self.access_tokens['primary_user']}"},
+            name=f"{self.url_prefix}/loyalty_plans/[id]",
+        )
+
+    @repeatable_task()
+    def get_loyalty_plans_journey_fields_by_id(self):
+        plan_id = random.choice(range(1, self.loyalty_plan_count))
+
+        self.client.get(
+            f"{self.url_prefix}/loyalty_plans/{plan_id}/journey_fields",
+            headers={"Authorization": f"bearer {self.access_tokens['primary_user']}"},
+            name=f"{self.url_prefix}/loyalty_plans/[id]/journey_fields",
+        )
+
+    @repeatable_task()
+    def get_loyalty_plans_overview(self):
+        self.client.get(
+            f"{self.url_prefix}/loyalty_plans_overview",
+            headers={"Authorization": f"bearer {self.access_tokens['primary_user']}"},
+            name=f"{self.url_prefix}/loyalty_plans_overview",
+        )
+
+    # ---------------------------------LOYALTY CARD TASKS---------------------------------
+
+    @repeatable_task()
+    def post_loyalty_cards_add(self):
+
+        # ADD with primary user - creates new card
+
+        plan_id = random.choice(range(1, self.loyalty_plan_count))
+
+        data = {
+            "loyalty_plan_id": plan_id,
+            "account": {
+                "add_fields": {
+                    "credentials": [{"credential_slug": "card_number", "value": str(random.randint(100000, 1000000))}]
+                }
+            },
+        }
+
+        with self.client.post(
+            f"{self.url_prefix}/loyalty_cards/add",
+            headers={"Authorization": f"bearer {self.access_tokens['primary_user']}"},
+            name=f"{self.url_prefix}/loyalty_cards/add",
+            json=data,
+        ) as response:
+            loyalty_card_id = response.json()["id"]
+
+        self.loyalty_cards.append({"loyalty_card_id": loyalty_card_id, "data": data})
+
+        #  ADD with secondary user (Multiuser) - links secondary user to just-created card
+
+        with self.client.post(
+            f"{self.url_prefix}/loyalty_cards/add",
+            headers={"Authorization": f"bearer {self.access_tokens['secondary_user']}"},
+            name=f"{self.url_prefix}/loyalty_cards/add (MULTIUSER)",
+            json=data,
+        ) as response:
+            loyalty_card_id = response.json()["id"]
+            if loyalty_card_id not in [item["loyalty_card_id"] for item in self.loyalty_cards]:
+                response.failure()
+
+    # ---------------------------------USER TASKS---------------------------------
+
+    @repeatable_task()
+    def delete_me(self):
+        self.client.delete(
+            f"{self.url_prefix}/me",
+            headers={"Authorization": f"bearer {self.access_tokens['primary_user']}"},
+            name=f"{self.url_prefix}/me",
+        )
+
+    # ---------------------------------SPECIAL TASKS---------------------------------
 
     @repeatable_task()
     def stop_locust_after_test_suite(self):

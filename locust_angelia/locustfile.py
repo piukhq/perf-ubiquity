@@ -24,7 +24,8 @@ class WebsiteUser(HttpUser):
         "get_loyalty_plans_journey_fields_by_id": 1,
         "get_loyalty_plans_overview": 1,
         "stop_locust_after_test_suite": 1,
-    }
+        "delete_me": 1,
+    } 
 
     set_task_repeats(repeats)
 

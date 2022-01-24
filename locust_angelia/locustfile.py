@@ -16,15 +16,17 @@ class WebsiteUser(HttpUser):
     """
 
     repeats = {
-        "post_token": 1,
+        "post_token": 1,  # REQUIRES: > 0
+        "post_token_secondary_user": 1,   # REQUIRES: > 0
         "post_get_new_access_token_via_refresh": 1,
         "post_get_new_access_token_via_b2b": 1,
         "get_loyalty_plans": 1,
         "get_loyalty_plans_by_id": 1,
         "get_loyalty_plans_journey_fields_by_id": 1,
         "get_loyalty_plans_overview": 1,
-        "stop_locust_after_test_suite": 1,
+        "post_loyalty_cards_add": 1,  # Single and Multiuser (1 each)
         "delete_me": 1,
+        "stop_locust_after_test_suite": 1,
     } 
 
     set_task_repeats(repeats)

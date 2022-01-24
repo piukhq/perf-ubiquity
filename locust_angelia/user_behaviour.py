@@ -157,7 +157,7 @@ class UserBehavior(SequentialTaskSet):
                     "credentials": [
                         {
                             "credential_slug": "card_number",
-                            "value": random.randint(100000, 1000000)
+                            "value": str(random.randint(100000, 1000000))
                         }
                     ]
                 }
@@ -165,14 +165,13 @@ class UserBehavior(SequentialTaskSet):
             }
         }
 
-        response = self.client.post(
+        with self.client.post(
             f"{self.url_prefix}/loyalty_cards/add",
             headers={"Authorization": f"bearer {self.access_tokens['primary_user']}"},
             name=f"{self.url_prefix}/loyalty_cards/add",
             json=data
-        )
-
-        loyalty_card_id = response.json()["id"]
+        ) as response:
+            loyalty_card_id = response.json()["id"]
 
         self.loyalty_cards.append({"loyalty_card_id": loyalty_card_id, "data": data})
 

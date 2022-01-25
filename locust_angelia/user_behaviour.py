@@ -151,7 +151,7 @@ class UserBehavior(SequentialTaskSet):
             "loyalty_plan_id": plan_id,
             "account": {
                 "add_fields": {
-                    "credentials": [{"credential_slug": "card_number", "value": str(random.randint(100000, 1000000))}]
+                    "credentials": [{"credential_slug": "card_number", "value": self.fake.credit_card_number()}]
                 }
             },
         }
@@ -212,7 +212,7 @@ class UserBehavior(SequentialTaskSet):
 
         self.loyalty_cards.append({"loyalty_card_id": loyalty_card_id, "data": data})
 
-        #  ADD with secondary user (Multiuser) - links secondary user to just-created card
+        #  ADD_AND_AUTH with secondary user (Multiuser) - links secondary user to just-created card
 
         with self.client.post(
                 f"{self.url_prefix}/loyalty_cards/add_and_authorise",

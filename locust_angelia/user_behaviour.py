@@ -29,11 +29,11 @@ class UserBehavior(SequentialTaskSet):
     """
 
     def __init__(self, parent):
-        self.email, self.external_id = angelia.generate_random_email_and_sub()
+        self.user_details = self.setup_user_info()
         self.client_name = "performanceone"
         self.private_key = load_secrets()["api2_private_keys"][self.client_name]
         self.url_prefix = "/v2"
-        self.b2b_tokens = {"primary_user": self.generate_b2b_token(), "secondary_user": self.generate_b2b_token()}
+        self.b2b_tokens = self.generate_b2b_tokens()
         self.access_tokens = {}
         self.refresh_tokens = {}
         self.loyalty_plan_count = MEMBERSHIP_PLANS
@@ -41,20 +41,37 @@ class UserBehavior(SequentialTaskSet):
         self.fake = Faker()
         super(UserBehavior, self).__init__(parent)
 
-    def generate_b2b_token(self):
-        access_life_time = 400
-        iat = datetime.datetime.utcnow()
-        exp = iat + datetime.timedelta(seconds=access_life_time)
+    @staticmethod
+    def setup_user_info():
+        data = {}
+        for user in ['primary_user', 'secondary_user']:
+            email, external_id = angelia.generate_random_email_and_sub()
+            data[user] = {}
+            data[user]['email'] = email
+            data[user]['external_id'] = external_id
+        return data
 
-        payload = {"email": self.email, "sub": self.external_id, "iat": iat, "exp": exp}
-        headers = {"kid": f"{self.client_name}-2021-12-16"}
-        # KIDs have trailing datetime to mimic real KID use cases. We don't need to cycle these so this date can be
-        # hardcoded.
-        key = self.private_key
+    def generate_b2b_tokens(self):
 
-        b2b_token = jwt.encode(payload=payload, key=key, algorithm="RS512", headers=headers)
+        b2b_tokens = {}
 
-        return b2b_token
+        for user in ['primary_user', 'secondary_user']:
+
+            access_life_time = 400
+            iat = datetime.datetime.utcnow()
+            exp = iat + datetime.timedelta(seconds=access_life_time)
+
+            payload = {"email": self.user_details[user]['email'], "sub": self.user_details[user]['external_id'], "iat": iat, "exp": exp}
+            headers = {"kid": f"{self.client_name}-2021-12-16"}
+            # KIDs have trailing datetime to mimic real KID use cases. We don't need to cycle these so this date can be
+            # hardcoded.
+            key = self.private_key
+
+            b2b_token = jwt.encode(payload=payload, key=key, algorithm="RS512", headers=headers)
+
+            b2b_tokens[user] = b2b_token
+
+        return b2b_tokens
 
     # ---------------------------------TOKEN TASKS---------------------------------
 

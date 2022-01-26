@@ -32,4 +32,4 @@ class WebsiteUser(HttpUser):
     set_task_repeats(repeats)
 
     tasks = [UserBehavior]
-    wait_time = constant(0)
+    wait_time = constant(3)

@@ -1,5 +1,4 @@
 import json
-import uuid
 
 from data_population.fixtures.client import ALL_CLIENTS
 from data_population.fixtures.membership_plan import CONSENT_LABEL
@@ -129,7 +128,7 @@ def scheme_consent(pk, scheme_id):
         False,  # required
         0,  # order
         1,  # journey (link)
-        f'consent_slug_{scheme_id}',  # slug
+        f"consent_slug_{scheme_id}",  # slug
         "2020-01-01 00:00:00",  # created on
         "2020-01-01 00:00:00",  # modified on
         scheme_id,  # scheme id

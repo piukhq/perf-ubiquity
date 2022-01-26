@@ -42,7 +42,7 @@ benchmark_old = DataConfig(
 
 benchmark = DataConfig(
     name="benchmark",
-    membership_plans=13,
+    membership_plans=36,
     users=273500,
     users_history=547000,
     membership_cards=1876210,

@@ -192,7 +192,7 @@ class UserBehavior(SequentialTaskSet):
             json=data,
         ) as response:
             loyalty_card_id = response.json()["id"]
-            if loyalty_card_id not in [item["loyalty_card_id"] for item in self.loyalty_cards]:
+            if response.json()['id'] != loyalty_card_id:
                 response.failure()
 
     @repeatable_task()
@@ -237,8 +237,7 @@ class UserBehavior(SequentialTaskSet):
                 name=f"{self.url_prefix}/loyalty_cards/add_and_authorise (MULTIUSER)",
                 json=data,
         ) as response:
-            loyalty_card_id = response.json()["id"]
-            if loyalty_card_id not in [item["loyalty_card_id"] for item in self.loyalty_cards]:
+            if response.json()['id'] != loyalty_card_id:
                 response.failure()
 
     @repeatable_task()

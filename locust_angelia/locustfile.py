@@ -16,16 +16,24 @@ class WebsiteUser(HttpUser):
     """
 
     repeats = {
-        "post_token": 1,  # REQUIRES: > 0
-        "post_token_secondary_user": 1,  # REQUIRES: > 0
+        # --TOKEN--
+        "post_token": 1,  # REQUIRED
+        "post_token_secondary_user": 1,  # REQUIRED
         "post_get_new_access_token_via_refresh": 1,
         "post_get_new_access_token_via_b2b": 1,
-        "get_loyalty_plans": 1,
-        "get_loyalty_plans_by_id": 1,
-        "get_loyalty_plans_journey_fields_by_id": 1,
-        "get_loyalty_plans_overview": 1,
-        "post_loyalty_cards_add": 1,  # Single and Multiuser (1 each)
-        "delete_me": 1,
+        # --LOYALTY_PLANS--
+        "get_loyalty_plans": 0,
+        "get_loyalty_plans_by_id": 0,
+        "get_loyalty_plans_journey_fields_by_id": 0,
+        "get_loyalty_plans_overview": 0,
+        # --LOYALTY_CARDS--
+        "post_loyalty_cards_add": 0,  # Single and Multiuser (1 each) - Adds 1 card
+        "post_loyalty_cards_add_and_auth": 0,  # Single and Multiuser (1 each) - Adds 1 card
+        "post_loyalty_cards_join": 0,  # Single user only
+        "delete_loyalty_card_by_id": 0,  # Should be less than total loyalty_cards added (or will 404)
+        # --USER--
+        "delete_me": 0,
+        # --SPECIAL--
         "stop_locust_after_test_suite": 1,
     }
 

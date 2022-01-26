@@ -2,6 +2,7 @@ import datetime
 import random
 
 import jwt
+from faker import Faker
 from locust import SequentialTaskSet
 from locust.exception import StopUser
 
@@ -28,31 +29,54 @@ class UserBehavior(SequentialTaskSet):
     """
 
     def __init__(self, parent):
-        self.email, self.external_id = angelia.generate_random_email_and_sub()
+        self.user_details = self.setup_user_info()
         self.client_name = "performanceone"
         self.private_key = load_secrets()["api2_private_keys"][self.client_name]
         self.url_prefix = "/v2"
-        self.b2b_tokens = {"primary_user": self.generate_b2b_token(), "secondary_user": self.generate_b2b_token()}
+        self.b2b_tokens = self.generate_b2b_tokens()
         self.access_tokens = {}
         self.refresh_tokens = {}
         self.loyalty_plan_count = MEMBERSHIP_PLANS
         self.loyalty_cards = []
+        self.fake = Faker()
         super(UserBehavior, self).__init__(parent)
 
-    def generate_b2b_token(self):
-        access_life_time = 400
-        iat = datetime.datetime.utcnow()
-        exp = iat + datetime.timedelta(seconds=access_life_time)
+    @staticmethod
+    def setup_user_info():
+        data = {}
+        for user in ["primary_user", "secondary_user"]:
+            email, external_id = angelia.generate_random_email_and_sub()
+            data[user] = {}
+            data[user]["email"] = email
+            data[user]["external_id"] = external_id
+        return data
 
-        payload = {"email": self.email, "sub": self.external_id, "iat": iat, "exp": exp}
-        headers = {"kid": f"{self.client_name}-2021-12-16"}
-        # KIDs have trailing datetime to mimic real KID use cases. We don't need to cycle these so this date can be
-        # hardcoded.
-        key = self.private_key
+    def generate_b2b_tokens(self):
 
-        b2b_token = jwt.encode(payload=payload, key=key, algorithm="RS512", headers=headers)
+        b2b_tokens = {}
 
-        return b2b_token
+        for user in ["primary_user", "secondary_user"]:
+
+            access_life_time = 400
+            iat = datetime.datetime.utcnow()
+            exp = iat + datetime.timedelta(seconds=access_life_time)
+
+            payload = {
+                "email": self.user_details[user]["email"],
+                "sub": self.user_details[user]["external_id"],
+                "iat": iat,
+                "exp": exp,
+            }
+            headers = {"kid": f"{self.client_name}-2021-12-16"}
+            # KIDs have trailing datetime to mimic real KID use cases. We don't need to cycle these so this date can be
+            # hardcoded.
+            key = self.private_key
+
+            b2b_token = jwt.encode(payload=payload, key=key, algorithm="RS512", headers=headers)
+
+            b2b_tokens[user] = b2b_token
+
+        return b2b_tokens
 
     # ---------------------------------TOKEN TASKS---------------------------------
 
@@ -149,7 +173,7 @@ class UserBehavior(SequentialTaskSet):
             "loyalty_plan_id": plan_id,
             "account": {
                 "add_fields": {
-                    "credentials": [{"credential_slug": "card_number", "value": str(random.randint(100000, 1000000))}]
+                    "credentials": [{"credential_slug": "card_number", "value": self.fake.credit_card_number()}]
                 }
             },
         }
@@ -173,8 +197,90 @@ class UserBehavior(SequentialTaskSet):
             json=data,
         ) as response:
             loyalty_card_id = response.json()["id"]
-            if loyalty_card_id not in [item["loyalty_card_id"] for item in self.loyalty_cards]:
+            if response.json()["id"] != loyalty_card_id:
                 response.failure()
+
+    @repeatable_task()
+    def post_loyalty_cards_add_and_auth(self):
+
+        # ADD_AND_AUTH with primary user - creates new card
+
+        plan_id = random.choice(range(1, self.loyalty_plan_count))
+
+        data = {
+            "loyalty_plan_id": plan_id,
+            "account": {
+                "add_fields": {
+                    "credentials": [{"credential_slug": "card_number", "value": self.fake.credit_card_number()}]
+                },
+                "authorise_fields": {
+                    "credentials": [{"credential_slug": "password", "value": self.fake.password()}],
+                    "consents": [{"consent_slug": f"consent_slug_{plan_id}", "value": "true"}],
+                },
+            },
+        }
+
+        with self.client.post(
+            f"{self.url_prefix}/loyalty_cards/add_and_authorise",
+            headers={"Authorization": f"bearer {self.access_tokens['primary_user']}"},
+            name=f"{self.url_prefix}/loyalty_cards/add_and_authorise",
+            json=data,
+        ) as response:
+            loyalty_card_id = response.json()["id"]
+
+        self.loyalty_cards.append({"loyalty_card_id": loyalty_card_id, "data": data})
+
+        #  ADD_AND_AUTH with secondary user (Multiuser) - links secondary user to just-created card
+
+        with self.client.post(
+            f"{self.url_prefix}/loyalty_cards/add_and_authorise",
+            headers={"Authorization": f"bearer {self.access_tokens['secondary_user']}"},
+            name=f"{self.url_prefix}/loyalty_cards/add_and_authorise (MULTIUSER)",
+            json=data,
+        ) as response:
+            if response.json()["id"] != loyalty_card_id:
+                response.failure()
+
+    @repeatable_task()
+    def post_loyalty_cards_join(self):
+
+        # JOIN only with primary user
+
+        plan_id = random.choice(range(1, self.loyalty_plan_count))
+
+        data = {
+            "loyalty_plan_id": plan_id,
+            "account": {
+                "join_fields": {
+                    "credentials": [
+                        {"credential_slug": "card_number", "value": self.fake.credit_card_number()},
+                        {"credential_slug": "password", "value": self.fake.password()},
+                    ],
+                }
+            },
+        }
+
+        self.client.post(
+            f"{self.url_prefix}/loyalty_cards/join",
+            headers={"Authorization": f"bearer {self.access_tokens['primary_user']}"},
+            name=f"{self.url_prefix}/loyalty_cards/join",
+            json=data,
+        )
+
+    @repeatable_task()
+    def delete_loyalty_card_by_id(self):
+
+        if self.loyalty_cards:
+            card_id = self.loyalty_cards[0]["loyalty_card_id"]
+        else:
+            card_id = "NO_CARD"
+
+        with self.client.delete(
+            f"{self.url_prefix}/loyalty_cards/{card_id}",
+            headers={"Authorization": f"bearer {self.access_tokens['primary_user']}"},
+            name=f"{self.url_prefix}/loyalty_cards/[id]",
+        ):
+            self.loyalty_cards.pop(0)
 
     # ---------------------------------USER TASKS---------------------------------
 

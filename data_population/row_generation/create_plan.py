@@ -123,7 +123,7 @@ def scheme_consent(pk, scheme_id):
     return [
         pk,  # id
         True,  # check box
-        "performance consent test",  # text
+        "performance consent text",  # text
         True,  # is enabled
         False,  # required
         0,  # order

@@ -1,8 +1,21 @@
-from locust import HttpUser, constant
+from locust import HttpUser, constant, events
 from user_behaviour import UserBehavior
 
+from environment.angelia_token_generation import tokens
 from locust_config import set_task_repeats
 from vault import load_secrets
+
+
+@events.test_start.add_listener
+def on_test_start(environment, **kwargs):
+    tokens.generate_tokens(environment)
+    print(tokens.all_user_tokens)
+
+
+@events.test_stop.add_listener
+def on_test_stop(environment, **kwargs):
+    tokens.all_user_tokens.clear()
+    print(tokens.all_user_tokens)
 
 
 class WebsiteUser(HttpUser):
@@ -29,6 +42,8 @@ class WebsiteUser(HttpUser):
         # --LOYALTY_CARDS--
         "post_loyalty_cards_add": 0,  # Single and Multiuser (1 each) - Adds 1 card
         "post_loyalty_cards_add_and_auth": 0,  # Single and Multiuser (1 each) - Adds 1 card
+        "put_loyalty_cards_authorise": 0,  # Single user only                   ****BROKEN DO NOT USE!!!***
+        "post_loyalty_cards_add_and_register": 0,  # Single and Multiuser (1 each) - Adds 1 card
         "post_loyalty_cards_join": 0,  # Single user only
         "delete_loyalty_card_by_id": 0,  # Should be less than total loyalty_cards added (or will 404)
         # --USER--

@@ -27,6 +27,7 @@ class KeyVault:
 
 
 def load_secrets():
+
     global channel_info
     if channel_info is None:
 

@@ -10,8 +10,8 @@ import settings
 from request_data import angelia
 from vault import load_secrets
 
-r = redis.Redis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=settings.REDIS_DB, password=settings.REDIS_PASS)
 logger = logging.getLogger(__name__)
+r = redis.Redis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=settings.REDIS_DB, password=settings.REDIS_PASS)
 
 
 class TokenGen:

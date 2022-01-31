@@ -15,7 +15,6 @@ logger = logging.getLogger(__name__)
 
 
 class TokenGen:
-
     def generate_tokens(self, environment: Environment) -> None:
         logger.info("Generating b2b_tokens")
 

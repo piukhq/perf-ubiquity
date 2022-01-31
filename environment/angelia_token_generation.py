@@ -1,28 +1,35 @@
 import datetime
+import json
+import logging
 
 import jwt
+import redis
+from locust.env import Environment
 
+import settings
 from request_data import angelia
 from vault import load_secrets
 
-user_count = 0
+r = redis.Redis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=settings.REDIS_DB, password=settings.REDIS_PASS)
+logger = logging.getLogger(__name__)
 
 
 class TokenGen:
-    def __init__(self):
-        self.all_user_tokens = []
 
-    def generate_tokens(self, environment):
-        print("generating tokens")
+    def generate_tokens(self, environment: Environment) -> None:
+        logger.info("Generating b2b_tokens")
 
         total_users = environment.runner.target_user_count
+        r.delete("user_tokens")  # Clear the list first to avoid expired tokens from previous tests
 
         for i in range(total_users):
             user_tokens = self.generate_b2b_tokens()
-            self.all_user_tokens.append(user_tokens)
+            r.lpush("user_tokens", json.dumps(user_tokens))
+
+        logger.info(f"{total_users} tokens successfully pushed to Redis queue 'b2b_tokens'.")
 
     @staticmethod
-    def setup_user_info():
+    def setup_user_info() -> dict:
         data = {}
         for user in ["primary_user", "secondary_user"]:
             email, external_id = angelia.generate_random_email_and_sub()
@@ -31,7 +38,7 @@ class TokenGen:
             data[user]["external_id"] = external_id
         return data
 
-    def generate_b2b_tokens(self):
+    def generate_b2b_tokens(self) -> dict:
         client_name = "performanceone"
         private_key = load_secrets()["api2_private_keys"][client_name]
         b2b_tokens = {}
@@ -59,11 +66,6 @@ class TokenGen:
             b2b_tokens[user] = b2b_token
 
         return b2b_tokens
-
-
-def reset_tokens():
-    global all_user_tokens
-    all_user_tokens = None
 
 
 tokens = TokenGen()

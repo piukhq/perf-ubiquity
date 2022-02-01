@@ -50,9 +50,3 @@ class WebsiteUser(HttpUser):
 def on_test_start(environment, **kwargs):
     print("Test started")
     tokens.generate_tokens(environment)
-
-
-@events.test_stop.add_listener
-def on_test_stop(environment, **kwargs):
-    tokens.all_user_tokens.clear()
-    print(tokens.all_user_tokens)

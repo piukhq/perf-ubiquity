@@ -11,7 +11,7 @@ import settings
 from locust_config import MEMBERSHIP_PLANS, repeatable_task
 
 logger = logging.getLogger(__name__)
-r = redis.Redis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=settings.REDIS_DB, password=settings.REDIS_PASS)
+r = redis.from_url(settings.REDIS_URL)
 
 
 class UserBehavior(SequentialTaskSet):

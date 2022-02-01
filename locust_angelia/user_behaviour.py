@@ -1,11 +1,17 @@
+import json
+import logging
 import random
 
+import redis
 from faker import Faker
 from locust import SequentialTaskSet
 from locust.exception import StopUser
 
-from environment.angelia_token_generation import tokens
+import settings
 from locust_config import MEMBERSHIP_PLANS, repeatable_task
+
+logger = logging.getLogger(__name__)
+r = redis.Redis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=settings.REDIS_DB, password=settings.REDIS_PASS)
 
 
 class UserBehavior(SequentialTaskSet):
@@ -28,7 +34,7 @@ class UserBehavior(SequentialTaskSet):
     def __init__(self, parent):
         super().__init__(parent)
         self.url_prefix = "/v2"
-        self.b2b_tokens = tokens.all_user_tokens.pop(0)
+        self.b2b_tokens = {}
         self.access_tokens = {}
         self.refresh_tokens = {}
         self.loyalty_plan_count = MEMBERSHIP_PLANS
@@ -37,10 +43,20 @@ class UserBehavior(SequentialTaskSet):
 
     # ---------------------------------TOKEN TASKS---------------------------------
 
+    def on_start(self):
+        try:
+            self.get_tokens()
+        except Exception:
+            logger.error("Failed to get b2b_tokens from Redis for this user. Stopping User.")
+            raise StopUser()
+
+    def get_tokens(self):
+        tokens = json.loads(r.lpop("user_tokens"))
+        print(tokens)
+        self.b2b_tokens = tokens
+
     @repeatable_task()
     def post_token(self):
-
-        print(self.b2b_tokens["primary_user"][-25:])
 
         with self.client.post(
             f"{self.url_prefix}/token",
@@ -54,8 +70,6 @@ class UserBehavior(SequentialTaskSet):
 
     @repeatable_task()
     def post_token_secondary_user(self):
-
-        print(self.b2b_tokens["secondary_user"][-25:])
 
         with self.client.post(
             f"{self.url_prefix}/token",

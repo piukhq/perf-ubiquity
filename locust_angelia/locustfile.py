@@ -6,18 +6,6 @@ from locust_config import set_task_repeats
 from vault import load_secrets
 
 
-@events.test_start.add_listener
-def on_test_start(environment, **kwargs):
-    tokens.generate_tokens(environment)
-    print(tokens.all_user_tokens)
-
-
-@events.test_stop.add_listener
-def on_test_stop(environment, **kwargs):
-    tokens.all_user_tokens.clear()
-    print(tokens.all_user_tokens)
-
-
 class WebsiteUser(HttpUser):
 
     load_secrets()
@@ -56,3 +44,9 @@ class WebsiteUser(HttpUser):
 
     tasks = [UserBehavior]
     wait_time = constant(0)
+
+
+@events.test_start.add_listener
+def on_test_start(environment, **kwargs):
+    print("Test started")
+    tokens.generate_tokens(environment)

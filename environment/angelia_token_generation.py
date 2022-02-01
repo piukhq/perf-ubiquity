@@ -11,7 +11,7 @@ from request_data import angelia
 from vault import load_secrets
 
 logger = logging.getLogger(__name__)
-r = redis.Redis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=settings.REDIS_DB, password=settings.REDIS_PASS)
+r = redis.from_url(settings.REDIS_URL)
 
 
 class TokenGen:

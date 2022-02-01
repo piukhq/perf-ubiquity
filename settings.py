@@ -17,10 +17,7 @@ TSV_BASE_DIR = env_var("TSV_BASE_DIR", "tsv")
 LOCAL_SECRETS = env_var("LOCAL_SECRETS", "False")
 LOCAL_SECRETS_PATH = env_var("LOCAL_SECRETS_PATH", "local_secrets.json")
 
-REDIS_HOST = env_var("REDIS_HOST", "localhost")
-REDIS_PORT = env_var("REDIS_PORT", 6379)
-REDIS_PASS = env_var("REDIS_PASS", "")
-REDIS_DB = env_var("REDIS_DB", 0)
+REDIS_URL = env_var("REDIS_URL", "redis://localhost:6379/0")
 
 VAULT_CONFIG = dict(
     VAULT_URL=env_var("VAULT_URL", ""),

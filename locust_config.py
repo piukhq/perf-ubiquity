@@ -11,7 +11,7 @@ logger.setLevel(logging.INFO)
 
 # Change this to specify how many channels the locust tests use
 MEMBERSHIP_PLANS = request_membership_plan_total()
-TOTAL_CLIENTS = 8
+TOTAL_CLIENTS = 6
 PCARD_DECRYPT_WAIT_TIME = 120
 MULTIPLE_PROPERTY_PCARD_INDEX = 0
 MULTIPLE_PROPERTY_MCARD_TOTAL = 4

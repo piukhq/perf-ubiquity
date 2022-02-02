@@ -30,13 +30,18 @@ class WebsiteUser(HttpUser):
         # --LOYALTY_CARDS--
         "post_loyalty_cards_add": 0,  # Single and Multiuser (1 each) - Adds 1 card
         "post_loyalty_cards_add_and_auth": 0,  # Single and Multiuser (1 each) - Adds 1 card
-        "put_loyalty_cards_authorise": 0,  # Single user only                   ****BROKEN DO NOT USE!!!***
+        "put_loyalty_cards_authorise": 0,  # Will 404 if > post_loyalty_cards_add
         "post_loyalty_cards_add_and_register": 0,  # Single and Multiuser (1 each) - Adds 1 card
-        "post_loyalty_cards_join": 0,  # Single user only
-        "delete_loyalty_card_by_id": 0,  # Should be less than total loyalty_cards added (or will 404)
+        "put_loyalty_cards_register": 0,  # Will 404 if > (post_loyalty_cards_add - put_authorise)
+        "post_loyalty_cards_join": 0,
+        "delete_loyalty_card": 0,  # Should be less than total loyalty_cards added (or will 404)
+        # --PAYMENT_ACCOUNTS--
+        "post_payment_account": 0,  # Single and Multiuser (1 each) - Adds 1 card
+        "patch_payment_account": 0,  # Will 404 if > post_payment_account
+        "delete_payment_account": 0,  # Will 404 if > post_payment_account
         # --WALLET--
+        "get_wallet": 0,
         "get_wallet_overview": 0,
-
         # --USER--
         "delete_me": 0,
         # --SPECIAL--

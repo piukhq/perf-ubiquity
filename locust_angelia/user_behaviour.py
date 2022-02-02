@@ -206,7 +206,7 @@ class UserBehavior(SequentialTaskSet):
         ) as response:
             loyalty_card_id = response.json()["id"]
 
-            self.loyalty_cards.update(loyalty_card_id={"data": data, "state": "AUTH", "plan_id": plan_id})
+            self.loyalty_cards.update({loyalty_card_id: {"data": data, "state": "AUTH", "plan_id": plan_id}})
 
         #  ADD_AND_AUTH with secondary user (Multiuser) - links secondary user to just-created card
 
@@ -306,7 +306,7 @@ class UserBehavior(SequentialTaskSet):
         ) as response:
             loyalty_card_id = response.json()["id"]
 
-            self.loyalty_cards.update(loyalty_card_id={"data": data, "state": "REG", "plan_id": plan_id})
+            self.loyalty_cards.update({loyalty_card_id: {"data": data, "state": "REG", "plan_id": plan_id}})
 
     @repeatable_task()
     def put_loyalty_cards_register(self):
@@ -378,25 +378,25 @@ class UserBehavior(SequentialTaskSet):
         card_nickname = self.fake.pystr()
 
         data = {
-          "expiry_month": self.fake.month(),
-          "expiry_year": self.fake.year(),
-          "name_on_card": self.fake.name(),
-          "card_nickname": card_nickname,
-          "issuer": "HSBC",
-          "token": str(uuid.uuid4()),
-          "last_four_digits": str(random.randint(1000, 9999)),
-          "first_six_digits": random.choice(["444444", "222155", "343434"]),
-          "fingerprint": str(uuid.uuid4()),
-          "type": "debit",
-          "country": "GB",
-          "currency_code": "GBP"
+            "expiry_month": self.fake.month(),
+            "expiry_year": self.fake.year(),
+            "name_on_card": self.fake.name(),
+            "card_nickname": card_nickname,
+            "issuer": "HSBC",
+            "token": str(uuid.uuid4()),
+            "last_four_digits": str(random.randint(1000, 9999)),
+            "first_six_digits": random.choice(["444444", "222155", "343434"]),
+            "fingerprint": str(uuid.uuid4()),
+            "type": "debit",
+            "country": "GB",
+            "currency_code": "GBP",
         }
 
         with self.client.post(
-                f"{self.url_prefix}/payment_accounts",
-                headers={"Authorization": f"bearer {self.access_tokens['primary_user']}"},
-                name=f"{self.url_prefix}/payment_accounts",
-                json=data,
+            f"{self.url_prefix}/payment_accounts",
+            headers={"Authorization": f"bearer {self.access_tokens['primary_user']}"},
+            name=f"{self.url_prefix}/payment_accounts",
+            json=data,
         ) as response:
             payment_account_id = response.json()["id"]
             self.payment_cards.update({payment_account_id: {"data": data}})
@@ -404,10 +404,10 @@ class UserBehavior(SequentialTaskSet):
         # Multi-User POST
 
         with self.client.post(
-                f"{self.url_prefix}/payment_accounts",
-                headers={"Authorization": f"bearer {self.access_tokens['secondary_user']}"},
-                name=f"{self.url_prefix}/payment_accounts",
-                json=data,
+            f"{self.url_prefix}/payment_accounts",
+            headers={"Authorization": f"bearer {self.access_tokens['secondary_user']}"},
+            name=f"{self.url_prefix}/payment_accounts",
+            json=data,
         ) as response:
             multiuser_payment_account_id = response.json()["id"]
             if not multiuser_payment_account_id == payment_account_id:
@@ -424,18 +424,16 @@ class UserBehavior(SequentialTaskSet):
             new_nickname = self.fake.pystr()
 
         else:
-            payment_account_id = 'NOT_FOUND'
+            payment_account_id = "NOT_FOUND"
             new_nickname = ""
 
-        data = {
-            "card_nickname": new_nickname
-        }
+        data = {"card_nickname": new_nickname}
 
         with self.client.patch(
-                f"{self.url_prefix}/payment_accounts/{payment_account_id}",
-                headers={"Authorization": f"bearer {self.access_tokens['primary_user']}"},
-                name=f"{self.url_prefix}/payment_accounts/[id]",
-                json=data,
+            f"{self.url_prefix}/payment_accounts/{payment_account_id}",
+            headers={"Authorization": f"bearer {self.access_tokens['primary_user']}"},
+            name=f"{self.url_prefix}/payment_accounts/[id]",
+            json=data,
         ) as response:
             response_payment_account_id = response.json()["id"]
             if not response_payment_account_id == payment_account_id:
@@ -449,12 +447,12 @@ class UserBehavior(SequentialTaskSet):
             payment_account_id = random.choice([account_id for account_id in self.payment_cards.keys()])
 
         else:
-            payment_account_id = 'NOT_FOUND'
+            payment_account_id = "NOT_FOUND"
 
         with self.client.delete(
-                f"{self.url_prefix}/payment_accounts/{payment_account_id}",
-                headers={"Authorization": f"bearer {self.access_tokens['primary_user']}"},
-                name=f"{self.url_prefix}/payment_accounts/[id]"
+            f"{self.url_prefix}/payment_accounts/{payment_account_id}",
+            headers={"Authorization": f"bearer {self.access_tokens['primary_user']}"},
+            name=f"{self.url_prefix}/payment_accounts/[id]",
         ) as response:
             response_payment_account_id = response.json()["id"]
             if not response_payment_account_id == payment_account_id:
@@ -466,9 +464,9 @@ class UserBehavior(SequentialTaskSet):
     def get_wallet(self):
 
         self.client.get(
-                f"{self.url_prefix}/wallet",
-                headers={"Authorization": f"bearer {self.access_tokens['primary_user']}"},
-                name=f"{self.url_prefix}/wallet",
+            f"{self.url_prefix}/wallet",
+            headers={"Authorization": f"bearer {self.access_tokens['primary_user']}"},
+            name=f"{self.url_prefix}/wallet",
         )
 
     @repeatable_task()

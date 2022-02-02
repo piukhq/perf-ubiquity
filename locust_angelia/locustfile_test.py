@@ -38,7 +38,7 @@ class WebsiteUser(HttpUser):
         # --PAYMENT_ACCOUNTS--
         "post_payment_account": 0,  # Single and Multiuser (1 each) - Adds 1 card
         "patch_payment_account": 0,  # Will 404 if > post_payment_account
-        "delete_payment_account": 0,   # Will 404 if > post_payment_account
+        "delete_payment_account": 0,  # Will 404 if > post_payment_account
         # --WALLET--
         "get_wallet": 0,
         "get_wallet_overview": 0,

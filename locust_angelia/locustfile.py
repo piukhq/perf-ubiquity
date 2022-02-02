@@ -23,10 +23,10 @@ class WebsiteUser(HttpUser):
         "post_get_new_access_token_via_refresh": 1,
         "post_get_new_access_token_via_b2b": 1,
         # --LOYALTY_PLANS--
-        "get_loyalty_plans": 0,
-        "get_loyalty_plans_by_id": 0,
-        "get_loyalty_plans_journey_fields_by_id": 0,
-        "get_loyalty_plans_overview": 0,
+        "get_loyalty_plans": 114,
+        "get_loyalty_plans_by_id": 5,
+        "get_loyalty_plans_journey_fields_by_id": 5,
+        "get_loyalty_plans_overview": 57,
         # --LOYALTY_CARDS--
         "post_loyalty_cards_add": 0,  # Single and Multiuser (1 each) - Adds 1 card
         "post_loyalty_cards_add_and_auth": 0,  # Single and Multiuser (1 each) - Adds 1 card

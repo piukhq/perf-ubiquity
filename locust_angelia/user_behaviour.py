@@ -288,7 +288,7 @@ class UserBehavior(SequentialTaskSet):
                 },
                 "register_ghost_card_fields": {
                     "credentials": [{"credential_slug": "password", "value": self.fake.password()}],
-                    "consents": [{"consent_slug": f"consent_slug_{plan_id}", "value": "true"}],
+                    "consents": [],
                 },
             },
         }
@@ -346,7 +346,7 @@ class UserBehavior(SequentialTaskSet):
             json=data,
         ) as response:
             if response.json()["id"] == card_id:
-                self.loyalty_cards[card_id]["state"] = "REG"  # Set State so /authorise doesn't try to use this card.
+                self.loyalty_cards[card_id]["state"] = "REG"  # Set State so /register doesn't try to use this card.
             else:
                 response.failure()
 
@@ -364,6 +364,26 @@ class UserBehavior(SequentialTaskSet):
             name=f"{self.url_prefix}/loyalty_cards/[id]",
         ):
             self.loyalty_cards.pop(card_id)
+
+    # ---------------------------------WALLET TASKS---------------------------------
+
+    @repeatable_task()
+    def get_wallet(self):
+
+        self.client.delete(
+                f"{self.url_prefix}/wallet",
+                headers={"Authorization": f"bearer {self.access_tokens['primary_user']}"},
+                name=f"{self.url_prefix}/wallet",
+        )
+
+    @repeatable_task()
+    def get_wallet_overview(self):
+
+        self.client.delete(
+            f"{self.url_prefix}/wallet_overview",
+            headers={"Authorization": f"bearer {self.access_tokens['primary_user']}"},
+            name=f"{self.url_prefix}/wallet_overview",
+        )
 
     # ---------------------------------USER TASKS---------------------------------
 

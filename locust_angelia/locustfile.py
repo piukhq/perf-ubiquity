@@ -34,6 +34,9 @@ class WebsiteUser(HttpUser):
         "post_loyalty_cards_add_and_register": 0,  # Single and Multiuser (1 each) - Adds 1 card
         "post_loyalty_cards_join": 0,  # Single user only
         "delete_loyalty_card_by_id": 0,  # Should be less than total loyalty_cards added (or will 404)
+        # --WALLET--
+        "get_wallet_overview": 0,
+
         # --USER--
         "delete_me": 0,
         # --SPECIAL--

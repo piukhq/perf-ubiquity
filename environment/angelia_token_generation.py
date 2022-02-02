@@ -45,7 +45,7 @@ class TokenGen:
 
         for user in ["primary_user", "secondary_user"]:
 
-            access_life_time = 400
+            access_life_time = 86400
             iat = datetime.datetime.utcnow()
             exp = iat + datetime.timedelta(seconds=access_life_time)
 

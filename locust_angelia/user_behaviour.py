@@ -416,7 +416,7 @@ class UserBehavior(SequentialTaskSet):
         with self.client.post(
             f"{self.url_prefix}/payment_accounts",
             headers={"Authorization": f"bearer {self.access_tokens['secondary_user']}"},
-            name=f"{self.url_prefix}/payment_accounts",
+            name=f"{self.url_prefix}/payment_accounts (MULTIUSER)",
             json=data,
         ) as response:
             multiuser_payment_account_id = response.json()["id"]

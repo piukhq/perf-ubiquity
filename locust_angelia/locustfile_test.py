@@ -17,16 +17,34 @@ class WebsiteUser(HttpUser):
     """
 
     repeats = {
-        "post_token": 1,  # REQUIRES: > 0
-        "post_token_secondary_user": 0,  # REQUIRES: > 0
+        # --TOKEN--
+        "post_token": 1,  # REQUIRED
+        "post_token_secondary_user": 0,  # REQUIRED
         "post_get_new_access_token_via_refresh": 0,
         "post_get_new_access_token_via_b2b": 0,
+        # --LOYALTY_PLANS--
         "get_loyalty_plans": 0,
         "get_loyalty_plans_by_id": 0,
         "get_loyalty_plans_journey_fields_by_id": 0,
         "get_loyalty_plans_overview": 0,
-        "post_loyalty_cards_add": 0,  # Single and Multiuser (1 each)
+        # --LOYALTY_CARDS--
+        "post_loyalty_cards_add": 0,  # Single and Multiuser (1 each) - Adds 1 card
+        "post_loyalty_cards_add_and_auth": 0,  # Single and Multiuser (1 each) - Adds 1 card
+        "put_loyalty_cards_authorise": 0,  # Will 404 if > post_loyalty_cards_add
+        "post_loyalty_cards_add_and_register": 0,  # Single and Multiuser (1 each) - Adds 1 card
+        "put_loyalty_cards_register": 0,  # Will 404 if > (post_loyalty_cards_add - put_authorise)
+        "post_loyalty_cards_join": 0,
+        "delete_loyalty_card": 0,  # Should be less than total loyalty_cards added (or will 404)
+        # --PAYMENT_ACCOUNTS--
+        "post_payment_account": 0,  # Single and Multiuser (1 each) - Adds 1 card
+        "patch_payment_account": 0,  # Will 404 if > post_payment_account
+        "delete_payment_account": 0,  # Will 404 if > post_payment_account
+        # --WALLET--
+        "get_wallet": 0,
+        "get_wallet_overview": 0,
+        # --USER--
         "delete_me": 0,
+        # --SPECIAL--
         "stop_locust_after_test_suite": 1,
     }
 

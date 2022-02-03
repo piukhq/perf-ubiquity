@@ -1,6 +1,7 @@
 import json
 import logging
 import random
+import uuid
 
 import redis
 from faker import Faker
@@ -39,6 +40,7 @@ class UserBehavior(SequentialTaskSet):
         self.refresh_tokens = {}
         self.loyalty_plan_count = MEMBERSHIP_PLANS
         self.loyalty_cards = {}
+        self.payment_cards = {}
         self.fake = Faker()
 
     # ---------------------------------TOKEN TASKS---------------------------------
@@ -52,7 +54,6 @@ class UserBehavior(SequentialTaskSet):
 
     def get_tokens(self):
         tokens = json.loads(r.lpop("user_tokens"))
-        print(tokens)
         self.b2b_tokens = tokens
 
     @repeatable_task()
@@ -139,6 +140,7 @@ class UserBehavior(SequentialTaskSet):
 
     @repeatable_task()
     def post_loyalty_cards_add(self):
+        """POSTS an add request."""
 
         # ADD with primary user - creates new card
 
@@ -162,7 +164,6 @@ class UserBehavior(SequentialTaskSet):
             loyalty_card_id = response.json()["id"]
 
         self.loyalty_cards.update({loyalty_card_id: {"data": data, "state": "ADD", "plan_id": plan_id}})
-        print(self.loyalty_cards)
 
         #  ADD with secondary user (Multiuser) - links secondary user to just-created card
 
@@ -178,6 +179,7 @@ class UserBehavior(SequentialTaskSet):
 
     @repeatable_task()
     def post_loyalty_cards_add_and_auth(self):
+        """POSTS an add_and_auth request."""
 
         # ADD_AND_AUTH with primary user - creates new card
 
@@ -204,7 +206,7 @@ class UserBehavior(SequentialTaskSet):
         ) as response:
             loyalty_card_id = response.json()["id"]
 
-            self.loyalty_cards.update(loyalty_card_id={"data": data, "state": "AUTH", "plan_id": plan_id})
+            self.loyalty_cards.update({loyalty_card_id: {"data": data, "state": "AUTH", "plan_id": plan_id}})
 
         #  ADD_AND_AUTH with secondary user (Multiuser) - links secondary user to just-created card
 
@@ -226,16 +228,12 @@ class UserBehavior(SequentialTaskSet):
         3. Else, will return a 404.
         """
 
-        # AUTHORISE with primary user
-
         card_id = None
 
         if self.loyalty_cards:
-            print(self.loyalty_cards.keys())
             add_card_ids = [
                 card_id for card_id in self.loyalty_cards.keys() if self.loyalty_cards[card_id]["state"] == "ADD"
             ]
-            print("ADD_CARD_IDS" + str(add_card_ids[0]))
             if add_card_ids:
                 card_id = random.choice(add_card_ids)
             else:
@@ -260,12 +258,10 @@ class UserBehavior(SequentialTaskSet):
             },
         }
 
-        print(card_id)
-
         with self.client.put(
-            f"{self.url_prefix}/loyalty_cards/authorise/{card_id}",
+            f"{self.url_prefix}/loyalty_cards/{card_id}/authorise",
             headers={"Authorization": f"bearer {self.access_tokens['primary_user']}"},
-            name=f"{self.url_prefix}/loyalty_cards/authorise/[id]",
+            name=f"{self.url_prefix}/loyalty_cards/[id]/authorise",
             json=data,
         ) as response:
             if response.json()["id"] == card_id:
@@ -275,8 +271,7 @@ class UserBehavior(SequentialTaskSet):
 
     @repeatable_task()
     def post_loyalty_cards_add_and_register(self):
-
-        # ADD_AND_REGISTER with primary user - creates new card
+        """POSTS an add_and_register request."""
 
         plan_id = random.choice(range(1, self.loyalty_plan_count))
 
@@ -288,7 +283,7 @@ class UserBehavior(SequentialTaskSet):
                 },
                 "register_ghost_card_fields": {
                     "credentials": [{"credential_slug": "password", "value": self.fake.password()}],
-                    "consents": [{"consent_slug": f"consent_slug_{plan_id}", "value": "true"}],
+                    "consents": [],
                 },
             },
         }
@@ -301,48 +296,36 @@ class UserBehavior(SequentialTaskSet):
         ) as response:
             loyalty_card_id = response.json()["id"]
 
-            self.loyalty_cards.update(loyalty_card_id={"data": data, "state": "REG", "plan_id": plan_id})
-
-        #  ADD_AND_REGISTER with secondary user (Multiuser) - links secondary user to just-created card
-
-        with self.client.post(
-            f"{self.url_prefix}/loyalty_cards/add_and_register",
-            headers={"Authorization": f"bearer {self.access_tokens['secondary_user']}"},
-            name=f"{self.url_prefix}/loyalty_cards/add_and_register (MULTIUSER)",
-            json=data,
-        ) as response:
-            if response.json()["id"] != loyalty_card_id:
-                response.failure()
+            self.loyalty_cards.update({loyalty_card_id: {"data": data, "state": "REG", "plan_id": plan_id}})
 
     @repeatable_task()
-    def post_loyalty_cards_register(self):
+    def put_loyalty_cards_register(self):
+        """PUTs a Register request for a (randomly selected) previously added card. If no remaining ADD card exists
+        then will 404."""
 
-        # REGISTER with primary user
-
+        card_id = None
         if self.loyalty_cards:
-            random_id = random.choice(
-                [card_id for card_id in self.loyalty_cards.keys() if self.loyalty_cards[card_id]["state"] == "ADD"]
-            )
-            existing_loyalty_card = self.loyalty_cards[random_id]
-            plan_id = existing_loyalty_card["plan_id"]
-            card_id = existing_loyalty_card["loyalty_card_id"]
-        else:
-            card_id = "MISSING_CARD_404"
-            plan_id = random.choice(range(1, self.loyalty_plan_count))
+            add_card_ids = [
+                card_id for card_id in self.loyalty_cards.keys() if self.loyalty_cards[card_id]["state"] == "ADD"
+            ]
+            if add_card_ids:
+                card_id = random.choice(add_card_ids)
+
+        card_id = card_id if card_id else "NOT_FOUND"
 
         data = {
             "account": {
-                "authorise_fields": {
+                "register_ghost_card_fields": {
                     "credentials": [{"credential_slug": "password", "value": self.fake.password()}],
-                    "consents": [{"consent_slug": f"consent_slug_{plan_id}", "value": "true"}],
+                    "consents": [],
                 },
             },
         }
 
-        with self.client.post(
-            f"{self.url_prefix}/loyalty_cards/authorise/{card_id}",
+        with self.client.put(
+            f"{self.url_prefix}/loyalty_cards/{card_id}/register",
             headers={"Authorization": f"bearer {self.access_tokens['primary_user']}"},
-            name=f"{self.url_prefix}/loyalty_cards/authorise/[id]",
+            name=f"{self.url_prefix}/loyalty_cards/[id]/register",
             json=data,
         ) as response:
             if response.json()["id"] == card_id:
@@ -351,7 +334,36 @@ class UserBehavior(SequentialTaskSet):
                 response.failure()
 
     @repeatable_task()
-    def delete_loyalty_card_by_id(self):
+    def post_loyalty_cards_join(self):
+        """POSTS a join request."""
+
+        plan_id = random.choice(range(1, self.loyalty_plan_count))
+
+        data = {
+            "loyalty_plan_id": plan_id,
+            "account": {
+                "join_fields": {
+                    "credentials": [
+                        {"credential_slug": "card_number", "value": self.fake.credit_card_number()},
+                        {"credential_slug": "password", "value": self.fake.password()},
+                    ]
+                }
+            },
+        }
+
+        with self.client.post(
+            f"{self.url_prefix}/loyalty_cards/join",
+            headers={"Authorization": f"bearer {self.access_tokens['primary_user']}"},
+            name=f"{self.url_prefix}/loyalty_cards/join",
+            json=data,
+        ) as response:
+            loyalty_card_id = response.json()["id"]
+
+        self.loyalty_cards.update({loyalty_card_id: {"data": data, "state": "JOIN", "plan_id": plan_id}})
+
+    @repeatable_task()
+    def delete_loyalty_card(self):
+        """DELETEs an existing loyalty card. Will 404 if no cards available."""
 
         if self.loyalty_cards:
             card_id = list(self.loyalty_cards.keys())[0]
@@ -364,6 +376,117 @@ class UserBehavior(SequentialTaskSet):
             name=f"{self.url_prefix}/loyalty_cards/[id]",
         ):
             self.loyalty_cards.pop(card_id)
+
+    # ---------------------------------PAYMENT ACCOUNT TASKS---------------------------------
+
+    @repeatable_task()
+    def post_payment_account(self):
+        """POSTs a new Payment account. Both Single and Multiuser. Randomly selects between Visa, Amex and Mastercard"""
+
+        # Single-User POST
+
+        card_nickname = self.fake.pystr()
+
+        data = {
+            "expiry_month": self.fake.month(),
+            "expiry_year": self.fake.year(),
+            "name_on_card": self.fake.name(),
+            "card_nickname": card_nickname,
+            "issuer": "HSBC",
+            "token": str(uuid.uuid4()),
+            "last_four_digits": str(random.randint(1000, 9999)),
+            "first_six_digits": random.choice(["444444", "222155", "343434"]),
+            "fingerprint": str(uuid.uuid4()),
+            "type": "debit",
+            "country": "GB",
+            "currency_code": "GBP",
+        }
+
+        with self.client.post(
+            f"{self.url_prefix}/payment_accounts",
+            headers={"Authorization": f"bearer {self.access_tokens['primary_user']}"},
+            name=f"{self.url_prefix}/payment_accounts",
+            json=data,
+        ) as response:
+            payment_account_id = response.json()["id"]
+            self.payment_cards.update({payment_account_id: {"data": data}})
+
+        # Multi-User POST
+
+        with self.client.post(
+            f"{self.url_prefix}/payment_accounts",
+            headers={"Authorization": f"bearer {self.access_tokens['secondary_user']}"},
+            name=f"{self.url_prefix}/payment_accounts (MULTIUSER)",
+            json=data,
+        ) as response:
+            multiuser_payment_account_id = response.json()["id"]
+            if not multiuser_payment_account_id == payment_account_id:
+                response.failure()
+
+    @repeatable_task()
+    def patch_payment_account(self):
+        """PATCHes a random payment account with a new card_nickname, one of the fields which will correctly trigger a
+        Payment Account PATCH. If no payment account is found, this will 404."""
+
+        if self.payment_cards:
+            payment_account_id = random.choice([account_id for account_id in self.payment_cards.keys()])
+
+            new_nickname = self.fake.pystr()
+
+        else:
+            payment_account_id = "NOT_FOUND"
+            new_nickname = ""
+
+        data = {"card_nickname": new_nickname}
+
+        with self.client.patch(
+            f"{self.url_prefix}/payment_accounts/{payment_account_id}",
+            headers={"Authorization": f"bearer {self.access_tokens['primary_user']}"},
+            name=f"{self.url_prefix}/payment_accounts/[id]",
+            json=data,
+        ) as response:
+            response_payment_account_id = response.json()["id"]
+            if not response_payment_account_id == payment_account_id:
+                response.failure()
+
+    @repeatable_task()
+    def delete_payment_account(self):
+        """DELETEs a random payment account. If none are present, this will 404."""
+
+        if self.payment_cards:
+            payment_account_id = random.choice([account_id for account_id in self.payment_cards.keys()])
+
+        else:
+            payment_account_id = "NOT_FOUND"
+
+        with self.client.delete(
+            f"{self.url_prefix}/payment_accounts/{payment_account_id}",
+            headers={"Authorization": f"bearer {self.access_tokens['primary_user']}"},
+            name=f"{self.url_prefix}/payment_accounts/[id]",
+        ) as response:
+            response_payment_account_id = response.json()["id"]
+            if not response_payment_account_id == payment_account_id:
+                response.failure()
+
+    # ---------------------------------WALLET TASKS---------------------------------
+
+    @repeatable_task()
+    def get_wallet(self):
+
+        self.client.get(
+            f"{self.url_prefix}/wallet",
+            headers={"Authorization": f"bearer {self.access_tokens['primary_user']}"},
+            name=f"{self.url_prefix}/wallet",
+        )
+
+    @repeatable_task()
+    def get_wallet_overview(self):
+
+        self.client.get(
+            f"{self.url_prefix}/wallet_overview",
+            headers={"Authorization": f"bearer {self.access_tokens['primary_user']}"},
+            name=f"{self.url_prefix}/wallet_overview",
+        )
 
     # ---------------------------------USER TASKS---------------------------------
 

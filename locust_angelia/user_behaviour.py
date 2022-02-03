@@ -140,6 +140,7 @@ class UserBehavior(SequentialTaskSet):
 
     @repeatable_task()
     def post_loyalty_cards_add(self):
+        """POSTS an add request."""
 
         # ADD with primary user - creates new card
 
@@ -178,6 +179,7 @@ class UserBehavior(SequentialTaskSet):
 
     @repeatable_task()
     def post_loyalty_cards_add_and_auth(self):
+        """POSTS an add_and_auth request."""
 
         # ADD_AND_AUTH with primary user - creates new card
 
@@ -226,8 +228,6 @@ class UserBehavior(SequentialTaskSet):
         3. Else, will return a 404.
         """
 
-        # AUTHORISE with primary user
-
         card_id = None
 
         if self.loyalty_cards:
@@ -271,8 +271,7 @@ class UserBehavior(SequentialTaskSet):
 
     @repeatable_task()
     def post_loyalty_cards_add_and_register(self):
-
-        # ADD_AND_REGISTER with primary user - creates new card
+        """POSTS an add_and_register request."""
 
         plan_id = random.choice(range(1, self.loyalty_plan_count))
 
@@ -301,8 +300,8 @@ class UserBehavior(SequentialTaskSet):
 
     @repeatable_task()
     def put_loyalty_cards_register(self):
-        """PUTs a Register request for a (randomly selected) previously added card. If no added card exists, or if all
-        added cards have already been used in /authorise calls, then will 404."""
+        """PUTs a Register request for a (randomly selected) previously added card. If no remaining ADD card exists
+        then will 404."""
 
         card_id = None
         if self.loyalty_cards:
@@ -335,7 +334,36 @@ class UserBehavior(SequentialTaskSet):
                 response.failure()
 
     @repeatable_task()
+    def post_loyalty_cards_join(self):
+        """POSTS a join request."""
+
+        plan_id = random.choice(range(1, self.loyalty_plan_count))
+
+        data = {
+            "loyalty_plan_id": plan_id,
+            "account": {
+                "join_fields": {
+                    "credentials": [
+                        {"credential_slug": "card_number", "value": self.fake.credit_card_number()},
+                        {"credential_slug": "password", "value": self.fake.password()},
+                    ]
+                }
+            },
+        }
+
+        with self.client.post(
+            f"{self.url_prefix}/loyalty_cards/join",
+            headers={"Authorization": f"bearer {self.access_tokens['primary_user']}"},
+            name=f"{self.url_prefix}/loyalty_cards/join",
+            json=data,
+        ) as response:
+            loyalty_card_id = response.json()["id"]
+
+        self.loyalty_cards.update({loyalty_card_id: {"data": data, "state": "JOIN", "plan_id": plan_id}})
+
+    @repeatable_task()
     def delete_loyalty_card(self):
+        """DELETEs an existing loyalty card. Will 404 if no cards available."""
 
         if self.loyalty_cards:
             card_id = list(self.loyalty_cards.keys())[0]

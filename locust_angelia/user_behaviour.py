@@ -54,7 +54,6 @@ class UserBehavior(SequentialTaskSet):
 
     def get_tokens(self):
         tokens = json.loads(r.lpop("user_tokens"))
-        print(tokens)
         self.b2b_tokens = tokens
 
     @repeatable_task()
@@ -164,7 +163,6 @@ class UserBehavior(SequentialTaskSet):
             loyalty_card_id = response.json()["id"]
 
         self.loyalty_cards.update({loyalty_card_id: {"data": data, "state": "ADD", "plan_id": plan_id}})
-        print(self.loyalty_cards)
 
         #  ADD with secondary user (Multiuser) - links secondary user to just-created card
 
@@ -233,18 +231,15 @@ class UserBehavior(SequentialTaskSet):
         card_id = None
 
         if self.loyalty_cards:
-            print("ALLCARDS" + json.dumps(self.loyalty_cards))
             add_card_ids = [
                 card_id for card_id in self.loyalty_cards.keys() if self.loyalty_cards[card_id]["state"] == "ADD"
             ]
-            print("ADD_CARD_IDS" + str(add_card_ids))
             if add_card_ids:
                 card_id = random.choice(add_card_ids)
             else:
                 auth_card_ids = [
                     card_id for card_id in self.loyalty_cards.keys() if self.loyalty_cards[card_id]["state"] == "AUTH"
                 ]
-                print("AUTH_CARD_IDS" + str(add_card_ids))
                 if auth_card_ids:
                     card_id = random.choice(auth_card_ids)
 
@@ -262,10 +257,6 @@ class UserBehavior(SequentialTaskSet):
                 },
             },
         }
-
-        print(card_id)
-
-        print(f"{self.url_prefix}/loyalty_cards/{card_id}/authorise")
 
         with self.client.put(
             f"{self.url_prefix}/loyalty_cards/{card_id}/authorise",
@@ -315,11 +306,9 @@ class UserBehavior(SequentialTaskSet):
 
         card_id = None
         if self.loyalty_cards:
-            print("ALLCARDS" + json.dumps(self.loyalty_cards))
             add_card_ids = [
                 card_id for card_id in self.loyalty_cards.keys() if self.loyalty_cards[card_id]["state"] == "ADD"
             ]
-            print("ADD_CARD_IDS" + str(add_card_ids))
             if add_card_ids:
                 card_id = random.choice(add_card_ids)
 
@@ -342,7 +331,6 @@ class UserBehavior(SequentialTaskSet):
         ) as response:
             if response.json()["id"] == card_id:
                 self.loyalty_cards[card_id]["state"] = "REG"  # Set State so /authorise doesn't try to use this card.
-                print(f"REGISTER: {response.status_code}")
             else:
                 response.failure()
 

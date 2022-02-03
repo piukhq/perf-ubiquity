@@ -310,8 +310,8 @@ class UserBehavior(SequentialTaskSet):
 
     @repeatable_task()
     def put_loyalty_cards_register(self):
-
-        # REGISTER with primary user
+        """PUTs a Register request for a (randomly selected) previously added card. If no added card exists, or if all
+        added cards have already been used in /authorise calls, then will 404."""
 
         card_id = None
         if self.loyalty_cards:
@@ -322,13 +322,6 @@ class UserBehavior(SequentialTaskSet):
             print("ADD_CARD_IDS" + str(add_card_ids))
             if add_card_ids:
                 card_id = random.choice(add_card_ids)
-            else:
-                reg_card_ids = [
-                    card_id for card_id in self.loyalty_cards.keys() if self.loyalty_cards[card_id]["state"] == "REG"
-                ]
-                print("AUTH_CARD_IDS" + str(add_card_ids))
-                if reg_card_ids:
-                    card_id = random.choice(reg_card_ids)
 
         card_id = card_id if card_id else "NOT_FOUND"
 
@@ -349,6 +342,7 @@ class UserBehavior(SequentialTaskSet):
         ) as response:
             if response.json()["id"] == card_id:
                 self.loyalty_cards[card_id]["state"] = "REG"  # Set State so /authorise doesn't try to use this card.
+                print(f"REGISTER: {response.status_code}")
             else:
                 response.failure()
 

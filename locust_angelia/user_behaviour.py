@@ -83,10 +83,6 @@ class UserBehavior(SequentialTaskSet):
             self.refresh_tokens["secondary_user"] = data.get("refresh_token")
 
     @repeatable_task()
-    def post_get_new_access_token_via_b2b(self):
-        self.post_token()
-
-    @repeatable_task()
     def post_get_new_access_token_via_refresh(self):
         with self.client.post(
             f"{self.url_prefix}/token",

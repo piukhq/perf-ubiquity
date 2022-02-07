@@ -21,7 +21,6 @@ class WebsiteUser(HttpUser):
         "post_token": 1,  # REQUIRED
         "post_token_secondary_user": 0,  # REQUIRED
         "post_get_new_access_token_via_refresh": 0,
-        "post_get_new_access_token_via_b2b": 0,
         # --LOYALTY_PLANS--
         "get_loyalty_plans": 0,
         "get_loyalty_plans_by_id": 0,

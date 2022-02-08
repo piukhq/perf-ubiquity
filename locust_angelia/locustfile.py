@@ -19,7 +19,7 @@ class WebsiteUser(HttpUser):
     repeats = {
         # --TOKEN--
         "post_token": 1,  # REQUIRED
-        "post_token_secondary_user": 0,  # REQUIRED
+        "post_token_secondary_user": 1,  # REQUIRED
         "post_get_new_access_token_via_refresh": 0,
         # --LOYALTY_PLANS--
         "get_loyalty_plans": 0,

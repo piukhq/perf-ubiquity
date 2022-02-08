@@ -23,7 +23,7 @@ class WebsiteUser(HttpUser):
         "post_get_new_access_token_via_refresh": 0,
         # --LOYALTY_PLANS--
         "get_loyalty_plans": 0,
-        "get_loyalty_plans_by_id": 89,
+        "get_loyalty_plans_by_id": 4,
         "get_loyalty_plans_journey_fields_by_id": 0,
         "get_loyalty_plans_overview": 0,
         # --LOYALTY_CARDS--

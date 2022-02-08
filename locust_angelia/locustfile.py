@@ -24,7 +24,7 @@ class WebsiteUser(HttpUser):
         # --LOYALTY_PLANS--
         "get_loyalty_plans": 0,
         "get_loyalty_plans_by_id": 0,
-        "get_loyalty_plans_journey_fields_by_id": 45,
+        "get_loyalty_plans_journey_fields_by_id": 0,
         "get_loyalty_plans_overview": 0,
         # --LOYALTY_CARDS--
         "post_loyalty_cards_add": 0,  # Single and Multiuser (1 each) - Adds 1 card
@@ -39,7 +39,7 @@ class WebsiteUser(HttpUser):
         "patch_payment_account": 0,  # Will 404 if > post_payment_account
         "delete_payment_account": 0,  # Will 404 if > post_payment_account
         # --WALLET--
-        "get_wallet": 0,
+        "get_wallet": 89,
         "get_wallet_overview": 0,
         # --USER--
         "delete_me": 0,

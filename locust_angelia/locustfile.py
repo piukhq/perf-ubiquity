@@ -39,8 +39,8 @@ class WebsiteUser(HttpUser):
         "patch_payment_account": 0,  # Will 404 if > post_payment_account
         "delete_payment_account": 0,  # Will 404 if > post_payment_account
         # --WALLET--
-        "get_wallet": 89,
-        "get_wallet_overview": 0,
+        "get_wallet": 0,
+        "get_wallet_overview": 45,
         # --USER--
         "delete_me": 0,
         # --SPECIAL--

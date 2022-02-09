@@ -33,15 +33,21 @@ class WebsiteUser(HttpUser):
         "post_loyalty_cards_add_and_register": 0,  # Single and Multiuser (1 each) - Adds 1 card
         "put_loyalty_cards_register": 0,  # Will 404 if > (post_loyalty_cards_add - put_authorise)
         "post_loyalty_cards_join": 0,
+        "get_loyalty_cards_vouchers": 0,
+        "get_loyalty_cards_transactions": 0,
+        "get_loyalty_cards_balance": 0,
+        "delete_join": 0,  # Should be less than total joins (or will 404)
         "delete_loyalty_card": 0,  # Should be less than total loyalty_cards added (or will 404)
         # --PAYMENT_ACCOUNTS--
         "post_payment_account": 0,  # Single and Multiuser (1 each) - Adds 1 card
-        "patch_payment_account": 0,  # Will 404 if > post_payment_account
+        "patch_payment_account": 0,  # Will 404 if no post_payment_account
         "delete_payment_account": 0,  # Will 404 if > post_payment_account
         # --WALLET--
         "get_wallet": 0,
         "get_wallet_overview": 0,
+        "get_wallet_loyalty_card": 0,  # Will 404 if no loyalty cards
         # --USER--
+        "post_email_update": 0,
         "delete_me": 0,
         # --SPECIAL--
         "stop_locust_after_test_suite": 1,

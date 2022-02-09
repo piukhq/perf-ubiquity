@@ -19,10 +19,10 @@ class WebsiteUser(HttpUser):
     repeats = {
         # --TOKEN--
         "post_token": 1,  # REQUIRED
-        "post_token_secondary_user": 1,  # REQUIRED
+        "post_token_secondary_user": 0,  # REQUIRED
         "post_get_new_access_token_via_refresh": 0,
         # --LOYALTY_PLANS--
-        "get_loyalty_plans": 0,
+        "get_loyalty_plans": 89,
         "get_loyalty_plans_by_id": 0,
         "get_loyalty_plans_journey_fields_by_id": 0,
         "get_loyalty_plans_overview": 0,
@@ -30,18 +30,24 @@ class WebsiteUser(HttpUser):
         "post_loyalty_cards_add": 15,  # Single and Multiuser (1 each) - Adds 1 card
         "post_loyalty_cards_add_and_auth": 4,  # Single and Multiuser (1 each) - Adds 1 card
         "put_loyalty_cards_authorise": 8,  # Will 404 if > post_loyalty_cards_add
-        "post_loyalty_cards_add_and_register": 1,  # Single and Multiuser (1 each) - Adds 1 card
+        "post_loyalty_cards_add_and_register": 1,  # Single  User - Adds 1 card
         "put_loyalty_cards_register": 3,  # Will 404 if > (post_loyalty_cards_add - put_authorise)
         "post_loyalty_cards_join": 4,
+        "get_loyalty_cards_vouchers": 0,
+        "get_loyalty_cards_transactions": 0,
+        "get_loyalty_cards_balance": 0,
+        "delete_join": 0,  # Should be less than total joins (or will 404)
         "delete_loyalty_card": 4,  # Should be less than total loyalty_cards added (or will 404)
         # --PAYMENT_ACCOUNTS--
         "post_payment_account": 0,  # Single and Multiuser (1 each) - Adds 1 card
-        "patch_payment_account": 0,  # Will 404 if > post_payment_account
+        "patch_payment_account": 0,  # Will 404 if no post_payment_account
         "delete_payment_account": 0,  # Will 404 if > post_payment_account
         # --WALLET--
         "get_wallet": 0,
         "get_wallet_overview": 0,
+        "get_wallet_loyalty_card": 0,  # Will 404 if no loyalty cards
         # --USER--
+        "post_email_update": 0,
         "delete_me": 0,
         # --SPECIAL--
         "stop_locust_after_test_suite": 1,

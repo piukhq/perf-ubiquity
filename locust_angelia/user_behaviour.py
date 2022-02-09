@@ -40,6 +40,7 @@ class UserBehavior(SequentialTaskSet):
         self.refresh_tokens = {}
         self.loyalty_plan_count = MEMBERSHIP_PLANS
         self.loyalty_cards = {}
+        self.join_ids = []
         self.payment_cards = {}
         self.fake = Faker()
 
@@ -355,7 +356,68 @@ class UserBehavior(SequentialTaskSet):
         ) as response:
             loyalty_card_id = response.json()["id"]
 
-        self.loyalty_cards.update({loyalty_card_id: {"data": data, "state": "JOIN", "plan_id": plan_id}})
+        self.join_ids.append(loyalty_card_id)
+
+    @repeatable_task()
+    def get_loyalty_cards_balance(self):
+
+        if self.loyalty_cards:
+            card_id = random.choice(list(self.loyalty_cards.keys()))
+        else:
+            card_id = "NO CARD"
+
+        with self.client.get(
+            f"{self.url_prefix}/loyalty_cards/{card_id}/balance",
+            headers={"Authorization": f"bearer {self.access_tokens['primary_user']}"},
+            name=f"{self.url_prefix}/loyalty_cards/[id]/balance",
+        ) as response:
+            print(card_id)
+            print(self.loyalty_cards[card_id])
+            print(response.json())
+
+    @repeatable_task()
+    def get_loyalty_cards_transactions(self):
+
+        if self.loyalty_cards:
+            card_id = random.choice(list(self.loyalty_cards.keys()))
+        else:
+            card_id = "NO CARD"
+
+        self.client.get(
+            f"{self.url_prefix}/loyalty_cards/{card_id}/transactions",
+            headers={"Authorization": f"bearer {self.access_tokens['primary_user']}"},
+            name=f"{self.url_prefix}/loyalty_cards/[id]/transactions",
+        )
+
+    @repeatable_task()
+    def get_loyalty_cards_vouchers(self):
+
+        if self.loyalty_cards:
+            card_id = random.choice(list(self.loyalty_cards.keys()))
+        else:
+            card_id = "NO CARD"
+
+        self.client.get(
+            f"{self.url_prefix}/loyalty_cards/{card_id}/vouchers",
+            headers={"Authorization": f"bearer {self.access_tokens['primary_user']}"},
+            name=f"{self.url_prefix}/loyalty_cards/[id]/vouchers",
+        )
+
+    @repeatable_task()
+    def delete_join(self):
+        """DELETEs an existing loyalty card join. Will 404 if no joins available."""
+
+        if self.join_ids:
+            card_id = random.choice(self.join_ids)
+        else:
+            card_id = "NO_CARD"
+
+        with self.client.delete(
+            f"{self.url_prefix}/loyalty_cards/{card_id}/join",
+            headers={"Authorization": f"bearer {self.access_tokens['primary_user']}"},
+            name=f"{self.url_prefix}/loyalty_cards/[id]/join",
+        ):
+            self.join_ids.remove(card_id)
 
     @repeatable_task()
     def delete_loyalty_card(self):
@@ -425,7 +487,7 @@ class UserBehavior(SequentialTaskSet):
         Payment Account PATCH. If no payment account is found, this will 404."""
 
         if self.payment_cards:
-            payment_account_id = random.choice([account_id for account_id in self.payment_cards.keys()])
+            payment_account_id = random.choice(list(self.payment_cards.keys()))
 
             new_nickname = self.fake.pystr()
 
@@ -450,19 +512,16 @@ class UserBehavior(SequentialTaskSet):
         """DELETEs a random payment account. If none are present, this will 404."""
 
         if self.payment_cards:
-            payment_account_id = random.choice([account_id for account_id in self.payment_cards.keys()])
+            payment_account_id = random.choice(list(self.payment_cards.keys()))
 
         else:
             payment_account_id = "NOT_FOUND"
 
-        with self.client.delete(
+        self.client.delete(
             f"{self.url_prefix}/payment_accounts/{payment_account_id}",
             headers={"Authorization": f"bearer {self.access_tokens['primary_user']}"},
             name=f"{self.url_prefix}/payment_accounts/[id]",
-        ) as response:
-            response_payment_account_id = response.json()["id"]
-            if not response_payment_account_id == payment_account_id:
-                response.failure()
+        )
 
     # ---------------------------------WALLET TASKS---------------------------------
 
@@ -484,7 +543,33 @@ class UserBehavior(SequentialTaskSet):
             name=f"{self.url_prefix}/wallet_overview",
         )
 
+    @repeatable_task()
+    def get_wallet_loyalty_card(self):
+
+        if self.loyalty_cards:
+            card_id = random.choice(list(self.loyalty_cards.keys()))
+        else:
+            card_id = "NO_CARD"
+
+        self.client.get(
+            f"{self.url_prefix}/wallet/loyalty_cards/{card_id}",
+            headers={"Authorization": f"bearer {self.access_tokens['primary_user']}"},
+            name=f"{self.url_prefix}/wallet/loyalty_cards/[id]",
+        )
+
     # ---------------------------------USER TASKS---------------------------------
+
+    @repeatable_task()
+    def post_email_update(self):
+
+        data = {"email": "updated_email" + str(uuid.uuid4())[15] + "@test.com"}
+
+        self.client.post(
+            f"{self.url_prefix}/email_update",
+            headers={"Authorization": f"bearer {self.access_tokens['primary_user']}"},
+            name=f"{self.url_prefix}/email_update",
+            json=data,
+        )
 
     @repeatable_task()
     def delete_me(self):

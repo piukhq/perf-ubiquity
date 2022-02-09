@@ -398,9 +398,9 @@ class UserBehavior(SequentialTaskSet):
             card_id = "NO CARD"
 
         self.client.get(
-                f"{self.url_prefix}/loyalty_cards/{card_id}/vouchers",
-                headers={"Authorization": f"bearer {self.access_tokens['primary_user']}"},
-                name=f"{self.url_prefix}/loyalty_cards/[id]/vouchers",
+            f"{self.url_prefix}/loyalty_cards/{card_id}/vouchers",
+            headers={"Authorization": f"bearer {self.access_tokens['primary_user']}"},
+            name=f"{self.url_prefix}/loyalty_cards/[id]/vouchers",
         )
 
     @repeatable_task()
@@ -413,9 +413,9 @@ class UserBehavior(SequentialTaskSet):
             card_id = "NO_CARD"
 
         with self.client.delete(
-                f"{self.url_prefix}/loyalty_cards/{card_id}/join",
-                headers={"Authorization": f"bearer {self.access_tokens['primary_user']}"},
-                name=f"{self.url_prefix}/loyalty_cards/[id]/join",
+            f"{self.url_prefix}/loyalty_cards/{card_id}/join",
+            headers={"Authorization": f"bearer {self.access_tokens['primary_user']}"},
+            name=f"{self.url_prefix}/loyalty_cards/[id]/join",
         ):
             self.join_ids.remove(card_id)
 
@@ -568,7 +568,7 @@ class UserBehavior(SequentialTaskSet):
             f"{self.url_prefix}/email_update",
             headers={"Authorization": f"bearer {self.access_tokens['primary_user']}"},
             name=f"{self.url_prefix}/email_update",
-            json=data
+            json=data,
         )
 
     @repeatable_task()

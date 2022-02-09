@@ -27,17 +27,17 @@ class WebsiteUser(HttpUser):
         "get_loyalty_plans_journey_fields_by_id": 0,
         "get_loyalty_plans_overview": 0,
         # --LOYALTY_CARDS--
-        "post_loyalty_cards_add": 0,  # Single and Multiuser (1 each) - Adds 1 card
-        "post_loyalty_cards_add_and_auth": 0,  # Single and Multiuser (1 each) - Adds 1 card
-        "put_loyalty_cards_authorise": 0,  # Will 404 if > post_loyalty_cards_add
-        "post_loyalty_cards_add_and_register": 0,  # Single and Multiuser (1 each) - Adds 1 card
-        "put_loyalty_cards_register": 0,  # Will 404 if > (post_loyalty_cards_add - put_authorise)
-        "post_loyalty_cards_join": 0,
+        "post_loyalty_cards_add": 15,  # Single and Multiuser (1 each) - Adds 1 card
+        "post_loyalty_cards_add_and_auth": 4,  # Single and Multiuser (1 each) - Adds 1 card
+        "put_loyalty_cards_authorise": 8,  # Will 404 if > post_loyalty_cards_add
+        "post_loyalty_cards_add_and_register": 1,  # Single and Multiuser (1 each) - Adds 1 card
+        "put_loyalty_cards_register": 3,  # Will 404 if > (post_loyalty_cards_add - put_authorise)
+        "post_loyalty_cards_join": 4,
         "get_loyalty_cards_vouchers": 0,
         "get_loyalty_cards_transactions": 0,
         "get_loyalty_cards_balance": 0,
         "delete_join": 0,  # Should be less than total joins (or will 404)
-        "delete_loyalty_card": 0,  # Should be less than total loyalty_cards added (or will 404)
+        "delete_loyalty_card": 4,  # Should be less than total loyalty_cards added (or will 404)
         # --PAYMENT_ACCOUNTS--
         "post_payment_account": 0,  # Single and Multiuser (1 each) - Adds 1 card
         "patch_payment_account": 0,  # Will 404 if no post_payment_account

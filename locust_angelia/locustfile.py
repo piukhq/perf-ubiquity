@@ -30,7 +30,7 @@ class WebsiteUser(HttpUser):
         "post_loyalty_cards_add": 15,  # Single and Multiuser (1 each) - Adds 1 card
         "post_loyalty_cards_add_and_auth": 4,  # Single and Multiuser (1 each) - Adds 1 card
         "put_loyalty_cards_authorise": 8,  # Will 404 if > post_loyalty_cards_add
-        "post_loyalty_cards_add_and_register": 1,  # Single and Multiuser (1 each) - Adds 1 card
+        "post_loyalty_cards_add_and_register": 1,  # Single  User - Adds 1 card
         "put_loyalty_cards_register": 3,  # Will 404 if > (post_loyalty_cards_add - put_authorise)
         "post_loyalty_cards_join": 4,
         "get_loyalty_cards_vouchers": 0,

@@ -29,20 +29,7 @@ test = DataConfig(
 
 benchmark_old = DataConfig(
     name="benchmark",
-    membership_plans=7,
-    users=449333,
-    users_history=449333,
-    membership_cards=3082426,
-    membership_cards_history=3082426,
-    payment_cards=674000,
-    payment_cards_history=674000,
-    transactions=30824266,
-)
-
-
-benchmark = DataConfig(
-    name="benchmark",
-    membership_plans=36,
+    membership_plans=13,
     users=273500,
     users_history=547000,
     membership_cards=1876210,
@@ -53,16 +40,16 @@ benchmark = DataConfig(
 )
 
 
-barclays_2021_old = DataConfig(
-    name="barclays_2021",
-    membership_plans=18,
-    users=5392000,
-    users_history=5392000,
-    membership_cards=36989120,
-    membership_cards_history=36989120,
-    payment_cards=8088000,
-    payment_cards_history=8088000,
-    transactions=369891200,
+benchmark = DataConfig(
+    name="benchmark",
+    membership_plans=36,
+    users=1567250,
+    users_history=3134500,
+    membership_cards=10751335,
+    membership_cards_history=42942650,
+    payment_cards=2350875,
+    payment_cards_history=3526313,
+    transactions=35263125,
 )
 
 
@@ -79,19 +66,6 @@ barclays_2021 = DataConfig(
 )
 
 
-barclays_2022_old = DataConfig(
-    name="barclays_2022",
-    membership_plans=26,
-    users=8192000,
-    users_history=8192000,
-    membership_cards=56197120,
-    membership_cards_history=56197120,
-    payment_cards=12288000,
-    payment_cards_history=12288000,
-    transactions=561971200,
-)
-
-
 barclays_2022 = DataConfig(
     name="barclays_2022",
     membership_plans=36,
@@ -105,19 +79,6 @@ barclays_2022 = DataConfig(
 )
 
 
-barclays_2023_old = DataConfig(
-    name="barclays_2023",
-    membership_plans=35,
-    users=11011000,
-    users_history=11011000,
-    membership_cards=75535460,
-    membership_cards_history=75535460,
-    payment_cards=16516500,
-    payment_cards_history=16516500,
-    transactions=755354600,
-)
-
-
 barclays_2023 = DataConfig(
     name="barclays_2023",
     membership_plans=74,
@@ -128,19 +89,6 @@ barclays_2023 = DataConfig(
     payment_cards=21922500,
     payment_cards_history=32883750,
     transactions=328837500,
-)
-
-
-barclays_2024_old = DataConfig(
-    name="barclays_2024",
-    membership_plans=50,
-    users=13593000,
-    users_history=13593000,
-    membership_cards=93247980,
-    membership_cards_history=93247980,
-    payment_cards=20389500,
-    payment_cards_history=20389500,
-    transactions=932479800,
 )
 
 
@@ -178,9 +126,5 @@ all_configs = [
     barclays_2024,
     barclays_internal_test,
     benchmark_old,
-    barclays_2021_old,
-    barclays_2022_old,
-    barclays_2023_old,
-    barclays_2024_old,
 ]
 all_config_names = [config.name for config in all_configs]

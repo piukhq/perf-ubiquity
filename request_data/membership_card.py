@@ -71,7 +71,6 @@ def random_join_json(plan_id, pub_key):
     mcard_json = {
         "account": {
             "enrol_fields": [
-                {"column": "Card Number", "value": card_number()},
                 {"column": "Password", "value": fake.password()},
             ]
         },

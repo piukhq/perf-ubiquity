@@ -342,7 +342,8 @@ class UserBehavior(SequentialTaskSet):
                 "join_fields": {
                     "credentials": [
                         {"credential_slug": "card_number", "value": self.fake.credit_card_number()},
-                        {"credential_slug": "password", "value": self.fake.password()},
+                        {"credential_slug": "password", "value": (self.fake.password() + "_failure")},  
+                        # the 'failure' keyword means that all joins will become failed joins in Midas mock agents.
                     ]
                 }
             },

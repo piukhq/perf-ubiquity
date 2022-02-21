@@ -106,13 +106,14 @@ def create_membership_plan_tsv_files(total_plans: int):
     voucher_schemes = []
     third_party_consent_index = 1
     for count in range(1, total_plans + 1):
-        if count == 1:
+        if count % 2 == 0:  # Even-numbered plans are non-voucher
+            plan_name = f"performance mock {count}"
+            plan_slug = f"performance-mock-{count}"
+        else:  # Odd-numbered plans are voucher plans
             plan_name = f"performance voucher mock {count}"
             plan_slug = f"performance-voucher-mock-{count}"
             voucher_schemes.append(create_plan.voucher_scheme(count, count))
-        else:
-            plan_name = f"performance mock {count}"
-            plan_slug = f"performance-mock-{count}"
+
         membership_plans.append(create_plan.membership_plan(count, plan_name, plan_slug))
         plan_questions.append(create_plan.card_no_question(count, count))
         password_question_id = total_plans + count

@@ -47,8 +47,8 @@ class WebsiteUser(HttpUser):
         "get_wallet_overview": 0,
         "get_wallet_loyalty_card": 0,  # Will 404 if no loyalty cards
         # --USER--
-        "post_email_update": 0,
-        "delete_me": 0,
+        "post_email_update": 1,
+        "delete_me": 1,
         # --SPECIAL--
         "stop_locust_after_test_suite": 1,
     }

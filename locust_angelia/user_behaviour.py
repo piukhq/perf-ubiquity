@@ -562,7 +562,7 @@ class UserBehavior(SequentialTaskSet):
     @repeatable_task()
     def post_email_update(self):
 
-        data = {"email": "updated_email" + str(uuid.uuid4())[15] + "@test.com"}
+        data = {"email": "updated_email" + str(uuid.uuid4())[:15] + "@test.com"}
 
         self.client.post(
             f"{self.url_prefix}/email_update",

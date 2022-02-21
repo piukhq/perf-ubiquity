@@ -35,8 +35,8 @@ class WebsiteUser(HttpUser):
         "post_loyalty_cards_join": 4,
         "get_loyalty_cards_vouchers": 0,
         "get_loyalty_cards_transactions": 1,
-        "get_loyalty_cards_balance": 0,
-        "delete_join": 0,  # Should be less than total joins (or will 404)
+        "get_loyalty_cards_balance": 1,
+        "delete_join": 3,  # Should be less than total joins (or will 404)
         "delete_loyalty_card": 4,  # Should be less than total loyalty_cards added (or will 404)
         # --PAYMENT_ACCOUNTS--
         "post_payment_account": 0,  # Single and Multiuser (1 each) - Adds 1 card

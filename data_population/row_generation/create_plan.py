@@ -84,7 +84,7 @@ def card_no_question(question_id, scheme_id):
         False,  # scan_question
         False,  # third_party_identifier
         False,  # one_question_link
-        2,  # options
+        6,  # options
         0,  # answer_type
         "NULL",  # choice
         "description",  # description
@@ -114,6 +114,29 @@ def password_question(question_id, scheme_id):
         "(.*)",  # validation
         False,  # add_field
         True,  # auth_field
+        True,  # enrol_field
+        True,  # register_field
+    ]
+
+
+def first_name_question(question_id, scheme_id):
+    return [
+        question_id,  # id
+        "First name",  # label
+        scheme_id,  # scheme_id
+        "first name",  # type
+        0,  # order
+        False,  # manual_question
+        False,  # scan_question
+        False,  # third_party_identifier
+        False,  # one_question_link
+        2,  # options
+        0,  # answer_type
+        "NULL",  # choice
+        "description",  # description
+        "(.*)",  # validation
+        False,  # add_field
+        False,  # auth_field
         True,  # enrol_field
         True,  # register_field
     ]

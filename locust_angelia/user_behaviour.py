@@ -279,7 +279,10 @@ class UserBehavior(SequentialTaskSet):
                     "credentials": [{"credential_slug": "card_number", "value": self.fake.credit_card_number()}]
                 },
                 "register_ghost_card_fields": {
-                    "credentials": [{"credential_slug": "password", "value": self.fake.password()}],
+                    "credentials": [
+                        {"credential_slug": "password", "value": self.fake.password()},
+                        {"credential_slug": "first_name", "value": (self.fake.first_name())},
+                    ],
                     "consents": [],
                 },
             },
@@ -313,7 +316,10 @@ class UserBehavior(SequentialTaskSet):
         data = {
             "account": {
                 "register_ghost_card_fields": {
-                    "credentials": [{"credential_slug": "password", "value": self.fake.password()}],
+                    "credentials": [
+                        {"credential_slug": "password", "value": self.fake.password()},
+                        {"credential_slug": "first_name", "value": (self.fake.first_name())},
+                    ],
                     "consents": [],
                 },
             },
@@ -341,6 +347,7 @@ class UserBehavior(SequentialTaskSet):
             "account": {
                 "join_fields": {
                     "credentials": [
+                        {"credential_slug": "first_name", "value": (self.fake.first_name())},
                         {"credential_slug": "password", "value": (self.fake.password() + "_failure")},
                         # the 'failure' keyword means that all joins will become failed joins in Midas mock agents.
                     ]

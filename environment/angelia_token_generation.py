@@ -6,9 +6,9 @@ import random
 import jwt
 import redis
 from locust.env import Environment
-from data_population.fixtures.client import NON_RESTRICTED_CLIENTS
 
 import settings
+from data_population.fixtures.client import NON_RESTRICTED_CLIENTS
 from request_data import angelia
 from vault import load_secrets
 
@@ -43,7 +43,7 @@ class TokenGen:
 
         private_key = load_secrets()["api2_private_keys"]
 
-        client_name = random.choice(NON_RESTRICTED_CLIENTS)['client_name'].replace(" ", "")
+        client_name = random.choice(NON_RESTRICTED_CLIENTS)["client_name"].replace(" ", "")
 
         b2b_tokens = {}
         user_details = self.setup_user_info()

@@ -91,7 +91,7 @@ def card_no_question(question_id, scheme_id):
         "(.*)",  # validation
         True,  # add_field
         False,  # auth_field
-        True,  # enrol_field
+        False,  # enrol_field
         False,  # register_field
     ]
 

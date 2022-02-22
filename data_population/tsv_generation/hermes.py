@@ -118,6 +118,8 @@ def create_membership_plan_tsv_files(total_plans: int):
         plan_questions.append(create_plan.card_no_question(count, count))
         password_question_id = total_plans + count
         plan_questions.append(create_plan.password_question(password_question_id, count))
+        first_name_question_id = (total_plans * 2) + count
+        plan_questions.append(create_plan.first_name_question(first_name_question_id, count))
         scheme_images.append(create_plan.scheme_image(count, count))
         scheme_balance_details.append(create_plan.scheme_balance_details(count, count))
         scheme_contents.append(create_plan.scheme_content(count, count))

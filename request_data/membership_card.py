@@ -72,6 +72,7 @@ def random_join_json(plan_id, pub_key):
         "account": {
             "enrol_fields": [
                 {"column": "Password", "value": fake.password()},
+                {"column": "First name", "value": fake.first_name()},
             ]
         },
         "membership_plan": plan_id,
@@ -87,7 +88,14 @@ def random_patch_json(pub_key):
 
 
 def random_registration_json(pub_key):
-    mcard_json = {"account": {"registration_fields": [{"column": "Password", "value": fake.password()}]}}
+    mcard_json = {
+        "account": {
+            "registration_fields": [
+                {"column": "Password", "value": fake.password()},
+                {"column": "First name", "value": fake.first_name()},
+            ]
+        }
+    }
     return encrypt(mcard_json, pub_key)
 
 

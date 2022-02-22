@@ -1,4 +1,5 @@
 import json
+import logging
 
 from azure.core.exceptions import HttpResponseError, ResourceNotFoundError, ServiceRequestError
 from azure.identity import DefaultAzureCredential
@@ -7,6 +8,8 @@ from azure.keyvault.secrets import SecretClient
 from settings import LOCAL_SECRETS, LOCAL_SECRETS_PATH, VAULT_CONFIG
 
 channel_info = None
+
+logger = logging.getLogger("vault")
 
 
 class KeyVaultError(Exception):
@@ -39,10 +42,23 @@ def load_secrets():
                 channel_info = secrets["channel_secrets"]
         else:
             vault = KeyVault(vault_url=VAULT_CONFIG["VAULT_URL"])
-            channel_secrets = vault.get_secret(VAULT_CONFIG["CHANNEL_SECRET_NAME"])
+
+            all_secrets_in_vault = vault.client.list_properties_of_secrets()
+
+            secrets_to_load = []
+            for secret in all_secrets_in_vault:
+                if "ubiquity-channel" in secret.name:
+                    secrets_to_load.append(secret.name)
+                    logger.info(f"Found channel information: {secret.name} - adding to load list")
+
+            channel_secrets = {}
+            for secret_name in secrets_to_load:
+                channel_secrets.update(json.loads(vault.get_secret(secret_name)))
+
             api2_private_keys = vault.get_secret(VAULT_CONFIG["API2_PRIVATE_KEYS_NAME"])
+
             channel_info.update(
-                {"channel_secrets": json.loads(channel_secrets), "api2_private_keys": json.loads(api2_private_keys)}
+                {"channel_secrets": channel_info, "api2_private_keys": json.loads(api2_private_keys)}
             )
 
     return channel_info

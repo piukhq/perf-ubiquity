@@ -1,10 +1,12 @@
 import datetime
 import json
 import logging
+import random
 
 import jwt
 import redis
 from locust.env import Environment
+from data_population.fixtures.client import NON_RESTRICTED_CLIENTS
 
 import settings
 from request_data import angelia
@@ -38,8 +40,11 @@ class TokenGen:
         return data
 
     def generate_b2b_tokens(self) -> dict:
-        client_name = "performanceone"
-        private_key = load_secrets()["api2_private_keys"][client_name]
+
+        private_key = load_secrets()["api2_private_keys"]
+
+        client_name = random.choice(NON_RESTRICTED_CLIENTS)['client_name'].replace(" ", "")
+
         b2b_tokens = {}
         user_details = self.setup_user_info()
 
@@ -58,9 +63,8 @@ class TokenGen:
             headers = {"kid": f"{client_name}-2021-12-16"}
             # KIDs have trailing datetime to mimic real KID use cases. We don't need to cycle these so this date can be
             # hardcoded.
-            key = private_key
 
-            b2b_token = jwt.encode(payload=payload, key=key, algorithm="RS512", headers=headers)
+            b2b_token = jwt.encode(payload=payload, key=private_key, algorithm="RS512", headers=headers)
 
             b2b_tokens[user] = b2b_token
 

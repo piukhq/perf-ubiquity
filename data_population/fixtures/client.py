@@ -132,11 +132,22 @@ CLIENT_ELEVEN = {
     "secret": JWT_SECRET,
 }
 
+CLIENT_TWELVE = {
+    "bundle_id": "performance.bundle.twelve",
+    "client_id": "performance_twelve",
+    "client_name": "performance twelve",
+    "id": 5061,
+    "organisation_name": "performance test twelve",
+    "status": 0,
+    "whitelist_status": "ACTIVE",
+    "secret": JWT_SECRET,
+}
+
 CLIENT_RESTRICTED = {
     "bundle_id": "performance.bundle.restricted",
     "client_id": "performance_restricted",
     "client_name": "performance restricted",
-    "id": 5061,
+    "id": 5062,
     "organisation_name": "performance test restricted",
     "status": 2,
     "whitelist_status": "INACTIVE",

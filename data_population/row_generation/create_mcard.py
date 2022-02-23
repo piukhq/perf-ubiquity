@@ -68,6 +68,7 @@ def historical_membership_card(history_id: int) -> list:
         STATIC_MCARD_HISTORY_BODY,  # body
         "",  # change_details
         "add",  # journey
+        arrow.now(),  # event_time
     ]
 
 

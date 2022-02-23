@@ -1,6 +1,8 @@
 import json
 import uuid
 
+import arrow
+
 from data_population.fixtures.payment_card import STATIC_PCARD_HISTORY_BODY
 from data_population.fixtures.payment_scheme import PAYMENT_SCHEME_INFO
 
@@ -155,4 +157,5 @@ def historical_payment_card(history_id: int) -> list:
         history_id,  # user_id
         STATIC_PCARD_HISTORY_BODY,  # body
         "",  # change_details
+        arrow.now(),  # event_time
     ]

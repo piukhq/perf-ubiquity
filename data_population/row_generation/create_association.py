@@ -1,5 +1,7 @@
 import uuid
 
+import arrow
+
 
 def pll_link(pk: int, pcard_id: int, mcard_id: int) -> list:
     return [
@@ -48,6 +50,7 @@ def historical_vop_activation(history_id: int) -> list:
         history_id,  # payment_card_account_id
         history_id,  # status
         history_id,  # activation_id
+        arrow.now(),  # event_time
     ]
 
 
@@ -70,6 +73,7 @@ def historical_scheme_account(history_id: int) -> list:
         history_id,  # user_id
         history_id,  # scheme_account_id
         "",  # change_details
+        arrow.now(),  # event_time
     ]
 
 
@@ -91,4 +95,5 @@ def historical_payment_card(history_id: int) -> list:
         history_id,  # user_id
         history_id,  # payment_card_account_id
         "",  # change_details
+        arrow.now(),  # event_time
     ]

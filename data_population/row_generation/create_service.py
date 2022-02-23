@@ -1,6 +1,8 @@
 import random
 import uuid
 
+import arrow
+
 from data_population.fixtures.client import ALL_CLIENTS
 from data_population.fixtures.user import STATIC_USER_HISTORY_BODY
 
@@ -45,6 +47,7 @@ def historic_user(history_id: int) -> list:
         STATIC_USER_HISTORY_BODY,  # body
         "robojeff@testbink.com",  # email
         "1234567890",  # external_id
+        arrow.now(),  # event_time
     ]
 
 

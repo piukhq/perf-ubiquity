@@ -124,7 +124,7 @@ def first_name_question(question_id, scheme_id):
         question_id,  # id
         "First name",  # label
         scheme_id,  # scheme_id
-        "first name",  # type
+        "first_name",  # type
         0,  # order
         False,  # manual_question
         False,  # scan_question

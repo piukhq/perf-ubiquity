@@ -30,6 +30,7 @@ def user(user_id: int) -> list:
         "NULL",  # apple
         "",  # delete_token
         "NULL",  # magic_link_verified
+        client["bundle_id"],  # (originating)bundle_id
     ]
 
 

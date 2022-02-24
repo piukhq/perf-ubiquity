@@ -57,6 +57,8 @@ def load_secrets():
 
             api2_private_keys = vault.get_secret(VAULT_CONFIG["API2_PRIVATE_KEYS_NAME"])
 
-            channel_info.update({"channel_secrets": channel_secrets, "api2_private_keys": json.loads(api2_private_keys)})
+            channel_info.update(
+                {"channel_secrets": channel_secrets, "api2_private_keys": json.loads(api2_private_keys)}
+            )
 
     return channel_info

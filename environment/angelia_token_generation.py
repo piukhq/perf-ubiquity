@@ -15,7 +15,7 @@ from vault import load_secrets
 logger = logging.getLogger(__name__)
 r = redis.from_url(settings.REDIS_URL)
 
-channels_to_test = 0   # number of channels to be tested. Value assigned by locustfile
+channels_to_test = 0  # number of channels to be tested. Value assigned by locustfile
 
 
 class TokenGen:

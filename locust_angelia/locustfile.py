@@ -1,7 +1,7 @@
 from locust import HttpUser, constant, events
 from user_behaviour import UserBehavior
 
-from environment.angelia_token_generation import tokens, set_channels
+from environment.angelia_token_generation import set_channels, tokens
 from locust_config import set_task_repeats
 from vault import load_secrets
 

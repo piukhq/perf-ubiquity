@@ -16,7 +16,7 @@ class WebsiteUser(HttpUser):
     ALL tasks to be run must be in this list and have the @repeatable_task decorator.
     """
 
-    TOTAL_CHANNELS = 12
+    TOTAL_CHANNELS = 8
 
     repeats = {
         # --TOKEN--

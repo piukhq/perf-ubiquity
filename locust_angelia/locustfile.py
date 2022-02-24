@@ -1,7 +1,7 @@
 from locust import HttpUser, constant, events
 from user_behaviour import UserBehavior
 
-from environment.angelia_token_generation import tokens
+from environment.angelia_token_generation import tokens, set_channels
 from locust_config import set_task_repeats
 from vault import load_secrets
 
@@ -15,6 +15,8 @@ class WebsiteUser(HttpUser):
     in total.
     ALL tasks to be run must be in this list and have the @repeatable_task decorator.
     """
+
+    TOTAL_CHANNELS = 12
 
     repeats = {
         # --TOKEN--
@@ -53,6 +55,7 @@ class WebsiteUser(HttpUser):
         "stop_locust_after_test_suite": 1,
     }
 
+    set_channels(TOTAL_CHANNELS)
     set_task_repeats(repeats)
 
     tasks = [UserBehavior]

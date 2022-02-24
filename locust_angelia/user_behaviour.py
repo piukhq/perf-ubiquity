@@ -147,7 +147,7 @@ class UserBehavior(SequentialTaskSet):
             "loyalty_plan_id": plan_id,
             "account": {
                 "add_fields": {
-                    "credentials": [{"credential_slug": "card_number", "value": self.fake.credit_card_number()}]
+                    "credentials": [{"credential_slug": "card_number", "value": "3" + self.fake.credit_card_number()}]
                 }
             },
         }
@@ -186,7 +186,7 @@ class UserBehavior(SequentialTaskSet):
             "loyalty_plan_id": plan_id,
             "account": {
                 "add_fields": {
-                    "credentials": [{"credential_slug": "card_number", "value": self.fake.credit_card_number()}]
+                    "credentials": [{"credential_slug": "card_number", "value": "3" + self.fake.credit_card_number()}]
                 },
                 "authorise_fields": {
                     "credentials": [{"credential_slug": "password", "value": self.fake.password()}],
@@ -276,7 +276,7 @@ class UserBehavior(SequentialTaskSet):
             "loyalty_plan_id": plan_id,
             "account": {
                 "add_fields": {
-                    "credentials": [{"credential_slug": "card_number", "value": self.fake.credit_card_number()}]
+                    "credentials": [{"credential_slug": "card_number", "value": "3" + self.fake.credit_card_number()}]
                 },
                 "register_ghost_card_fields": {
                     "credentials": [

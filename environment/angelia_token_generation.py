@@ -15,6 +15,8 @@ from vault import load_secrets
 logger = logging.getLogger(__name__)
 r = redis.from_url(settings.REDIS_URL)
 
+channels_to_test = 0   # number of channels to be tested. Value assigned by locustfile
+
 
 class TokenGen:
     def generate_tokens(self, environment: Environment) -> None:
@@ -43,7 +45,7 @@ class TokenGen:
 
         private_key = load_secrets()["api2_private_keys"]
 
-        client_name = random.choice(NON_RESTRICTED_CLIENTS)["client_name"].replace(" ", "")
+        client_name = random.choice(NON_RESTRICTED_CLIENTS[:channels_to_test])["client_name"].replace(" ", "")
 
         b2b_tokens = {}
         user_details = self.setup_user_info()
@@ -69,6 +71,15 @@ class TokenGen:
             b2b_tokens[user] = b2b_token
 
         return b2b_tokens
+
+
+def set_channels(channels: int):
+    global channels_to_test
+    if channels < 1:
+        raise ValueError("TOTAL_CHANNELS cannot be 0")
+    if channels > len(NON_RESTRICTED_CLIENTS):
+        raise ValueError("TOTAL_CHANNELS cannot be greater than number of client fixtures")
+    channels_to_test = channels
 
 
 tokens = TokenGen()

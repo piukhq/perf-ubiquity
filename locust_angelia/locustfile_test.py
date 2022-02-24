@@ -16,6 +16,8 @@ class WebsiteUser(HttpUser):
     ALL tasks to be run must be in this list and have the @repeatable_task decorator.
     """
 
+    TOTAL_CHANNELS = 12
+
     repeats = {
         # --TOKEN--
         "post_token": 1,  # REQUIRED
@@ -53,6 +55,7 @@ class WebsiteUser(HttpUser):
         "stop_locust_after_test_suite": 1,
     }
 
+    set_channels(TOTAL_CHANNELS)
     set_task_repeats(repeats)
 
     tasks = [UserBehavior]

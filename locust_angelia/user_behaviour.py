@@ -380,7 +380,6 @@ class UserBehavior(SequentialTaskSet):
             name=f"{self.url_prefix}/loyalty_cards/[id]/balance",
         )
 
-
     @repeatable_task()
     def get_loyalty_cards_transactions(self):
 

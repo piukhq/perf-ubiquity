@@ -1,6 +1,7 @@
 import json
 import logging
 import random
+import time
 import uuid
 
 import redis
@@ -373,14 +374,11 @@ class UserBehavior(SequentialTaskSet):
         else:
             card_id = "NO CARD"
 
-        with self.client.get(
+        self.client.get(
             f"{self.url_prefix}/loyalty_cards/{card_id}/balance",
             headers={"Authorization": f"bearer {self.access_tokens['primary_user']}"},
             name=f"{self.url_prefix}/loyalty_cards/[id]/balance",
-        ) as response:
-            print(card_id)
-            print(self.loyalty_cards[card_id])
-            print(response.json())
+        )
 
     @repeatable_task()
     def get_loyalty_cards_transactions(self):
@@ -413,6 +411,8 @@ class UserBehavior(SequentialTaskSet):
     @repeatable_task()
     def delete_join(self):
         """DELETEs an existing loyalty card join. Will 404 if no joins available."""
+
+        time.sleep(0.5)
 
         if self.join_ids:
             card_id = random.choice(self.join_ids)

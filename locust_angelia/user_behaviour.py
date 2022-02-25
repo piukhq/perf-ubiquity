@@ -412,7 +412,7 @@ class UserBehavior(SequentialTaskSet):
     def delete_join(self):
         """DELETEs an existing loyalty card join. Will 404 if no joins available."""
 
-        time.sleep(0.5)
+        time.sleep(1)
 
         if self.join_ids:
             card_id = random.choice(self.join_ids)

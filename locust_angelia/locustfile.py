@@ -35,10 +35,10 @@ class WebsiteUser(HttpUser):
         "post_loyalty_cards_add_and_register": 2,  # Single  User - Adds 1 card
         "put_loyalty_cards_register": 3,  # Will 404 if > (post_loyalty_cards_add - put_authorise)
         "post_loyalty_cards_join": 4,
-        "get_loyalty_cards_vouchers": 0,
+        "get_loyalty_cards_vouchers": 1,
         "get_loyalty_cards_transactions": 1,
         "get_loyalty_cards_balance": 1,
-        "delete_join": 3,  # Should be less than total joins (or will 404)
+        "delete_join": 0,  # Should be less than total joins (or will 404)
         "delete_loyalty_card": 4,  # Should be less than total loyalty_cards added (or will 404)
         # --PAYMENT_ACCOUNTS--
         "post_payment_account": 0,  # Single and Multiuser (1 each) - Adds 1 card
@@ -47,7 +47,7 @@ class WebsiteUser(HttpUser):
         # --WALLET--
         "get_wallet": 0,
         "get_wallet_overview": 0,
-        "get_wallet_loyalty_card": 0,  # Will 404 if no loyalty cards
+        "get_wallet_loyalty_card": 4,  # Will 404 if no loyalty cards
         # --USER--
         "post_email_update": 1,
         "delete_me": 1,

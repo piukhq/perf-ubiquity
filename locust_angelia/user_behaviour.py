@@ -1,9 +1,11 @@
 import json
 import logging
 import random
+import time
 import uuid
 
 import redis
+from database.jobs import query_status
 from faker import Faker
 from locust import SequentialTaskSet
 from locust.exception import StopUser
@@ -414,10 +416,21 @@ class UserBehavior(SequentialTaskSet):
     def delete_join(self):
         """DELETEs an existing loyalty card join. Will 404 if no joins available."""
 
+        RETRY_TIME = 1
+        TIMEOUT = 15
+        current_retry = 0
+
         if self.join_ids:
             card_id = random.choice(self.join_ids)
         else:
             card_id = "NO_CARD"
+
+        while current_retry < TIMEOUT:
+            if query_status(card_id) == 901:
+                break
+            else:
+                time.sleep(RETRY_TIME)
+                current_retry += RETRY_TIME
 
         with self.client.delete(
             f"{self.url_prefix}/loyalty_cards/{card_id}/join",

@@ -1,0 +1,26 @@
+from sqlalchemy import Table
+from sqlalchemy.orm import relationship
+
+from locust_angelia.database.db import DB
+
+# Reflect each database table we need to use, using metadata. Some redundant models that we aren't using any more,
+# but will leave these in, in case they are needed.
+
+
+class User(DB().Base):
+    __table__ = Table("user", DB().metadata, autoload=True)
+    profile = relationship("UserDetail", backref="user", uselist=False)  # uselist = False sets one to one relation
+    scheme_account_user_associations = relationship("SchemeAccountUserAssociation", backref="user")
+
+
+class UserDetail(DB().Base):
+    __table__ = Table("user_userdetail", DB().metadata, autoload=True)
+
+
+class SchemeAccount(DB().Base):
+    __table__ = Table("scheme_schemeaccount", DB().metadata, autoload=True)
+    scheme_account_user_associations = relationship("SchemeAccountUserAssociation", backref="scheme_account")
+
+
+class SchemeAccountUserAssociation(DB().Base):
+    __table__ = Table("ubiquity_schemeaccountentry", DB().metadata, autoload=True)

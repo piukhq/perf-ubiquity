@@ -375,14 +375,11 @@ class UserBehavior(SequentialTaskSet):
         else:
             card_id = "NO CARD"
 
-        with self.client.get(
+        self.client.get(
             f"{self.url_prefix}/loyalty_cards/{card_id}/balance",
             headers={"Authorization": f"bearer {self.access_tokens['primary_user']}"},
             name=f"{self.url_prefix}/loyalty_cards/[id]/balance",
-        ) as response:
-            print(card_id)
-            print(self.loyalty_cards[card_id])
-            print(response.json())
+        )
 
     @repeatable_task()
     def get_loyalty_cards_transactions(self):

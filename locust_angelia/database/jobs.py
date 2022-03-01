@@ -50,7 +50,6 @@ def add_join(email: str, loyalty_plan: int):  # Not currently used - for future 
         result = session.execute(query).one()
 
         user_id = result.User.id
-        print(user_id)
 
         loyalty_card = SchemeAccount(
             status=901,

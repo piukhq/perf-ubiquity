@@ -26,21 +26,11 @@ class DB(metaclass=Singleton):
 
     To use the singleton import the DB class then:
 
-    DB().open_write() or DB().open_read()  at start of request ie in middleware
-    DB().session   to get the session in database layer
-    DB().session.close() to close the session at the end of request in middleware
-
-    For non api code use in with statement:
-
-    with DB().open_write() as session:
-    with DB().open_read() as session:
-
-
+    with DB().open as session:
     """
 
     def __init__(self):
         """Note as a singleton will only run on first instantiation"""
-        # test_engine is used only for tests to copy the hermes schema to the hermes_test db
 
         connection_string = DB_CONNECTION_URI.replace("/postgres", "/hermes")
 

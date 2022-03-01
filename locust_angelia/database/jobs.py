@@ -11,62 +11,74 @@ from settings import fake
 logger = logging.getLogger("Database_Handler")
 
 
-def query_status(card_id):
-    DB().open()
-    session = DB().session
+def query_status(card_id: int) -> int:
+    """Queries a loyalty card's current status.
 
-    query = select(User).where(SchemeAccount).id == card_id
+    :param card_id: id of the card to be queried
 
-    try:
+    :returns: status of the card
+
+    """
+    with DB().open() as session:
+
+        query = select(SchemeAccount).where(SchemeAccount.id == card_id)
+
+        try:
+            result = session.execute(query).one()
+        except DatabaseError:
+            logger.error(f"Could not fetch card status for card {card_id}!")
+        else:
+            return result.SchemeAccount.status
+
+
+def add_join(email: str, loyalty_plan: int):  # Not currently used - for future use if needed
+    """
+    Adds a failed join to the database for this user and returns its id.
+    **N.b. Not currently being used, but have left this in here in case we need it in the future. Re-implementation of
+    this would require us to store the user email alongside the token to avoid having to decrypt Angelia tokens.
+
+    :param email: email of the user adding the join
+    :param loyalty_plan: id of the loyalty plan
+
+    :returns: id of the created loyalty card in failed join state
+
+    """
+    with DB().open() as session:
+
+        query = select(User).where(User.email == email)
+
         result = session.execute(query).one()
-    except DatabaseError:
-        logger.error(f"Could not fetch card status for card {card_id}!")
-    else:
-        return result.SchemeAccount.status
 
-    DB().close()
+        user_id = result.User.id
+        print(user_id)
 
+        loyalty_card = SchemeAccount(
+            status=901,
+            order=1,
+            created=datetime.now(),
+            updated=datetime.now(),
+            card_number=fake.credit_card_number(),
+            barcode=fake.pyint(),
+            main_answer=fake.credit_card_number(),
+            scheme_id=loyalty_plan,
+            is_deleted=False,
+            balances={},
+            vouchers={},
+            transactions=[],
+            pll_links=[],
+            formatted_images={},
+            originating_journey=0,
+        )
 
-def add_join(email, loyalty_plan):  # Not using this for now, but will leave in in case we need this in the future.
-    DB().open()
-    session = DB().session
+        session.add(loyalty_card)
+        session.flush()
 
-    query = select(User).where(User.email == email)
+        user_association_object = SchemeAccountUserAssociation(
+            scheme_account_id=loyalty_card.id, user_id=user_id, auth_provided=True
+        )
 
-    result = session.execute(query).one()
-
-    user_id = result.User.id
-    print(user_id)
-
-    loyalty_card = SchemeAccount(
-        status=901,
-        order=1,
-        created=datetime.now(),
-        updated=datetime.now(),
-        card_number=fake.credit_card_number(),
-        barcode=fake.pyint(),
-        main_answer=fake.credit_card_number(),
-        scheme_id=loyalty_plan,
-        is_deleted=False,
-        balances={},
-        vouchers={},
-        transactions=[],
-        pll_links=[],
-        formatted_images={},
-        originating_journey=0,
-    )
-
-    session.add(loyalty_card)
-    session.flush()
-
-    user_association_object = SchemeAccountUserAssociation(
-        scheme_account_id=loyalty_card.id, user_id=user_id, auth_provided=True
-    )
-
-    session.add(user_association_object)
-    session.commit()
-
-    DB().close()
+        session.add(user_association_object)
+        session.commit()
 
     logger.info(f"Created Failed join with ID: {loyalty_card.id}")
 

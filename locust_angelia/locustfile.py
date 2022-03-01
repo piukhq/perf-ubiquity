@@ -1,7 +1,7 @@
 from locust import HttpUser, constant, events
 from user_behaviour import UserBehavior
 
-from environment.angelia_token_generation import tokens
+from environment.angelia_token_generation import set_channels, tokens
 from locust_config import set_task_repeats
 from vault import load_secrets
 
@@ -16,16 +16,18 @@ class WebsiteUser(HttpUser):
     ALL tasks to be run must be in this list and have the @repeatable_task decorator.
     """
 
+    TOTAL_CHANNELS = 8
+
     repeats = {
         # --TOKEN--
         "post_token": 1,  # REQUIRED
         "post_token_secondary_user": 1,  # REQUIRED
-        "post_get_new_access_token_via_refresh": 0,
+        "post_get_new_access_token_via_refresh": 1,
         # --LOYALTY_PLANS--
         "get_loyalty_plans": 0,
-        "get_loyalty_plans_by_id": 0,
-        "get_loyalty_plans_journey_fields_by_id": 0,
-        "get_loyalty_plans_overview": 0,
+        "get_loyalty_plans_by_id": 4,
+        "get_loyalty_plans_journey_fields_by_id": 4,
+        "get_loyalty_plans_overview": 45,
         # --LOYALTY_CARDS--
         "post_loyalty_cards_add": 15,  # Single and Multiuser (1 each) - Adds 1 card
         "post_loyalty_cards_add_and_auth": 4,  # Single and Multiuser (1 each) - Adds 1 card
@@ -33,19 +35,19 @@ class WebsiteUser(HttpUser):
         "post_loyalty_cards_add_and_register": 2,  # Single  User - Adds 1 card
         "put_loyalty_cards_register": 3,  # Will 404 if > (post_loyalty_cards_add - put_authorise)
         "post_loyalty_cards_join": 4,
-        "get_loyalty_cards_vouchers": 0,
+        "get_loyalty_cards_vouchers": 1,
         "get_loyalty_cards_transactions": 1,
         "get_loyalty_cards_balance": 1,
-        "delete_join": 3,  # Should be less than total joins (or will 404)
+        "delete_join": 0,  # Should be less than total joins (or will 404)
         "delete_loyalty_card": 4,  # Should be less than total loyalty_cards added (or will 404)
         # --PAYMENT_ACCOUNTS--
-        "post_payment_account": 0,  # Single and Multiuser (1 each) - Adds 1 card
-        "patch_payment_account": 0,  # Will 404 if no post_payment_account
-        "delete_payment_account": 0,  # Will 404 if > post_payment_account
+        "post_payment_account": 4,  # Single and Multiuser (1 each) - Adds 1 card
+        "patch_payment_account": 4,  # Will 404 if no post_payment_account
+        "delete_payment_account": 3,  # Will 404 if > post_payment_account
         # --WALLET--
-        "get_wallet": 0,
-        "get_wallet_overview": 0,
-        "get_wallet_loyalty_card": 0,  # Will 404 if no loyalty cards
+        "get_wallet": 89,
+        "get_wallet_overview": 45,
+        "get_wallet_loyalty_card": 4,  # Will 404 if no loyalty cards
         # --USER--
         "post_email_update": 1,
         "delete_me": 1,
@@ -53,6 +55,7 @@ class WebsiteUser(HttpUser):
         "stop_locust_after_test_suite": 1,
     }
 
+    set_channels(TOTAL_CHANNELS)
     set_task_repeats(repeats)
 
     tasks = [UserBehavior]

@@ -2,7 +2,7 @@ from sqlalchemy import MetaData, create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import scoped_session, sessionmaker
 
-from settings import DB_CONNECTION_URI
+from settings import DB_CONNECTION_URI, HERMES_DB
 
 
 class Singleton(type):
@@ -32,7 +32,7 @@ class DB(metaclass=Singleton):
     def __init__(self):
         """Note as a singleton will only run on first instantiation"""
 
-        connection_string = DB_CONNECTION_URI.replace("/postgres", "/hermes")
+        connection_string = DB_CONNECTION_URI.replace("/postgres", f"/{HERMES_DB}")
 
         self.engine = create_engine(connection_string)
         self.metadata = MetaData(bind=self.engine)

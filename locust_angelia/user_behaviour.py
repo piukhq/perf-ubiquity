@@ -416,21 +416,24 @@ class UserBehavior(SequentialTaskSet):
     def delete_join(self):
         """DELETEs an existing loyalty card join. Will 404 if no joins available."""
 
-        RETRY_TIME = 1
-        TIMEOUT = 15
+        retry_time = 0.5  # Fetch status every x seconds from db
+        timeout = 10  # Timeout status fetch after x seconds, after which we send request anyway.
         current_retry = 0
 
         if self.join_ids:
             card_id = random.choice(self.join_ids)
+            while current_retry < timeout:
+                if query_status(card_id) == 901:
+                    break
+                else:
+                    time.sleep(retry_time)
+                    current_retry += retry_time
+            if current_retry >= timeout:
+                logger.error(
+                    f"STATUS TIMEOUT: Loyalty Card: {card_id} - Card still in incorrect status after {timeout} "
+                    f"seconds. Sending request anyway.")
         else:
             card_id = "NO_CARD"
-
-        while current_retry < TIMEOUT:
-            if query_status(card_id) == 901:
-                break
-            else:
-                time.sleep(RETRY_TIME)
-                current_retry += RETRY_TIME
 
         with self.client.delete(
             f"{self.url_prefix}/loyalty_cards/{card_id}/join",

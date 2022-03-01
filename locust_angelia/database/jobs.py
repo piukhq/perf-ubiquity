@@ -33,9 +33,9 @@ def query_status(card_id: int) -> int:
 
 def add_join(email: str, loyalty_plan: int):  # Not currently used - for future use if needed
     """
-    Adds a failed join to the database for this user and returns its id.
     **N.b. Not currently being used, but have left this in here in case we need it in the future. Re-implementation of
-    this would require us to store the user email alongside the token to avoid having to decrypt Angelia tokens.
+    this would require us to store the user email alongside the token to avoid having to decrypt Angelia tokens.**
+    Adds a failed join to the database for this user and returns its id.
 
     :param email: email of the user adding the join
     :param loyalty_plan: id of the loyalty plan

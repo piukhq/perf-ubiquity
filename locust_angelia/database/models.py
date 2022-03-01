@@ -3,8 +3,8 @@ from sqlalchemy.orm import relationship
 
 from locust_angelia.database.db import DB
 
-# Reflect each database table we need to use, using metadata. Some redundant models that we aren't using any more,
-# but will leave these in, in case they are needed.
+# These Reflect each database table we need to use, using metadata. Some redundant models that we aren't using at the
+# moment (for the 'add_join database job'), but will leave these in, in case they are needed.
 
 
 class User(DB().Base):

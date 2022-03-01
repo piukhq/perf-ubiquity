@@ -431,7 +431,8 @@ class UserBehavior(SequentialTaskSet):
             if current_retry >= timeout:
                 logger.error(
                     f"STATUS TIMEOUT: Loyalty Card: {card_id} - Card still in incorrect status after {timeout} "
-                    f"seconds. Sending request anyway.")
+                    f"seconds. Sending request anyway."
+                )
         else:
             card_id = "NO_CARD"
 

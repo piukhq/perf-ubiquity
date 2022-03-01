@@ -16,6 +16,9 @@ from locust_config import MEMBERSHIP_PLANS, repeatable_task
 logger = logging.getLogger(__name__)
 r = redis.from_url(settings.REDIS_URL)
 
+global retry_time
+global timeout
+
 
 class UserBehavior(SequentialTaskSet):
     """
@@ -413,32 +416,29 @@ class UserBehavior(SequentialTaskSet):
     def delete_join(self):
         """DELETEs an existing loyalty card join. Will 404 if no joins available."""
 
-        retry_time = 0.5  # Fetch status every x seconds from db
-        timeout = 10  # Timeout status fetch after x seconds, after which we send request anyway.
         current_retry = 0
 
         if self.join_ids:
-            card_id = random.choice(self.join_ids)
+            card_id = self.join_ids.pop(0)
             while current_retry < timeout:
-                if query_status(card_id) == 901:
+                if query_status(card_id) == 901:  # 901 = ENROL_FAILED
                     break
                 else:
                     time.sleep(retry_time)
                     current_retry += retry_time
             if current_retry >= timeout:
                 logger.error(
-                    f"STATUS TIMEOUT: Loyalty Card: {card_id} - Card still in incorrect status after {timeout} "
-                    f"seconds. Sending request anyway."
+                    f"STATUS TIMEOUT: Loyalty Card {card_id} still not processed after {timeout} seconds. Sending "
+                    f"request anyway."
                 )
         else:
             card_id = "NO_CARD"
 
-        with self.client.delete(
+        self.client.delete(
             f"{self.url_prefix}/loyalty_cards/{card_id}/join",
             headers={"Authorization": f"bearer {self.access_tokens['primary_user']}"},
             name=f"{self.url_prefix}/loyalty_cards/[id]/join",
-        ):
-            self.join_ids.remove(card_id)
+        )
 
     @repeatable_task()
     def delete_loyalty_card(self):
@@ -605,3 +605,10 @@ class UserBehavior(SequentialTaskSet):
     @repeatable_task()
     def stop_locust_after_test_suite(self):
         raise StopUser()
+
+
+def set_retry_and_timeout(retry_time_value: float, timeout_value: float):
+    global retry_time
+    global timeout
+    retry_time = retry_time_value
+    timeout = timeout_value

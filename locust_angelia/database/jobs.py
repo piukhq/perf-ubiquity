@@ -21,14 +21,14 @@ def query_status(card_id: int) -> int:
     """
     with DB().open() as session:
 
-        query = select(SchemeAccount).where(SchemeAccount.id == card_id)
+        query = select(SchemeAccount.status).where(SchemeAccount.id == card_id)
 
         try:
             result = session.execute(query).one()
         except DatabaseError:
             logger.error(f"Could not fetch card status for card {card_id}!")
         else:
-            return result.SchemeAccount.status
+            return result[0]
 
 
 def add_join(email: str, loyalty_plan: int):  # Not currently used - for future use if needed

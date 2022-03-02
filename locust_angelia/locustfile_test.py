@@ -1,5 +1,5 @@
 from locust import HttpUser, constant, events
-from user_behaviour import UserBehavior
+from user_behaviour import UserBehavior, set_retry_and_timeout
 
 from environment.angelia_token_generation import set_channels, tokens
 from locust_config import set_task_repeats
@@ -17,6 +17,8 @@ class WebsiteUser(HttpUser):
     """
 
     TOTAL_CHANNELS = 8
+    RETRY_TIME = 0.5
+    TIMEOUT = 10
 
     repeats = {
         # --TOKEN--
@@ -57,6 +59,7 @@ class WebsiteUser(HttpUser):
 
     set_channels(TOTAL_CHANNELS)
     set_task_repeats(repeats)
+    set_retry_and_timeout(retry_time_value=RETRY_TIME, timeout_value=TIMEOUT)
 
     tasks = [UserBehavior]
     wait_time = constant(0)

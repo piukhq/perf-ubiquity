@@ -32,6 +32,8 @@ shared-config-storage = {index = "bink-pypi", version = "*"}
 azure-keyvault-secrets = "*"
 azure-identity = "*"
 redis = "*"
+sqlalchemy = "*"
+itsdangerous = "==2.0.1"
 
 [requires]
 python_version = "3.9"

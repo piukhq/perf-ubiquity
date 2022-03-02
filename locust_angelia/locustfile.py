@@ -27,29 +27,29 @@ class WebsiteUser(HttpUser):
         "post_get_new_access_token_via_refresh": 1,
         # --LOYALTY_PLANS--
         "get_loyalty_plans": 0,
-        "get_loyalty_plans_by_id": 4,
-        "get_loyalty_plans_journey_fields_by_id": 4,
-        "get_loyalty_plans_overview": 45,
+        "get_loyalty_plans_by_id": 2,
+        "get_loyalty_plans_journey_fields_by_id": 2,
+        "get_loyalty_plans_overview": 23,
         # --LOYALTY_CARDS--
-        "post_loyalty_cards_add": 15,  # Single and Multiuser (1 each) - Adds 1 card
-        "post_loyalty_cards_add_and_auth": 4,  # Single and Multiuser (1 each) - Adds 1 card
-        "put_loyalty_cards_authorise": 8,  # Will 404 if > post_loyalty_cards_add
-        "post_loyalty_cards_add_and_register": 2,  # Single  User - Adds 1 card
-        "put_loyalty_cards_register": 3,  # Will 404 if > (post_loyalty_cards_add - put_authorise)
-        "post_loyalty_cards_join": 4,
+        "post_loyalty_cards_add": 8,  # Single and Multiuser (1 each) - Adds 1 card
+        "post_loyalty_cards_add_and_auth": 2,  # Single and Multiuser (1 each) - Adds 1 card
+        "put_loyalty_cards_authorise": 4,  # Will 404 if > post_loyalty_cards_add
+        "post_loyalty_cards_add_and_register": 1,  # Single  User - Adds 1 card
+        "put_loyalty_cards_register": 2,  # Will 404 if > (post_loyalty_cards_add - put_authorise)
+        "post_loyalty_cards_join": 2,
         "get_loyalty_cards_vouchers": 1,
         "get_loyalty_cards_transactions": 1,
         "get_loyalty_cards_balance": 1,
-        "delete_join": 3,  # Should be less than total joins (or will 404)
-        "delete_loyalty_card": 4,  # Should be less than total loyalty_cards added (or will 404)
+        "delete_join": 1,  # Should be less than total joins (or will 404)
+        "delete_loyalty_card": 2,  # Should be less than total loyalty_cards added (or will 404)
         # --PAYMENT_ACCOUNTS--
-        "post_payment_account": 4,  # Single and Multiuser (1 each) - Adds 1 card
-        "patch_payment_account": 4,  # Will 404 if no post_payment_account
-        "delete_payment_account": 3,  # Will 404 if > post_payment_account
+        "post_payment_account": 2,  # Single and Multiuser (1 each) - Adds 1 card
+        "patch_payment_account": 2,  # Will 404 if no post_payment_account
+        "delete_payment_account": 2,  # Will 404 if > post_payment_account
         # --WALLET--
-        "get_wallet": 89,
-        "get_wallet_overview": 45,
-        "get_wallet_loyalty_card": 4,  # Will 404 if no loyalty cards
+        "get_wallet": 45,
+        "get_wallet_overview": 23,
+        "get_wallet_loyalty_card": 2,  # Will 404 if no loyalty cards
         # --USER--
         "post_email_update": 1,
         "delete_me": 1,

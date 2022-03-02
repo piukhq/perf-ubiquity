@@ -17,8 +17,8 @@ class WebsiteUser(HttpUser):
     """
 
     TOTAL_CHANNELS = 8
-    RETRY_TIME = 0.5
-    TIMEOUT = 10
+    RETRY_TIME = 1
+    TIMEOUT = 20
 
     repeats = {
         # --TOKEN--

@@ -534,6 +534,7 @@ class UserBehavior(SequentialTaskSet):
 
         if self.payment_cards:
             payment_account_id = random.choice(list(self.payment_cards.keys()))
+            self.payment_cards.pop(payment_account_id)
 
         else:
             payment_account_id = "NOT_FOUND"

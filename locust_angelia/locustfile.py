@@ -18,7 +18,7 @@ class WebsiteUser(HttpUser):
 
     TOTAL_CHANNELS = 8
     RETRY_TIME = 1
-    TIMEOUT = 20
+    TIMEOUT = 30
 
     repeats = {
         # --TOKEN--
@@ -26,7 +26,7 @@ class WebsiteUser(HttpUser):
         "post_token_secondary_user": 1,  # REQUIRED
         "post_get_new_access_token_via_refresh": 1,
         # --LOYALTY_PLANS--
-        "get_loyalty_plans": 89,
+        "get_loyalty_plans": 0,
         "get_loyalty_plans_by_id": 4,
         "get_loyalty_plans_journey_fields_by_id": 4,
         "get_loyalty_plans_overview": 45,
@@ -40,7 +40,7 @@ class WebsiteUser(HttpUser):
         "get_loyalty_cards_vouchers": 1,
         "get_loyalty_cards_transactions": 1,
         "get_loyalty_cards_balance": 1,
-        "delete_join": 0,  # Should be less than total joins (or will 404)
+        "delete_join": 3,  # Should be less than total joins (or will 404)
         "delete_loyalty_card": 4,  # Should be less than total loyalty_cards added (or will 404)
         # --PAYMENT_ACCOUNTS--
         "post_payment_account": 4,  # Single and Multiuser (1 each) - Adds 1 card

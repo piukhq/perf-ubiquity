@@ -24,9 +24,9 @@ class WebsiteUser(HttpUser):
         # --TOKEN--
         "post_token": 1,  # REQUIRED
         "post_token_secondary_user": 1,  # REQUIRED
-        "post_get_new_access_token_via_refresh": 0,
+        "post_get_new_access_token_via_refresh": 1,
         # --LOYALTY_PLANS--
-        "get_loyalty_plans": 89,
+        "get_loyalty_plans": 0,
         "get_loyalty_plans_by_id": 0,
         "get_loyalty_plans_journey_fields_by_id": 0,
         "get_loyalty_plans_overview": 0,

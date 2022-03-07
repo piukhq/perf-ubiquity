@@ -29,6 +29,7 @@ class WebsiteUser(HttpUser):
         "get_loyalty_plans": 89,
         "get_loyalty_plans_by_id": 0,
         "get_loyalty_plans_journey_fields_by_id": 0,
+        "get_loyalty_plan_details_by_id": 0,
         "get_loyalty_plans_overview": 0,
         # --LOYALTY_CARDS--
         "post_loyalty_cards_add": 0,  # Single and Multiuser (1 each) - Adds 1 card

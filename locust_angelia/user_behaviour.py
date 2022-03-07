@@ -121,6 +121,16 @@ class UserBehavior(SequentialTaskSet):
         )
 
     @repeatable_task()
+    def get_loyalty_plan_details_by_id(self):
+        plan_id = random.choice(range(1, self.loyalty_plan_count))
+
+        self.client.get(
+            f"{self.url_prefix}/loyalty_plans/{plan_id}/plan_details",
+            headers={"Authorization": f"bearer {self.access_tokens['primary_user']}"},
+            name=f"{self.url_prefix}/loyalty_plans/[id]/plan_details",
+        )
+
+    @repeatable_task()
     def get_loyalty_plans_journey_fields_by_id(self):
         plan_id = random.choice(range(1, self.loyalty_plan_count))
 

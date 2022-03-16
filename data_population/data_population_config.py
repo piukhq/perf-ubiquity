@@ -43,13 +43,13 @@ benchmark_old = DataConfig(
 benchmark = DataConfig(
     name="benchmark",
     membership_plans=36,
-    users=1567250,
-    users_history=3134500,
-    membership_cards=10751335,
-    membership_cards_history=42942650,
-    payment_cards=2350875,
-    payment_cards_history=3526313,
-    transactions=35263125,
+    users=132902,
+    users_history=265804,
+    membership_cards=911708,
+    membership_cards_history=3646831,
+    payment_cards=199353,
+    payment_cards_history=299030,
+    transactions=1993530,
 )
 
 
@@ -69,13 +69,13 @@ barclays_2021 = DataConfig(
 barclays_2022 = DataConfig(
     name="barclays_2022",
     membership_plans=36,
-    users=6269000,
-    users_history=12538000,
-    membership_cards=43005340,
-    membership_cards_history=171770600,
-    payment_cards=9403500,
-    payment_cards_history=14105250,
-    transactions=141052500,
+    users=531608,
+    users_history=1063216,
+    membership_cards=3646830,
+    membership_cards_history=14587323,
+    payment_cards=797412,
+    payment_cards_history=1196118,
+    transactions=7974120,
 )
 
 

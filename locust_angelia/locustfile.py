@@ -32,7 +32,7 @@ class WebsiteUser(HttpUser):
         "get_loyalty_plan_details_by_id": 1,
         "get_loyalty_plans_overview": 3,
         # --LOYALTY_CARDS--
-        "post_loyalty_cards_add": 1,  # Single and Multiuser (1 each) - Adds 1 card
+        "post_loyalty_cards_add": 2,  # Single and Multiuser (1 each) - Adds 1 card
         "post_loyalty_cards_add_and_auth": 1,  # Single and Multiuser (1 each) - Adds 1 card
         "put_loyalty_cards_authorise": 1,  # Will 404 if > post_loyalty_cards_add
         "post_loyalty_cards_add_and_register": 1,  # Single  User - Adds 1 card

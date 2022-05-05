@@ -49,6 +49,8 @@ TEST_SUITE = {
     "patch_membership_cards_id_add": True,
     "delete_payment_card_multiple_property": True,
     "delete_payment_card_single_property": True,
+    "delete_payment_card_by_hash_multiple_property": False,
+    "delete_payment_card_by_hash_single_property": False,
     "delete_membership_card": True,
     "delete_service": True,
     # barclays specific tests

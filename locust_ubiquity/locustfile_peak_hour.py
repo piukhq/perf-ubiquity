@@ -549,6 +549,27 @@ class UserBehavior(SequentialTaskSet):
 
     @check_suite_whitelist
     @task
+    def delete_payment_card_by_hash_multiple_property(self):
+        hash = self.payment_cards[MULTIPLE_PROPERTY_PCARD_INDEX]["hash"]
+        self.client.delete(
+            f"{self.url_prefix}/payment_card/hash-{hash}",
+            headers=self.multi_prop_header,
+            name=f"{self.url_prefix}/payment_card/hash-<hash> {LocustLabel.MULTI_PROPERTY}",
+        )
+
+    @check_suite_whitelist
+    @task
+    @repeat_task(3)
+    def delete_payment_card_by_hash_single_property(self):
+        hash = self.payment_cards.pop(0)["hash"]
+        self.client.delete(
+            f"{self.url_prefix}/payment_card/hash-{hash}",
+            headers=self.single_prop_header,
+            name=f"{self.url_prefix}/payment_card/hash-<hash> {LocustLabel.SINGLE_PROPERTY}",
+        )
+
+    @check_suite_whitelist
+    @task
     @repeat_task(2)
     def delete_membership_card(self):
         mcard = self.membership_cards.pop(0)

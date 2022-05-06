@@ -20,7 +20,7 @@ def generate_unencrypted_static():
     return {
         "card": {
             "hash": "28OBFUDWPS4YX13WPA0ENXW96Z4X2EG9GXSIGJOD06ZV3XKX9MDG733NVPJR14TEHQEFVHKYVB2ETM3Z0UCQY4A8UCB8GPE67Z"
-                    "B87HP2J2QKKMYCMBN3CUH9NYE7R83N",
+            "B87HP2J2QKKMYCMBN3CUH9NYE7R83N",
             "token": "9bd11390-b8e8-4627-baa0-c738645fb9b5",
             "last_four_digits": 3733,  # amex bin
             "first_six_digits": 466666,

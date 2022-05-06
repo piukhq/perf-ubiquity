@@ -553,8 +553,6 @@ class UserBehavior(SequentialTaskSet):
             headers=self.multi_prop_header,
             name=f"{self.url_prefix}/payment_card/hash-<hash> {LocustLabel.MULTI_PROPERTY}",
         )
-        print(f"HASH: {hash_val}")
-        print(f"{self.url_prefix}/payment_card/hash-{hash_val} MULTI")
 
     @check_suite_whitelist
     @task
@@ -566,8 +564,6 @@ class UserBehavior(SequentialTaskSet):
             headers=self.single_prop_header,
             name=f"{self.url_prefix}/payment_card/hash-<hash> {LocustLabel.SINGLE_PROPERTY}",
         )
-        print(f"HASH: {hash_val}")
-        print(f"{self.url_prefix}/payment_card/hash-{hash_val} SINGLE")
 
     @check_suite_whitelist
     @task

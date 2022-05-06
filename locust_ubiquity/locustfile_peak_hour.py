@@ -216,6 +216,7 @@ class UserBehavior(SequentialTaskSet):
     @repeat_task(5)
     def post_payment_cards_single_property(self):
         pcard = payment_card.generate_unencrypted_random()
+        hash = pcard["card"]["hash"]
         pcard_json = payment_card.encrypt(pcard, self.pub_key)
         resp = self.client.post(
             f"{self.url_prefix}/payment_cards",
@@ -226,7 +227,7 @@ class UserBehavior(SequentialTaskSet):
         )
 
         pcard_id = resp.json()["id"]
-        pcard = {"id": pcard_id, "hash": pcard_json["card"]["hash"], "json": pcard_json}
+        pcard = {"id": pcard_id, "hash": hash, "json": pcard_json}
         self.payment_cards.append(pcard)
 
     @check_suite_whitelist
@@ -552,7 +553,7 @@ class UserBehavior(SequentialTaskSet):
     def delete_payment_card_by_hash_multiple_property(self):
         hash_val = self.payment_cards[MULTIPLE_PROPERTY_PCARD_INDEX]["hash"]
         self.client.delete(
-            f"{self.url_prefix}/payment_card/hash-{hash_val}/",
+            f"{self.url_prefix}/payment_card/hash-{hash_val}",
             headers=self.multi_prop_header,
             name=f"{self.url_prefix}/payment_card/hash-<hash> {LocustLabel.MULTI_PROPERTY}",
         )

@@ -216,6 +216,7 @@ class UserBehavior(SequentialTaskSet):
     @repeat_task(5)
     def post_payment_cards_single_property(self):
         pcard = payment_card.generate_unencrypted_random()
+        hash = pcard["card"]["hash"]
         pcard_json = payment_card.encrypt(pcard, self.pub_key)
         resp = self.client.post(
             f"{self.url_prefix}/payment_cards",
@@ -226,7 +227,7 @@ class UserBehavior(SequentialTaskSet):
         )
 
         pcard_id = resp.json()["id"]
-        pcard = {"id": pcard_id, "hash": pcard["card"]["hash"], "json": pcard_json}
+        pcard = {"id": pcard_id, "hash": hash, "json": pcard_json}
         self.payment_cards.append(pcard)
 
     @check_suite_whitelist

@@ -230,7 +230,7 @@ class UserBehavior(SequentialTaskSet):
         )
 
         pcard_id = resp.json()["id"]
-        pcard = {"id": pcard_id, "hash": pcard["card"]["hash"], "json": pcard_json}
+        pcard = {"id": pcard_id, "hash": pcard_json["card"]["hash"], "json": pcard_json}
         self.payment_cards.append(pcard)
 
     @check_suite_whitelist

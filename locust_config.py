@@ -52,7 +52,7 @@ TEST_SUITE = {
     "delete_payment_card_by_hash_multiple_property": True,
     "delete_payment_card_by_hash_single_property": True,
     "delete_membership_card": True,
-    "delete_service": False,
+    "delete_service": True,
     # barclays specific tests
     "post_membership_cards": True,
     # config functions

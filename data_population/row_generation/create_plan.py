@@ -70,6 +70,7 @@ def membership_plan(scheme_id, name, slug):
         "#fc03e3",  # secondary_colour
         0,  # plan_popularity
         "000000",  # text_colour
+        1200,  # balance_renew_period
     ]
 
 

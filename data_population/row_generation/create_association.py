@@ -9,6 +9,9 @@ def pll_link(pk: int, pcard_id: int, mcard_id: int) -> list:
         True,  # active_link
         pcard_id,  # payment_card_account_id
         mcard_id,  # scheme_account_id
+        "",  # description
+        "",  # slug
+        0,  # state
     ]
 
 

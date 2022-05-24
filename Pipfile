@@ -34,6 +34,7 @@ azure-identity = "*"
 redis = "*"
 sqlalchemy = "*"
 itsdangerous = "==2.0.1"
+jinja2 = "<3"  # To fix: https://stackoverflow.com/questions/71718167/importerror-cannot-import-name-escape-from-jinja2, remove after upgrading locust/flask
 
 [requires]
 python_version = "3.9"

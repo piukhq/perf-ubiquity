@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "783c108b47f9d0e48fbdce8d0ef266679af2dda909e3187ec9a981690e1f5be6"
+            "sha256": "bffe270568014ed715d86e46a89912897dd4efd2749827d256a507e503bf35f5"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -478,7 +478,7 @@
                 "sha256:fa877ca7f6b48054f847b61d6fa7bed5cebb663ebc55e018fda12db09dcc664c",
                 "sha256:fdcec0b8399108577ec290f55551d926d9a1fa6cad45882093a7a07ac5ec147b"
             ],
-            "markers": "python_version >= '3' and platform_machine == 'aarch64' or (platform_machine == 'ppc64le' or (platform_machine == 'x86_64' or (platform_machine == 'amd64' or (platform_machine == 'AMD64' or (platform_machine == 'win32' or platform_machine == 'WIN32')))))",
+            "markers": "platform_python_implementation == 'CPython'",
             "version": "==1.1.2"
         },
         "hvac": {
@@ -514,11 +514,11 @@
         },
         "jinja2": {
             "hashes": [
-                "sha256:31351a702a408a9e7595a8fc6150fc3f43bb6bf7e319770cbc0db9df9437e852",
-                "sha256:6088930bfe239f0e6710546ab9c19c9ef35e29792895fed6e6e31a023a182a61"
+                "sha256:03e47ad063331dd6a3f04a43eddca8a966a26ba0c5b7207a9a9e4e08f1b29419",
+                "sha256:a6d58433de0ae800347cab1fa3043cebbabe8baa9d29e668f1c768cb87a333c6"
             ],
-            "markers": "python_version >= '3.7'",
-            "version": "==3.1.2"
+            "index": "pypi",
+            "version": "==2.11.3"
         },
         "locust": {
             "hashes": [
@@ -921,6 +921,10 @@
             "version": "==62.3.2"
         },
         "shared-config-storage": {
+            "hashes": [
+                "sha256:2aace59c928a7fe2f899871de2237fa6773f93652f414984a825567760b36907",
+                "sha256:98829b386a827ef59cf1b42b39432fa715bbb201d3170c1f9cc6afc2cc308a25"
+            ],
             "index": "bink-pypi",
             "version": "==1.6.1"
         },

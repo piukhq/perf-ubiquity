@@ -10,7 +10,7 @@ verify_ssl = true
 
 [dev-packages]
 flake8 = "*"
-black = "==21.9b0"
+black = "*"
 mypy = "*"
 pytest = "*"
 ptpython = "*"

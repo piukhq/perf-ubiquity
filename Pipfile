@@ -37,6 +37,7 @@ itsdangerous = "==2.0.1"
 jinja2 = "<3"  # To fix: https://stackoverflow.com/questions/71718167/importerror-cannot-import-name-escape-from-jinja2, remove after upgrading locust/flask
 markupsafe = "<2.1"
 werkzeug = "<2.1"
+pyzmq = "<23"
 
 [requires]
 python_version = "3.9"

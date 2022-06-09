@@ -48,6 +48,7 @@ def historic_user(history_id: int) -> list:
         "robojeff@testbink.com",  # email
         "1234567890",  # external_id
         arrow.now(),  # event_time
+        "NULL",  # uuid
     ]
 
 

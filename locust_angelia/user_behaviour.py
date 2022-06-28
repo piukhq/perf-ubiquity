@@ -365,6 +365,8 @@ class UserBehavior(SequentialTaskSet):
                         {"credential_slug": "first_name", "value": (self.fake.first_name())},
                         {"credential_slug": "password", "value": (self.fake.password() + "_failure")},
                         # the 'failure' keyword means that all joins will become failed joins in Midas mock agents.
+                        # This is so that we can test deleting failed joins later down the line (otherwise these go into
+                        # pending state which we can't delete!
                     ]
                 }
             },

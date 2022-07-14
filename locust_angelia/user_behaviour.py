@@ -424,50 +424,6 @@ class UserBehavior(SequentialTaskSet):
             name=f"{self.url_prefix}/loyalty_cards/[id]/vouchers",
         )
 
-    @repeatable_task()
-    def delete_join(self):
-        """DELETEs an existing loyalty card join. Will 404 if no joins available."""
-
-        current_retry = 0
-
-        if self.join_ids:
-            card_id = self.join_ids.pop(0)
-            while current_retry < timeout:
-                if query_status(card_id) == 901:  # 901 = ENROL_FAILED
-                    break
-                else:
-                    time.sleep(retry_time)
-                    current_retry += retry_time
-            if current_retry >= timeout:
-                logger.error(
-                    f"STATUS TIMEOUT: Loyalty Card {card_id} still not processed after {timeout} seconds. Sending "
-                    f"request anyway."
-                )
-        else:
-            card_id = "NO_CARD"
-
-        self.client.delete(
-            f"{self.url_prefix}/loyalty_cards/{card_id}/join",
-            headers={"Authorization": f"bearer {self.access_tokens['primary_user']}"},
-            name=f"{self.url_prefix}/loyalty_cards/[id]/join",
-        )
-
-    @repeatable_task()
-    def delete_loyalty_card(self):
-        """DELETEs an existing loyalty card. Will 404 if no cards available."""
-
-        if self.loyalty_cards:
-            card_id = list(self.loyalty_cards.keys())[0]
-        else:
-            card_id = "NO_CARD"
-
-        with self.client.delete(
-            f"{self.url_prefix}/loyalty_cards/{card_id}",
-            headers={"Authorization": f"bearer {self.access_tokens['primary_user']}"},
-            name=f"{self.url_prefix}/loyalty_cards/[id]",
-        ):
-            self.loyalty_cards.pop(card_id)
-
     # ---------------------------------PAYMENT ACCOUNT TASKS---------------------------------
 
     @repeatable_task()
@@ -540,23 +496,6 @@ class UserBehavior(SequentialTaskSet):
             if not response_payment_account_id == payment_account_id:
                 response.failure()
 
-    @repeatable_task()
-    def delete_payment_account(self):
-        """DELETEs a random payment account. If none are present, this will 404."""
-
-        if self.payment_cards:
-            payment_account_id = random.choice(list(self.payment_cards.keys()))
-            self.payment_cards.pop(payment_account_id)
-
-        else:
-            payment_account_id = "NOT_FOUND"
-
-        self.client.delete(
-            f"{self.url_prefix}/payment_accounts/{payment_account_id}",
-            headers={"Authorization": f"bearer {self.access_tokens['primary_user']}"},
-            name=f"{self.url_prefix}/payment_accounts/[id]",
-        )
-
     # ---------------------------------WALLET TASKS---------------------------------
 
     @repeatable_task()
@@ -591,12 +530,77 @@ class UserBehavior(SequentialTaskSet):
             name=f"{self.url_prefix}/wallet/loyalty_cards/[id]",
         )
 
+    # ---------------------------------DELETE TASKS---------------------------------
+    # These are separated from other loyalty account/ payment account functions because they are performed
+    # asynchronously, and so risk creating race conditions on the wallet/retrieval endpoints.
+
+    @repeatable_task()
+    def delete_join(self):
+        """DELETEs an existing loyalty card join. Will 404 if no joins available."""
+
+        current_retry = 0
+
+        if self.join_ids:
+            card_id = self.join_ids.pop(0)
+            while current_retry < timeout:
+                if query_status(card_id) == 901:  # 901 = ENROL_FAILED
+                    break
+                else:
+                    time.sleep(retry_time)
+                    current_retry += retry_time
+            if current_retry >= timeout:
+                logger.error(
+                    f"STATUS TIMEOUT: Loyalty Card {card_id} still not processed after {timeout} seconds. Sending "
+                    f"request anyway."
+                )
+        else:
+            card_id = "NO_CARD"
+
+        self.client.delete(
+            f"{self.url_prefix}/loyalty_cards/{card_id}/join",
+            headers={"Authorization": f"bearer {self.access_tokens['primary_user']}"},
+            name=f"{self.url_prefix}/loyalty_cards/[id]/join",
+        )
+
+    @repeatable_task()
+    def delete_loyalty_card(self):
+        """DELETEs an existing loyalty card. Will 404 if no cards available."""
+
+        if self.loyalty_cards:
+            card_id = list(self.loyalty_cards.keys())[0]
+        else:
+            card_id = "NO_CARD"
+
+        with self.client.delete(
+            f"{self.url_prefix}/loyalty_cards/{card_id}",
+            headers={"Authorization": f"bearer {self.access_tokens['primary_user']}"},
+            name=f"{self.url_prefix}/loyalty_cards/[id]",
+        ):
+            self.loyalty_cards.pop(card_id)
+
+    @repeatable_task()
+    def delete_payment_account(self):
+        """DELETEs a random payment account. If none are present, this will 404."""
+
+        if self.payment_cards:
+            payment_account_id = random.choice(list(self.payment_cards.keys()))
+            self.payment_cards.pop(payment_account_id)
+
+        else:
+            payment_account_id = "NOT_FOUND"
+
+        self.client.delete(
+            f"{self.url_prefix}/payment_accounts/{payment_account_id}",
+            headers={"Authorization": f"bearer {self.access_tokens['primary_user']}"},
+            name=f"{self.url_prefix}/payment_accounts/[id]",
+        )
+
     # ---------------------------------USER TASKS---------------------------------
 
     @repeatable_task()
     def post_email_update(self):
 
-        data = {"email": "updated_email" + str(uuid.uuid4())[:15] + "@test.com"}
+        data = {"email": "updated-" + str(uuid.uuid4()) + "@testbink.com"}
 
         self.client.post(
             f"{self.url_prefix}/email_update",

@@ -40,16 +40,17 @@ class WebsiteUser(HttpUser):
         "get_loyalty_cards_vouchers": 0,
         "get_loyalty_cards_transactions": 0,
         "get_loyalty_cards_balance": 0,
-        "delete_join": 0,  # Should be less than total joins (or will 404)
-        "delete_loyalty_card": 0,  # Should be less than total loyalty_cards added (or will 404)
         # --PAYMENT_ACCOUNTS--
         "post_payment_account": 0,  # Single and Multiuser (1 each) - Adds 1 card
         "patch_payment_account": 0,  # Will 404 if no post_payment_account
-        "delete_payment_account": 0,  # Will 404 if > post_payment_account
         # --WALLET--
         "get_wallet": 0,
         "get_wallet_overview": 0,
         "get_wallet_loyalty_card": 0,  # Will 404 if no loyalty cards
+        # --DELETE--
+        "delete_join": 0,  # Should be less than total joins (or will 404)
+        "delete_loyalty_card": 0,  # Should be less than total loyalty_cards added (or will 404)
+        "delete_payment_account": 0,  # Will 404 if > post_payment_account
         # --USER--
         "post_email_update": 0,
         "delete_me": 0,

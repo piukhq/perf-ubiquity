@@ -257,12 +257,15 @@ class UserBehavior(SequentialTaskSet):
 
         if card_id:
             plan_id = self.loyalty_cards[card_id]["plan_id"]
+            card_number = self.loyalty_cards[card_id]["data"]["account"]["add_fields"]["credentials"][0]["value"]
         else:
             card_id = "MISSING_CARD_404"
-            plan_id = random.choice(range(1, self.loyalty_plan_count))
+            plan_id = ""
+            card_number = ""
 
         data = {
             "account": {
+                "add_fields": {"credentials": [{"credential_slug": "card_number", "value": card_number}]},
                 "authorise_fields": {
                     "credentials": [{"credential_slug": "password", "value": self.fake.password()}],
                     "consents": [{"consent_slug": f"consent_slug_{plan_id}", "value": "true"}],

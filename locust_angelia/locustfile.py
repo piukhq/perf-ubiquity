@@ -38,6 +38,7 @@ class WebsiteUser(HttpUser):
         "post_loyalty_cards_add_and_register": 1,  # Single  User - Adds 1 card
         "put_loyalty_cards_register": 1,  # Will 404 if > (post_loyalty_cards_add - put_authorise)
         "post_loyalty_cards_join": 1,
+        "put_loyalty_card_join": 1,
         "get_loyalty_cards_vouchers": 1,
         "get_loyalty_cards_transactions": 1,
         "get_loyalty_cards_balance": 1,

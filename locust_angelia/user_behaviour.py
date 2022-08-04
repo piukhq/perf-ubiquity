@@ -386,7 +386,7 @@ class UserBehavior(SequentialTaskSet):
         self.join_ids.append(loyalty_card_id)
 
     @repeatable_task()
-    def put_loyalty_card_join(self):
+    def put_loyalty_cards_join(self):
         """PUT request an existing loyalty card join. Will 404 if no joins available."""
 
         current_retry = 0

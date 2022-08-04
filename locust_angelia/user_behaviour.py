@@ -425,7 +425,7 @@ class UserBehavior(SequentialTaskSet):
             f"{self.url_prefix}/loyalty_cards/{card_id}/join",
             headers={"Authorization": f"bearer {self.access_tokens['primary_user']}"},
             name=f"{self.url_prefix}/loyalty_cards/[id]/join",
-            json=data
+            json=data,
         ) as response:
             loyalty_card_id = response.json()["id"]
 

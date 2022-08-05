@@ -386,6 +386,52 @@ class UserBehavior(SequentialTaskSet):
         self.join_ids.append(loyalty_card_id)
 
     @repeatable_task()
+    def put_loyalty_cards_join(self):
+        """PUT request an existing loyalty card join. Will 404 if no joins available."""
+
+        current_retry = 0
+        if self.join_ids:
+            card_id = self.join_ids.pop(0)
+            while current_retry < timeout:
+                if query_status(card_id) == 901:  # 901 = ENROL_FAILED
+                    break
+                else:
+                    time.sleep(retry_time)
+                    current_retry += retry_time
+            if current_retry >= timeout:
+                logger.error(
+                    f"STATUS TIMEOUT: Loyalty Card {card_id} still not processed after {timeout} seconds. Sending "
+                    f"request anyway."
+                )
+        else:
+            card_id = "NO_CARD"
+
+        data = {
+            "loyalty_plan_id": self.card_id,
+            "account": {
+                "join_fields": {
+                    "credentials": [
+                        {"credential_slug": "first_name", "value": (self.fake.first_name())},
+                        {"credential_slug": "password", "value": (self.fake.password() + "_failure")},
+                        # the 'failure' keyword means that all joins will become failed joins in Midas mock agents.
+                        # This is so that we can test deleting failed joins later down the line (otherwise these go into
+                        # pending state which we can't delete!
+                    ]
+                }
+            },
+        }
+
+        with self.client.put(
+            f"{self.url_prefix}/loyalty_cards/{card_id}/join",
+            headers={"Authorization": f"bearer {self.access_tokens['primary_user']}"},
+            name=f"{self.url_prefix}/loyalty_cards/[id]/join",
+            json=data,
+        ) as response:
+            loyalty_card_id = response.json()["id"]
+
+        self.join_ids.append(loyalty_card_id)
+
+    @repeatable_task()
     def get_loyalty_cards_balance(self):
 
         if self.loyalty_cards:

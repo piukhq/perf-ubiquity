@@ -407,7 +407,7 @@ class UserBehavior(SequentialTaskSet):
             card_id = "NO_CARD"
 
         data = {
-            "loyalty_plan_id": self.card_id,
+            "loyalty_plan_id": card_id,
             "account": {
                 "join_fields": {
                     "credentials": [

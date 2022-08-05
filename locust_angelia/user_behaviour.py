@@ -389,6 +389,8 @@ class UserBehavior(SequentialTaskSet):
     def put_loyalty_cards_join(self):
         """PUT request an existing loyalty card join. Will 404 if no joins available."""
 
+        plan_id = random.choice(range(1, self.loyalty_plan_count))
+
         current_retry = 0
         if self.join_ids:
             card_id = self.join_ids.pop(0)
@@ -407,7 +409,7 @@ class UserBehavior(SequentialTaskSet):
             card_id = "NO_CARD"
 
         data = {
-            "loyalty_plan_id": card_id,
+            "loyalty_plan_id": plan_id,
             "account": {
                 "join_fields": {
                     "credentials": [

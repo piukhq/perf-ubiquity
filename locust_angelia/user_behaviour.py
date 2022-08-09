@@ -387,17 +387,21 @@ class UserBehavior(SequentialTaskSet):
 
     @repeatable_task()
     def put_loyalty_cards_join(self):
-        """PUT request an existing loyalty card join. Will 404 if no joins available."""
+        """
+        PUT request an existing loyalty card join. Will 404 if no joins available or 409 if not in failed state.
+        """
 
         plan_id = random.choice(range(1, self.loyalty_plan_count))
 
         current_retry = 0
         if self.join_ids:
-            card_id = self.join_ids.pop(0)
+            loyalty_card = self.join_ids.pop(0)
             while current_retry < timeout:
-                if query_status(card_id) == 901:  # 901 = ENROL_FAILED
+                if query_status(loyalty_card) == 901:  # 901 = ENROL_FAILED
+                    card_id = loyalty_card
                     break
                 else:
+                    # Retries to see if card is 901 if not proceed with the rest of the code
                     time.sleep(retry_time)
                     current_retry += retry_time
             if current_retry >= timeout:
@@ -405,6 +409,7 @@ class UserBehavior(SequentialTaskSet):
                     f"STATUS TIMEOUT: Loyalty Card {card_id} still not processed after {timeout} seconds. Sending "
                     f"request anyway."
                 )
+                card_id = "CARD_NOT_IN_FAILED_STATUS"
         else:
             card_id = "NO_CARD"
 
@@ -429,9 +434,11 @@ class UserBehavior(SequentialTaskSet):
             name=f"{self.url_prefix}/loyalty_cards/[id]/join",
             json=data,
         ) as response:
-            loyalty_card_id = response.json()["id"]
+            # Want to append the card regardless so that it can be deleted further down
+            self.join_ids.append(loyalty_card)
 
-        self.join_ids.append(loyalty_card_id)
+            if response.json().get("id") != loyalty_card:
+                response.failure()
 
     @repeatable_task()
     def get_loyalty_cards_balance(self):

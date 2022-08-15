@@ -396,8 +396,8 @@ class UserBehavior(SequentialTaskSet):
         join_ids = deepcopy(self.join_ids)
 
         if join_ids:
-            loyalty_card = join_ids.pop(0)
-            set_status_for_loyalty_card(loyalty_card, 901)
+            card_id = join_ids.pop(0)
+            set_status_for_loyalty_card(card_id, 901)
         else:
             card_id = "NO_CARD"
 

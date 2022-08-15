@@ -1,7 +1,7 @@
 import logging
 from datetime import datetime
 
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.exc import DatabaseError
 
 from locust_angelia.database.db import DB
@@ -29,6 +29,24 @@ def query_status(card_id: int) -> int:
             logger.error(f"Could not fetch card status for card {card_id}!")
         else:
             return result[0]
+
+
+def set_status_for_loyalty_card(card_id: int, status: int) -> None:
+    """
+    Set loyalty card status.
+
+    :param card_id: id of the card to be queried
+    :param status: status to be set
+    """
+
+    with DB().open() as session:
+        query = update(SchemeAccount).where(SchemeAccount.id == card_id).values(status=status)
+
+        try:
+            session.execute(query)
+            session.commit()
+        except DatabaseError:
+            logger.error(f"Could not update card status for card {card_id}!")
 
 
 def add_join(email: str, loyalty_plan: int):  # Not currently used - for future use if needed

@@ -3,9 +3,10 @@ import logging
 import random
 import time
 import uuid
+from copy import deepcopy
 
 import redis
-from database.jobs import query_status
+from database.jobs import query_status, set_status_for_loyalty_card
 from faker import Faker
 from locust import SequentialTaskSet
 from locust.exception import StopUser
@@ -392,24 +393,11 @@ class UserBehavior(SequentialTaskSet):
         """
 
         plan_id = random.choice(range(1, self.loyalty_plan_count))
+        join_ids = deepcopy(self.join_ids)
 
-        current_retry = 0
-        if self.join_ids:
-            loyalty_card = self.join_ids.pop(0)
-            while current_retry < timeout:
-                if query_status(loyalty_card) == 901:  # 901 = ENROL_FAILED
-                    card_id = loyalty_card
-                    break
-                else:
-                    # Retries to see if card is 901 if not proceed with the rest of the code
-                    time.sleep(retry_time)
-                    current_retry += retry_time
-            if current_retry >= timeout:
-                logger.error(
-                    f"STATUS TIMEOUT: Loyalty Card {card_id} still not processed after {timeout} seconds. Sending "
-                    f"request anyway."
-                )
-                card_id = "CARD_NOT_IN_FAILED_STATUS"
+        if join_ids:
+            loyalty_card = join_ids.pop(0)
+            set_status_for_loyalty_card(loyalty_card, 901)
         else:
             card_id = "NO_CARD"
 
@@ -428,17 +416,12 @@ class UserBehavior(SequentialTaskSet):
             },
         }
 
-        with self.client.put(
+        self.client.put(
             f"{self.url_prefix}/loyalty_cards/{card_id}/join",
             headers={"Authorization": f"bearer {self.access_tokens['primary_user']}"},
             name=f"{self.url_prefix}/loyalty_cards/[id]/join",
             json=data,
-        ) as response:
-            # Want to append the card regardless so that it can be deleted further down
-            self.join_ids.append(loyalty_card)
-
-            if response.json().get("id") != loyalty_card:
-                response.failure()
+        )
 
     @repeatable_task()
     def get_loyalty_cards_balance(self):

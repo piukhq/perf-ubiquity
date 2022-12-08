@@ -143,6 +143,17 @@ CLIENT_TWELVE = {
     "secret": JWT_SECRET,
 }
 
+CLIENT_TRUSTED_CHANNEL_ONE = {
+    "bundle_id": "performance.bundle.trusted.one",
+    "client_id": "performance_trusted_one",
+    "client_name": "performance trusted one",
+    "id": 5062,
+    "organisation_name": "performance test trusted one",
+    "status": 0,
+    "whitelist_status": "ACTIVE",
+    "secret": JWT_SECRET,
+}
+
 CLIENT_RESTRICTED = {
     "bundle_id": "performance.bundle.restricted",
     "client_id": "performance_restricted",
@@ -168,4 +179,7 @@ NON_RESTRICTED_CLIENTS = [
     CLIENT_ELEVEN,
     CLIENT_TWELVE,
 ]
-ALL_CLIENTS = [CLIENT_RESTRICTED] + NON_RESTRICTED_CLIENTS
+
+TRUSTED_CHANNEL_CLIENTS = [CLIENT_TRUSTED_CHANNEL_ONE]
+
+ALL_CLIENTS = [CLIENT_RESTRICTED] + NON_RESTRICTED_CLIENTS + TRUSTED_CHANNEL_CLIENTS

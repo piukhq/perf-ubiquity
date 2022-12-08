@@ -6,7 +6,7 @@ from functools import partial
 
 from data_population.data_population_config import DataConfig
 from data_population.database_tables import HermesTables
-from data_population.fixtures.client import ALL_CLIENTS, NON_RESTRICTED_CLIENTS
+from data_population.fixtures.client import ALL_CLIENTS, NON_RESTRICTED_CLIENTS, TRUSTED_CHANNEL_CLIENTS
 from data_population.fixtures.payment_scheme import ALL_PAYMENT_PROVIDER_STATUS_MAPPINGS
 from data_population.job_creation import MCARDS_PER_SERVICE, PCARDS_PER_SERVICE, CardTypes, cores, create_tsv_jobs
 from data_population.row_generation import (
@@ -145,7 +145,7 @@ def create_membership_plan_tsv_files(total_plans: int):
 
     whitelist_list = []
     whitelist_id = 0
-    for client_fixture in NON_RESTRICTED_CLIENTS:
+    for client_fixture in NON_RESTRICTED_CLIENTS + TRUSTED_CHANNEL_CLIENTS:
         for plan in membership_plans:
             whitelist_id += 1
             plan_id = plan[0]

@@ -17,6 +17,7 @@ class WebsiteUser(HttpUser):
     """
 
     TOTAL_CHANNELS = 8
+    TOTAL_TRUSTED_CHANNELS = 1
     RETRY_TIME = 1
     TIMEOUT = 30
 
@@ -60,7 +61,7 @@ class WebsiteUser(HttpUser):
         "stop_locust_after_test_suite": 1,
     }
 
-    set_channels(TOTAL_CHANNELS)
+    set_channels(TOTAL_CHANNELS, TOTAL_TRUSTED_CHANNELS)
     set_task_repeats(repeats)
     set_retry_and_timeout(retry_time_value=RETRY_TIME, timeout_value=TIMEOUT)
 

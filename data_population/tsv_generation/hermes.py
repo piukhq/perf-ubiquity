@@ -120,6 +120,8 @@ def create_membership_plan_tsv_files(total_plans: int):
         plan_questions.append(create_plan.password_question(password_question_id, count))
         first_name_question_id = (total_plans * 2) + count
         plan_questions.append(create_plan.first_name_question(first_name_question_id, count))
+        merchant_identifier_question_id = (total_plans * 3) + count
+        plan_questions.append(create_plan.merchant_identifier_question(merchant_identifier_question_id, count))
         scheme_images.append(create_plan.scheme_image(count, count))
         scheme_balance_details.append(create_plan.scheme_balance_details(count, count))
         scheme_contents.append(create_plan.scheme_content(count, count))
@@ -295,24 +297,35 @@ def create_membership_card_answers_job(total_mcards: int, total_plans: int, job:
 
     add_answers = []
     auth_answers = []
+    merchant_id_answers = []
     for add_answer_pk in range(start, start + count):
         if len(add_answers) > BULK_SIZE:
             write_to_tsv_part(HermesTables.ANSWER, part, add_answers)
             write_to_tsv_part(HermesTables.ANSWER, part, auth_answers)
+            write_to_tsv_part(HermesTables.ANSWER, part, merchant_id_answers)
             add_answers.clear()
             auth_answers.clear()
+            merchant_id_answers.clear()
 
         add_question_pk = random.randint(1, total_plans)
         add_answers.append(create_mcard.card_number_answer(add_answer_pk, add_answer_pk, add_question_pk))
+
         auth_answer_pk = total_mcards + add_answer_pk
-        auth_question_pk = add_question_pk + total_plans
+        auth_question_pk = total_plans + add_question_pk
         auth_answers.append(create_mcard.password_answer(auth_answer_pk, add_answer_pk, auth_question_pk))
+
+        merchant_id_answer_pk = (total_mcards * 2) + add_answer_pk
+        merchant_id_question_pk = (total_plans * 2) + add_question_pk
+        auth_answers.append(
+            create_mcard.password_answer(merchant_id_answer_pk, merchant_id_answer_pk, merchant_id_question_pk)
+        )
 
         if add_answer_pk % 100000 == 0:
             logger.info(f"Generated {add_answer_pk} answers")
 
     write_to_tsv_part(HermesTables.ANSWER, part, add_answers)
     write_to_tsv_part(HermesTables.ANSWER, part, auth_answers)
+    write_to_tsv_part(HermesTables.ANSWER, part, merchant_id_answers)
 
     logger.info(f"Finished {part}")
 

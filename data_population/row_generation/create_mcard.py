@@ -72,7 +72,7 @@ def historical_membership_card(history_id: int) -> list:
     ]
 
 
-def card_number_answer(answer_id, scheme_account_id, question_id):
+def card_number_answer(answer_id: int, scheme_account_id: int, question_id: int):
     return [
         answer_id,  # id
         str(uuid.uuid4()),  # answer
@@ -81,7 +81,16 @@ def card_number_answer(answer_id, scheme_account_id, question_id):
     ]
 
 
-def password_answer(answer_id, scheme_account_id, question_id):
+def password_answer(answer_id: int, scheme_account_id: int, question_id: int):
+    return [
+        answer_id,  # id
+        str(uuid.uuid4()),  # answer
+        scheme_account_id,  # scheme_account_id
+        question_id,  # question_id
+    ]
+
+
+def merchant_identifier_answer(answer_id: int, scheme_account_id: int, question_id: int):
     return [
         answer_id,  # id
         str(uuid.uuid4()),  # answer

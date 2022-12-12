@@ -46,8 +46,10 @@ class UserBehavior(SequentialTaskSet):
         self.refresh_tokens = {}
         self.loyalty_plan_count = MEMBERSHIP_PLANS
         self.loyalty_cards = {}
+        self.trusted_loyalty_cards = {}
         self.join_ids = []
         self.payment_cards = {}
+        self.trusted_channel_payment_cards = {}
         self.fake = Faker()
 
     # ---------------------------------TOKEN TASKS---------------------------------
@@ -65,7 +67,6 @@ class UserBehavior(SequentialTaskSet):
 
     @repeatable_task()
     def post_token(self):
-
         with self.client.post(
             f"{self.url_prefix}/token",
             json={"grant_type": "b2b", "scope": ["user"]},
@@ -78,7 +79,6 @@ class UserBehavior(SequentialTaskSet):
 
     @repeatable_task()
     def post_token_secondary_user(self):
-
         with self.client.post(
             f"{self.url_prefix}/token",
             json={"grant_type": "b2b", "scope": ["user"]},
@@ -88,6 +88,30 @@ class UserBehavior(SequentialTaskSet):
             data = response.json()
             self.access_tokens["secondary_user"] = data.get("access_token")
             self.refresh_tokens["secondary_user"] = data.get("refresh_token")
+
+    @repeatable_task()
+    def post_token_trusted_channel_primary_user(self):
+        with self.client.post(
+            f"{self.url_prefix}/token",
+            json={"grant_type": "b2b", "scope": ["user"]},
+            headers={"Authorization": f"bearer {self.b2b_tokens['trusted_channel_primary_user']}"},
+            name=f"{self.url_prefix}/token",
+        ) as response:
+            data = response.json()
+            self.access_tokens["trusted_channel_primary_user"] = data.get("access_token")
+            self.refresh_tokens["trusted_channel_primary_user"] = data.get("refresh_token")
+
+    @repeatable_task()
+    def post_token_trusted_channel_secondary_user(self):
+        with self.client.post(
+            f"{self.url_prefix}/token",
+            json={"grant_type": "b2b", "scope": ["user"]},
+            headers={"Authorization": f"bearer {self.b2b_tokens['trusted_channel_secondary_user']}"},
+            name=f"{self.url_prefix}/token",
+        ) as response:
+            data = response.json()
+            self.access_tokens["trusted_channel_secondary_user"] = data.get("access_token")
+            self.refresh_tokens["trusted_channel_secondary_user"] = data.get("refresh_token")
 
     @repeatable_task()
     def post_get_new_access_token_via_refresh(self):
@@ -191,6 +215,47 @@ class UserBehavior(SequentialTaskSet):
                 response.failure()
 
     @repeatable_task()
+    def post_loyalty_cards_trusted_add(self):
+        """POSTS a trusted channel add request."""
+
+        # ADD_AND_AUTH with primary user - creates new card
+
+        plan_id = random.choice(range(1, self.loyalty_plan_count))
+
+        data = {
+            "loyalty_plan_id": plan_id,
+            "account": {
+                "add_fields": {
+                    "credentials": [{"credential_slug": "card_number", "value": "3" + self.fake.credit_card_number()}]
+                },
+                "merchant_fields": {"account_id": str(uuid.uuid4())},
+            },
+        }
+
+        with self.client.post(
+            f"{self.url_prefix}/loyalty_cards/trusted_add",
+            headers={"Authorization": f"bearer {self.access_tokens['trusted_channel_primary_user']}"},
+            name=f"{self.url_prefix}/loyalty_cards/trusted_add",
+            json=data,
+        ) as response:
+            loyalty_card_id = response.json()["id"]
+            self.trusted_loyalty_cards.update(
+                {loyalty_card_id: {"data": data, "state": "TRUSTED_ADD", "plan_id": plan_id}}
+            )
+
+        #  ADD with secondary user (Multiuser) - links secondary user to just-created card
+
+        with self.client.post(
+            f"{self.url_prefix}/loyalty_cards/trusted_add",
+            headers={"Authorization": f"bearer {self.access_tokens['trusted_channel_secondary_user']}"},
+            name=f"{self.url_prefix}/loyalty_cards/trusted_add (MULTIUSER)",
+            json=data,
+        ) as response:
+            loyalty_card_id = response.json()["id"]
+            if response.json()["id"] != loyalty_card_id:
+                response.failure()
+
+    @repeatable_task()
     def post_loyalty_cards_add_and_auth(self):
         """POSTS an add_and_auth request."""
 
@@ -282,6 +347,37 @@ class UserBehavior(SequentialTaskSet):
         ) as response:
             if response.json()["id"] == card_id:
                 self.loyalty_cards[card_id]["state"] = "AUTH"  # Set State so /register doesn't try to use this card.
+            else:
+                response.failure()
+
+    @repeatable_task()
+    def put_loyalty_cards_trusted_channel(self):
+        """
+        For each request:
+        1. Tries to get a random previously added card that hasn't yet been registered or authed (-> 202).
+        2. If not, tries to get a random previously added card that has already been authed (-> 200).
+        3. Else, will return a 404.
+        """
+
+        card_id = random.choice(list(self.trusted_loyalty_cards.keys()))
+
+        data = {
+            "account": {
+                "add_fields": {
+                    "credentials": [{"credential_slug": "card_number", "value": "3" + self.fake.credit_card_number()}]
+                },
+                "merchant_fields": {"account_id": str(uuid.uuid4())},
+            }
+        }
+
+        with self.client.put(
+            f"{self.url_prefix}/loyalty_cards/{card_id}/trusted_add",
+            headers={"Authorization": f"bearer {self.access_tokens['trusted_channel_primary_user']}"},
+            name=f"{self.url_prefix}/loyalty_cards/[id]/authorise",
+            json=data,
+        ) as response:
+            if response.json()["id"] == card_id:
+                self.trusted_loyalty_cards[card_id]["state"] = "TRUSTED_PUT"
             else:
                 response.failure()
 
@@ -512,6 +608,49 @@ class UserBehavior(SequentialTaskSet):
                 response.failure()
 
     @repeatable_task()
+    def post_payment_account_trusted_channel_user(self):
+        """POSTs a new Payment account for a trusted channel user. Randomly selects between Visa, Amex and Mastercard"""
+
+        # Single-User POST
+
+        card_nickname = self.fake.pystr()
+        data = {
+            "expiry_month": self.fake.month(),
+            "expiry_year": self.fake.year(),
+            "name_on_card": self.fake.name(),
+            "card_nickname": card_nickname,
+            "issuer": "HSBC",
+            "token": str(uuid.uuid4()),
+            "last_four_digits": str(random.randint(1000, 9999)),
+            "first_six_digits": random.choice(["444444", "222155", "343434"]),
+            "fingerprint": str(uuid.uuid4()),
+            "type": "debit",
+            "country": "GB",
+            "currency_code": "GBP",
+        }
+
+        with self.client.post(
+            f"{self.url_prefix}/payment_accounts",
+            headers={"Authorization": f"bearer {self.access_tokens['trusted_channel_primary_user']}"},
+            name=f"{self.url_prefix}/payment_accounts",
+            json=data,
+        ) as response:
+            payment_account_id = response.json()["id"]
+            self.trusted_channel_payment_cards.update({payment_account_id: {"data": data}})
+
+        # Multi-User POST
+
+        with self.client.post(
+            f"{self.url_prefix}/payment_accounts",
+            headers={"Authorization": f"bearer {self.access_tokens['trusted_channel_secondary_user']}"},
+            name=f"{self.url_prefix}/payment_accounts (MULTIUSER)",
+            json=data,
+        ) as response:
+            multiuser_payment_account_id = response.json()["id"]
+            if not multiuser_payment_account_id == payment_account_id:
+                response.failure()
+
+    @repeatable_task()
     def patch_payment_account(self):
         """PATCHes a random payment account with a new card_nickname, one of the fields which will correctly trigger a
         Payment Account PATCH. If no payment account is found, this will 404."""
@@ -549,11 +688,29 @@ class UserBehavior(SequentialTaskSet):
         )
 
     @repeatable_task()
+    def get_wallet_trusted_channel(self):
+
+        self.client.get(
+            f"{self.url_prefix}/wallet",
+            headers={"Authorization": f"bearer {self.access_tokens['trusted_channel_primary_user']}"},
+            name=f"{self.url_prefix}/wallet",
+        )
+
+    @repeatable_task()
     def get_wallet_overview(self):
 
         self.client.get(
             f"{self.url_prefix}/wallet_overview",
             headers={"Authorization": f"bearer {self.access_tokens['primary_user']}"},
+            name=f"{self.url_prefix}/wallet_overview",
+        )
+
+    @repeatable_task()
+    def get_wallet_overview_trusted_channel(self):
+
+        self.client.get(
+            f"{self.url_prefix}/wallet_overview",
+            headers={"Authorization": f"bearer {self.access_tokens['trusted_channel_primary_user']}"},
             name=f"{self.url_prefix}/wallet_overview",
         )
 
@@ -615,6 +772,22 @@ class UserBehavior(SequentialTaskSet):
         with self.client.delete(
             f"{self.url_prefix}/loyalty_cards/{card_id}",
             headers={"Authorization": f"bearer {self.access_tokens['primary_user']}"},
+            name=f"{self.url_prefix}/loyalty_cards/[id]",
+        ):
+            self.loyalty_cards.pop(card_id)
+
+    @repeatable_task()
+    def delete_trusted_loyalty_card(self):
+        """DELETEs an existing loyalty card from a trusted channel user. Will 404 if no cards available."""
+
+        if self.trusted_loyalty_cards:
+            card_id = list(self.loyalty_cards.keys())[0]
+        else:
+            card_id = "NO_CARD"
+
+        with self.client.delete(
+            f"{self.url_prefix}/loyalty_cards/{card_id}",
+            headers={"Authorization": f"bearer {self.access_tokens['trusted_channel_primary_user']}"},
             name=f"{self.url_prefix}/loyalty_cards/[id]",
         ):
             self.loyalty_cards.pop(card_id)

@@ -76,8 +76,11 @@ class TokenGen:
             sub = user_details[user]["external_id"]
             b2b_tokens[user] = self.generate_b2b_token(email, sub, client_name, private_key)
 
-        trusted_channel_token = self.generate_b2b_token(email, sub, trusted_channel_client_name, private_key)
-        b2b_tokens["trusted_channel_user"] = trusted_channel_token
+        for user in ["primary_user", "secondary_user"]:
+            email = user_details[user]["email"]
+            sub = user_details[user]["external_id"]
+            token = self.generate_b2b_token(email, sub, trusted_channel_client_name, private_key)
+            b2b_tokens[f"trusted_channel_{user}"] = token
 
         return b2b_tokens
 

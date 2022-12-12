@@ -30,6 +30,7 @@ class HermesTables(str, Enum):
     PAYMENT_ACCOUNT_ENTRY = "ubiquity_paymentcardaccountentry"
     SCHEME_ACCOUNT_ENTRY = "ubiquity_schemeaccountentry"
     PAYMENT_MEMBERSHIP_ENTRY = "ubiquity_paymentcardschemeentry"
+    PLL_USER_ASSOCIATION = "ubiquity_plluserassociation"
     VOP_ACTIVATION = "ubiquity_vopactivation"
 
 

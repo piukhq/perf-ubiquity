@@ -20,6 +20,7 @@ def client_application_bundle(fixture):
         10,  # access_token_lifetime
         15,  # refresh_token_lifetime
         False,  # email_required
+        fixture["is_trusted"],  # is_trusted
     ]
 
 

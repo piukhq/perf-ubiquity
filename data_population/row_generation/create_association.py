@@ -9,9 +9,18 @@ def pll_link(pk: int, pcard_id: int, mcard_id: int) -> list:
         True,  # active_link
         pcard_id,  # payment_card_account_id
         mcard_id,  # scheme_account_id
-        "",  # description
-        "",  # slug
+    ]
+
+
+def pll_user_association(pk: int, pll_id: int, user_id: int) -> list:
+    return [
+        pk,  # id
         0,  # state
+        "",  # slug
+        "2019-03-12 15:51:36.390742+00",  # created
+        "2019-03-15 05:55:28.532571+00",  # updated
+        pll_id,  # pll_id
+        user_id,  # user_id
     ]
 
 
@@ -24,9 +33,10 @@ def historical_pll_link(history_id: int) -> list:
         "internal_service",  # channel
         "",  # change_details
         "NULL",  # user_id
-        history_id,  # payment_card_account_id
         history_id,  # scheme_account_id
+        history_id,  # payment_card_account_id
         False,  # active_link
+        arrow.now(),  # event_time
     ]
 
 
@@ -62,7 +72,7 @@ def scheme_account(pk: int, scheme_account_id: int, user_id: int) -> list:
         pk,  # id
         scheme_account_id,  # scheme_account_id
         user_id,  # user_id
-        True,  # auth_provided
+        1,  # link_status
     ]
 
 
@@ -77,6 +87,7 @@ def historical_scheme_account(history_id: int) -> list:
         history_id,  # scheme_account_id
         "",  # change_details
         arrow.now(),  # event_time
+        1,  # link_status
     ]
 
 

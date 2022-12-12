@@ -35,6 +35,7 @@ class Counters:
         self.payment_cards = []
         self.payment_card_associations = []
         self.pll_links = []
+        self.pll_user_associations = []
         self.vop_activation_dict = {}
         self.service_start = job["start"]
         self.mcard_index = job[f"{CardTypes.MCARD}_start"]
@@ -53,6 +54,7 @@ class Counters:
             self.payment_cards,
             self.payment_card_associations,
             self.pll_links,
+            self.pll_user_associations,
             self.vop_activation_dict,
         ):
             entries.clear()
@@ -65,6 +67,7 @@ class Counters:
         write_to_tsv_part(HermesTables.PAYMENT_ACCOUNT, self.part, self.payment_cards)
         write_to_tsv_part(HermesTables.PAYMENT_ACCOUNT_ENTRY, self.part, self.payment_card_associations)
         write_to_tsv_part(HermesTables.PAYMENT_MEMBERSHIP_ENTRY, self.part, self.pll_links)
+        write_to_tsv_part(HermesTables.PLL_USER_ASSOCIATION, self.part, self.pll_user_associations)
         vop_activation_list = list(self.vop_activation_dict.values())
         write_to_tsv_part(HermesTables.VOP_ACTIVATION, self.part, vop_activation_list)
 
@@ -219,7 +222,12 @@ def create_service_mcard_and_pcard_job(total_plans: int, transactions_per_mcard:
             link = create_association.pll_link(
                 counters.pcard_index - 1, counters.pcard_index - 1, counters.mcard_index - 1
             )
+            pll_user_association = create_association.pll_user_association(
+                counters.pcard_index - 1, counters.pcard_index - 1, service_pk
+            )
+
             counters.pll_links.append(link)
+            counters.pll_user_associations.append(pll_user_association)
             scheme_id = random.randint(1, total_plans)
             vop_activation = create_association.vop_activation(
                 counters.pcard_index - 1, counters.pcard_index - 1, scheme_id
@@ -313,16 +321,16 @@ def create_membership_card_answers_job(total_mcards: int, total_plans: int, job:
             merchant_id_answers.clear()
 
         add_question_pk = random.randint(1, total_plans)
-        add_answers.append(create_mcard.card_number_answer(add_answer_pk, add_answer_pk, add_question_pk))
+        add_answers.append(create_mcard.card_number_answer(add_answer_pk, add_question_pk, add_answer_pk))
 
         auth_answer_pk = total_mcards + add_answer_pk
         auth_question_pk = total_plans + add_question_pk
-        auth_answers.append(create_mcard.password_answer(auth_answer_pk, add_answer_pk, auth_question_pk))
+        auth_answers.append(create_mcard.password_answer(auth_answer_pk, auth_question_pk, add_answer_pk))
 
         merchant_id_answer_pk = (total_mcards * 2) + add_answer_pk
         merchant_id_question_pk = (total_plans * 2) + add_question_pk
-        auth_answers.append(
-            create_mcard.password_answer(merchant_id_answer_pk, merchant_id_answer_pk, merchant_id_question_pk)
+        merchant_id_answers.append(
+            create_mcard.merchant_identifier_answer(merchant_id_answer_pk, merchant_id_question_pk, add_answer_pk)
         )
 
         if add_answer_pk % 100000 == 0:

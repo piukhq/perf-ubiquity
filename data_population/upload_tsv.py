@@ -32,10 +32,11 @@ def update_seq(cur, table_name):
     cur.execute(setval_statement)
 
 
-def truncate_and_populate_tables(db_name, tables):
-    connection_string = DB_CONNECTION_URI.replace("/postgres", f"/{db_name}")
+def truncate_and_populate_tables(db_name: str, tables: Enum):
+    db_connection_info = psycopg2.extensions.parse_dsn(DB_CONNECTION_URI)
+    db_connection_info["dbname"] = db_name
 
-    with psycopg2.connect(connection_string) as connection:
+    with psycopg2.connect(**db_connection_info) as connection:
         with connection.cursor() as cursor:
             logger.debug(f"Truncating tables defined in '{tables}'")
             for table in tables:

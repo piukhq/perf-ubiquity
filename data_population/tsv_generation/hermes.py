@@ -277,10 +277,14 @@ def create_membership_card_answers(total_mcards: int, total_plans: int):
     answers_per_core = total_mcards // cores
     jobs = []
 
-    for job_id, start in enumerate(range(1, total_mcards + 1, answers_per_core)):
-        end = min(start + answers_per_core, total_mcards + 1)
+    try:
+        for job_id, start in enumerate(range(1, total_mcards + 1, answers_per_core)):
+            end = min(start + answers_per_core, total_mcards + 1)
 
-        jobs.append({"job_id": job_id, "start": start, "count": end - start})
+            jobs.append({"job_id": job_id, "start": start, "count": end - start})
+    except ValueError as e:
+        raise ValueError(f"Total mcards: {total_mcards}, "
+                         f"cannot be lower than total CPU cores: {cores}. Please adjust config. ") from e
 
     logger.info(f"Starting {len(jobs)} jobs for membership card answer data...")
     pool = multiprocessing.Pool(processes=cores)

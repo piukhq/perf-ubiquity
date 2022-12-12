@@ -13,6 +13,6 @@ STATIC_MCARD_HISTORY_BODY = json.dumps(
         "is_deleted": False,
         "card_number": "",
         "alt_main_answer": "pytest+auto@testbink.com",
-        "originating_journey": 2
+        "originating_journey": 2,
     }
 )

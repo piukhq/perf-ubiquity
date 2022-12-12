@@ -23,6 +23,6 @@ STATIC_USER_HISTORY_BODY = json.dumps(
         "is_superuser": False,
         "last_accessed": "2022-01-01T01:01:01.000001+00:00",
         "marketing_code": None,
-        "magic_link_verified": None
+        "magic_link_verified": None,
     }
 )

@@ -15,10 +15,7 @@ STATIC_PCARD_HISTORY_BODY = json.dumps(
         "consents": [],
         "pan_start": "421111",
         "psp_token": "imatesttoken123",
-        "agent_data":
-            {
-                "card_uid": "123456-1234-1234-1234-123456"
-            },
+        "agent_data": {"card_uid": "123456-1234-1234-1234-123456"},
         "is_deleted": False,
         "start_year": None,
         "expiry_year": 2055,
@@ -29,6 +26,6 @@ STATIC_PCARD_HISTORY_BODY = json.dumps(
         "name_on_card": "Jeff",
         "payment_card": 1,
         "card_nickname": "",
-        "currency_code": "GBP"
+        "currency_code": "GBP",
     }
 )

@@ -63,6 +63,7 @@ class UserBehavior(SequentialTaskSet):
 
     def get_tokens(self):
         tokens = json.loads(r.lpop("user_tokens"))
+        logger.info(f"user tokens: {tokens}")
         self.b2b_tokens = tokens
 
     @repeatable_task()

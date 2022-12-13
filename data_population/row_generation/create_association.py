@@ -15,7 +15,7 @@ def pll_link(pk: int, pcard_id: int, mcard_id: int) -> list:
 def pll_user_association(pk: int, pll_id: int, user_id: int) -> list:
     return [
         pk,  # id
-        0,  # state
+        1,  # state
         "",  # slug
         "2019-03-12 15:51:36.390742+00",  # created
         "2019-03-15 05:55:28.532571+00",  # updated

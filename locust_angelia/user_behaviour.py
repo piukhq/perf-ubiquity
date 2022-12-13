@@ -799,7 +799,7 @@ class UserBehavior(SequentialTaskSet):
         """DELETEs an existing loyalty card from a trusted channel user. Will 404 if no cards available."""
 
         if self.trusted_loyalty_cards:
-            card_id = list(self.loyalty_cards.keys())[0]
+            card_id = list(self.trusted_loyalty_cards.keys())[0]
         else:
             card_id = "NO_CARD"
 

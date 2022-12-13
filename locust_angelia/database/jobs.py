@@ -21,7 +21,9 @@ def query_status(card_id: int) -> int:
     """
     with DB().open() as session:
 
-        query = select(SchemeAccount.status).where(SchemeAccount.id == card_id)
+        query = select(SchemeAccountUserAssociation.link_status).where(
+            SchemeAccountUserAssociation.scheme_account_id == card_id
+        )
 
         try:
             result = session.execute(query).one()
@@ -40,8 +42,11 @@ def set_status_for_loyalty_card(card_id: int, status: int) -> None:
     """
 
     with DB().open() as session:
-        query = update(SchemeAccount).where(SchemeAccount.id == card_id).values(status=status)
-
+        query = (
+            update(SchemeAccountUserAssociation)
+            .where(SchemeAccountUserAssociation.scheme_account_id == card_id)
+            .values(link_status=status)
+        )
         try:
             session.execute(query)
             session.commit()

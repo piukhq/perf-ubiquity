@@ -14,7 +14,7 @@ def category():
     ]
 
 
-def membership_plan(scheme_id, name, slug):
+def membership_plan(scheme_id: int, name: str, slug: str):
     return [
         scheme_id,  # id
         name,  # name
@@ -74,7 +74,7 @@ def membership_plan(scheme_id, name, slug):
     ]
 
 
-def card_no_question(question_id, scheme_id):
+def card_no_question(question_id: int, scheme_id: int):
     return [
         question_id,  # id
         "Card Number",  # label
@@ -97,7 +97,7 @@ def card_no_question(question_id, scheme_id):
     ]
 
 
-def password_question(question_id, scheme_id):
+def password_question(question_id: int, scheme_id: int):
     return [
         question_id,  # id
         "Password",  # label
@@ -117,6 +117,29 @@ def password_question(question_id, scheme_id):
         True,  # auth_field
         True,  # enrol_field
         True,  # register_field
+    ]
+
+
+def merchant_identifier_question(question_id: int, scheme_id: int):
+    return [
+        question_id,  # id
+        "Merchant Identifier",  # label
+        scheme_id,  # scheme_id
+        "merchant_identifier",  # type
+        0,  # order
+        False,  # manual_question
+        False,  # scan_question
+        True,  # third_party_identifier
+        False,  # one_question_link
+        8,  # options
+        0,  # answer_type
+        "NULL",  # choice
+        "description",  # description
+        "(.*)",  # validation
+        False,  # add_field
+        False,  # auth_field
+        False,  # enrol_field
+        False,  # register_field
     ]
 
 

@@ -1,8 +1,8 @@
 # Running Performance Tests:
 ### On Sandbox:
 * Make sure your kube config is pointing towards the performance sandbox:
-  * Context: `uksouth-perf0`
-  * Namespace: `default`
+  * Context: `uksouth-sandbox`
+  * Namespace: `perf-api-v1` or `perf-api-v2`
 * Port forward to sandbox locust web ui:
   * `kubectl port-forward <locust master pod name> 8089`
 * Open up web ui by going to below link:

@@ -17,6 +17,7 @@ class WebsiteUser(HttpUser):
     """
 
     TOTAL_CHANNELS = 8
+    TOTAL_TRUSTED_CHANNELS = 1
     RETRY_TIME = 0.5
     TIMEOUT = 10
 
@@ -24,6 +25,8 @@ class WebsiteUser(HttpUser):
         # --TOKEN--
         "post_token": 1,  # REQUIRED
         "post_token_secondary_user": 0,  # REQUIRED
+        "post_token_trusted_channel_primary_user": 0,  # REQUIRED
+        "post_token_trusted_channel_secondary_user": 0,  # REQUIRED
         "post_get_new_access_token_via_refresh": 0,
         # --LOYALTY_PLANS--
         "get_loyalty_plans": 0,
@@ -32,8 +35,10 @@ class WebsiteUser(HttpUser):
         "get_loyalty_plans_overview": 0,
         # --LOYALTY_CARDS--
         "post_loyalty_cards_add": 0,  # Single and Multiuser (1 each) - Adds 1 card
+        "post_loyalty_cards_trusted_add": 0,  # Single and Multiuser (1 each) - Adds 1 card
         "post_loyalty_cards_add_and_auth": 0,  # Single and Multiuser (1 each) - Adds 1 card
         "put_loyalty_cards_authorise": 0,  # Will 404 if > post_loyalty_cards_add
+        "put_loyalty_cards_trusted_channel": 0,  # Will 404 if > post_loyalty_cards_trusted_add
         "post_loyalty_cards_add_and_register": 0,  # # Single User (1 each) - Adds 1 card
         "put_loyalty_cards_register": 0,  # Will 404 if > (post_loyalty_cards_add - put_authorise)
         "post_loyalty_cards_join": 0,
@@ -46,11 +51,14 @@ class WebsiteUser(HttpUser):
         "patch_payment_account": 0,  # Will 404 if no post_payment_account
         # --WALLET--
         "get_wallet": 0,
+        "get_wallet_trusted_channel": 0,
         "get_wallet_overview": 0,
+        "get_wallet_overview_trusted_channel": 0,
         "get_wallet_loyalty_card": 0,  # Will 404 if no loyalty cards
         # --DELETE--
         "delete_join": 0,  # Should be less than total joins (or will 404)
         "delete_loyalty_card": 0,  # Should be less than total loyalty_cards added (or will 404)
+        "delete_trusted_loyalty_card": 0,  # Should be less than total trusted_loyalty_cards added (or will 404)
         "delete_payment_account": 0,  # Will 404 if > post_payment_account
         # --USER--
         "post_email_update": 0,
@@ -59,7 +67,7 @@ class WebsiteUser(HttpUser):
         "stop_locust_after_test_suite": 1,
     }
 
-    set_channels(TOTAL_CHANNELS)
+    set_channels(TOTAL_CHANNELS, TOTAL_TRUSTED_CHANNELS)
     set_task_repeats(repeats)
     set_retry_and_timeout(retry_time_value=RETRY_TIME, timeout_value=TIMEOUT)
 

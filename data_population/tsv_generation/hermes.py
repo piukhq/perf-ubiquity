@@ -6,7 +6,7 @@ from functools import partial
 
 from data_population.data_population_config import DataConfig
 from data_population.database_tables import HermesTables
-from data_population.fixtures.client import ALL_CLIENTS, NON_RESTRICTED_CLIENTS
+from data_population.fixtures.client import ALL_CLIENTS, NON_RESTRICTED_CLIENTS, TRUSTED_CHANNEL_CLIENTS
 from data_population.fixtures.payment_scheme import ALL_PAYMENT_PROVIDER_STATUS_MAPPINGS
 from data_population.job_creation import MCARDS_PER_SERVICE, PCARDS_PER_SERVICE, CardTypes, cores, create_tsv_jobs
 from data_population.row_generation import (
@@ -35,6 +35,7 @@ class Counters:
         self.payment_cards = []
         self.payment_card_associations = []
         self.pll_links = []
+        self.pll_user_associations = []
         self.vop_activation_dict = {}
         self.service_start = job["start"]
         self.mcard_index = job[f"{CardTypes.MCARD}_start"]
@@ -53,6 +54,7 @@ class Counters:
             self.payment_cards,
             self.payment_card_associations,
             self.pll_links,
+            self.pll_user_associations,
             self.vop_activation_dict,
         ):
             entries.clear()
@@ -65,6 +67,7 @@ class Counters:
         write_to_tsv_part(HermesTables.PAYMENT_ACCOUNT, self.part, self.payment_cards)
         write_to_tsv_part(HermesTables.PAYMENT_ACCOUNT_ENTRY, self.part, self.payment_card_associations)
         write_to_tsv_part(HermesTables.PAYMENT_MEMBERSHIP_ENTRY, self.part, self.pll_links)
+        write_to_tsv_part(HermesTables.PLL_USER_ASSOCIATION, self.part, self.pll_user_associations)
         vop_activation_list = list(self.vop_activation_dict.values())
         write_to_tsv_part(HermesTables.VOP_ACTIVATION, self.part, vop_activation_list)
 
@@ -120,6 +123,8 @@ def create_membership_plan_tsv_files(total_plans: int):
         plan_questions.append(create_plan.password_question(password_question_id, count))
         first_name_question_id = (total_plans * 2) + count
         plan_questions.append(create_plan.first_name_question(first_name_question_id, count))
+        merchant_identifier_question_id = (total_plans * 3) + count
+        plan_questions.append(create_plan.merchant_identifier_question(merchant_identifier_question_id, count))
         scheme_images.append(create_plan.scheme_image(count, count))
         scheme_balance_details.append(create_plan.scheme_balance_details(count, count))
         scheme_contents.append(create_plan.scheme_content(count, count))
@@ -145,7 +150,7 @@ def create_membership_plan_tsv_files(total_plans: int):
 
     whitelist_list = []
     whitelist_id = 0
-    for client_fixture in NON_RESTRICTED_CLIENTS:
+    for client_fixture in NON_RESTRICTED_CLIENTS + TRUSTED_CHANNEL_CLIENTS:
         for plan in membership_plans:
             whitelist_id += 1
             plan_id = plan[0]
@@ -217,7 +222,12 @@ def create_service_mcard_and_pcard_job(total_plans: int, transactions_per_mcard:
             link = create_association.pll_link(
                 counters.pcard_index - 1, counters.pcard_index - 1, counters.mcard_index - 1
             )
+            pll_user_association = create_association.pll_user_association(
+                counters.pcard_index - 1, counters.pcard_index - 1, service_pk
+            )
+
             counters.pll_links.append(link)
+            counters.pll_user_associations.append(pll_user_association)
             scheme_id = random.randint(1, total_plans)
             vop_activation = create_association.vop_activation(
                 counters.pcard_index - 1, counters.pcard_index - 1, scheme_id
@@ -275,10 +285,15 @@ def create_membership_card_answers(total_mcards: int, total_plans: int):
     answers_per_core = total_mcards // cores
     jobs = []
 
-    for job_id, start in enumerate(range(1, total_mcards + 1, answers_per_core)):
-        end = min(start + answers_per_core, total_mcards + 1)
+    try:
+        for job_id, start in enumerate(range(1, total_mcards + 1, answers_per_core)):
+            end = min(start + answers_per_core, total_mcards + 1)
 
-        jobs.append({"job_id": job_id, "start": start, "count": end - start})
+            jobs.append({"job_id": job_id, "start": start, "count": end - start})
+    except ValueError as e:
+        raise ValueError(
+            f"Total mcards: {total_mcards}, " f"cannot be lower than total CPU cores: {cores}. Please adjust config."
+        ) from e
 
     logger.info(f"Starting {len(jobs)} jobs for membership card answer data...")
     pool = multiprocessing.Pool(processes=cores)
@@ -295,24 +310,35 @@ def create_membership_card_answers_job(total_mcards: int, total_plans: int, job:
 
     add_answers = []
     auth_answers = []
+    merchant_id_answers = []
     for add_answer_pk in range(start, start + count):
         if len(add_answers) > BULK_SIZE:
             write_to_tsv_part(HermesTables.ANSWER, part, add_answers)
             write_to_tsv_part(HermesTables.ANSWER, part, auth_answers)
+            write_to_tsv_part(HermesTables.ANSWER, part, merchant_id_answers)
             add_answers.clear()
             auth_answers.clear()
+            merchant_id_answers.clear()
 
         add_question_pk = random.randint(1, total_plans)
-        add_answers.append(create_mcard.card_number_answer(add_answer_pk, add_answer_pk, add_question_pk))
+        add_answers.append(create_mcard.card_number_answer(add_answer_pk, add_question_pk, add_answer_pk))
+
         auth_answer_pk = total_mcards + add_answer_pk
-        auth_question_pk = add_question_pk + total_plans
-        auth_answers.append(create_mcard.password_answer(auth_answer_pk, add_answer_pk, auth_question_pk))
+        auth_question_pk = total_plans + add_question_pk
+        auth_answers.append(create_mcard.password_answer(auth_answer_pk, auth_question_pk, add_answer_pk))
+
+        merchant_id_answer_pk = (total_mcards * 2) + add_answer_pk
+        merchant_id_question_pk = (total_plans * 2) + add_question_pk
+        merchant_id_answers.append(
+            create_mcard.merchant_identifier_answer(merchant_id_answer_pk, merchant_id_question_pk, add_answer_pk)
+        )
 
         if add_answer_pk % 100000 == 0:
             logger.info(f"Generated {add_answer_pk} answers")
 
     write_to_tsv_part(HermesTables.ANSWER, part, add_answers)
     write_to_tsv_part(HermesTables.ANSWER, part, auth_answers)
+    write_to_tsv_part(HermesTables.ANSWER, part, merchant_id_answers)
 
     logger.info(f"Finished {part}")
 

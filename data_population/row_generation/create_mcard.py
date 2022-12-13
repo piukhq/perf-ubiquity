@@ -26,7 +26,6 @@ def membership_card(card_id, scheme_id, transaction_total):
 
     return [
         card_id,  # id
-        1,  # status
         0,  # order
         "2019-03-12 15:51:36.390742+00",  # created
         "2019-03-15 05:55:28.532571+00",  # updated
@@ -50,7 +49,7 @@ def membership_card(card_id, scheme_id, transaction_total):
         card_number,  # barcode
         card_number,  # card number
         transactions,  # transactions
-        card_number,  # main_answer
+        card_number,  # alt_main_answer
         json.dumps([]),  # pll_links
         "{}",  # formatted_images
         5,  # originating_journey
@@ -72,21 +71,30 @@ def historical_membership_card(history_id: int) -> list:
     ]
 
 
-def card_number_answer(answer_id, scheme_account_id, question_id):
+def card_number_answer(answer_id: int, question_id: int, scheme_account_entry_id: int):
     return [
         answer_id,  # id
         str(uuid.uuid4()),  # answer
-        scheme_account_id,  # scheme_account_id
         question_id,  # question_id
+        scheme_account_entry_id,  # scheme_account_entry_id
     ]
 
 
-def password_answer(answer_id, scheme_account_id, question_id):
+def password_answer(answer_id: int, question_id: int, scheme_account_entry_id: int):
     return [
         answer_id,  # id
         str(uuid.uuid4()),  # answer
-        scheme_account_id,  # scheme_account_id
         question_id,  # question_id
+        scheme_account_entry_id,  # scheme_account_entry_id
+    ]
+
+
+def merchant_identifier_answer(answer_id: int, question_id: int, scheme_account_entry_id: int):
+    return [
+        answer_id,  # id
+        str(uuid.uuid4()),  # answer
+        question_id,  # question_id
+        scheme_account_entry_id,  # scheme_account_entry_id
     ]
 
 

@@ -60,7 +60,7 @@ class WebsiteUser(HttpUser):
         # --DELETE--
         "delete_join": 0,  # Should be less than total joins (or will 404)
         "delete_loyalty_card": 1,  # Should be less than total loyalty_cards added (or will 404)
-        "delete_trusted_loyalty_card": 1,  # Should be less than total trusted_loyalty_cards added (or will 404)
+        "delete_trusted_loyalty_card": 0,  # Should be less than total trusted_loyalty_cards added (or will 404)
         "delete_payment_account": 1,  # Will 404 if > post_payment_account
         # --USER--
         "post_email_update": 1,

@@ -808,7 +808,7 @@ class UserBehavior(SequentialTaskSet):
             headers={"Authorization": f"bearer {self.access_tokens['trusted_channel_primary_user']}"},
             name=f"{self.url_prefix}/loyalty_cards/[id]",
         ):
-            self.loyalty_cards.pop(card_id)
+            self.trusted_loyalty_cards.pop(card_id)
 
     @repeatable_task()
     def delete_payment_account(self):

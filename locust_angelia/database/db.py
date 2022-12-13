@@ -1,6 +1,5 @@
 from sqlalchemy import MetaData, create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import scoped_session, sessionmaker
+from sqlalchemy.orm import declarative_base, scoped_session, sessionmaker
 
 from settings import DB_CONNECTION_URI, HERMES_DB
 
@@ -35,7 +34,7 @@ class DB(metaclass=Singleton):
         connection_string = DB_CONNECTION_URI.replace("/postgres", f"/{HERMES_DB}")
 
         self.engine = create_engine(connection_string)
-        self.metadata = MetaData(bind=self.engine)
+        self.metadata = MetaData()
 
         self.Base = declarative_base()
 

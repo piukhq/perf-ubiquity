@@ -8,19 +8,19 @@ from locust_angelia.database.db import DB
 
 
 class User(DB().Base):
-    __table__ = Table("user", DB().metadata, autoload=True)
+    __table__ = Table("user", DB().metadata, autoload_with=DB().engine)
     profile = relationship("UserDetail", backref="user", uselist=False)  # uselist = False sets one to one relation
     scheme_account_user_associations = relationship("SchemeAccountUserAssociation", backref="user")
 
 
 class UserDetail(DB().Base):
-    __table__ = Table("user_userdetail", DB().metadata, autoload=True)
+    __table__ = Table("user_userdetail", DB().metadata, autoload_with=DB().engine)
 
 
 class SchemeAccount(DB().Base):
-    __table__ = Table("scheme_schemeaccount", DB().metadata, autoload=True)
+    __table__ = Table("scheme_schemeaccount", DB().metadata, autoload_with=DB().engine)
     scheme_account_user_associations = relationship("SchemeAccountUserAssociation", backref="scheme_account")
 
 
 class SchemeAccountUserAssociation(DB().Base):
-    __table__ = Table("ubiquity_schemeaccountentry", DB().metadata, autoload=True)
+    __table__ = Table("ubiquity_schemeaccountentry", DB().metadata, autoload_with=DB().engine)

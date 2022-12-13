@@ -40,6 +40,7 @@ def membership_card(card_id, scheme_id, transaction_total):
                     "prefix": "",
                     "suffix": "pts",
                     "currency": "points",
+                    "reward_tier": 0,
                     "updated_at": 1591719196,
                     "description": "Placeholder Balance Description",
                 }

@@ -92,6 +92,14 @@ class UserBehavior(SequentialTaskSet):
 
     @repeatable_task()
     def post_token_trusted_channel_primary_user(self):
+        # Remove this extra pre-call when bug to fix first token not being trusted has been fixed
+        self.client.post(
+            f"{self.url_prefix}/token",
+            json={"grant_type": "b2b", "scope": ["user"]},
+            headers={"Authorization": f"bearer {self.b2b_tokens['trusted_channel_primary_user']}"},
+            name=f"{self.url_prefix}/token",
+        )
+
         with self.client.post(
             f"{self.url_prefix}/token",
             json={"grant_type": "b2b", "scope": ["user"]},
@@ -104,6 +112,14 @@ class UserBehavior(SequentialTaskSet):
 
     @repeatable_task()
     def post_token_trusted_channel_secondary_user(self):
+        # Remove this extra pre-call when bug to fix first token not being trusted has been fixed
+        self.client.post(
+            f"{self.url_prefix}/token",
+            json={"grant_type": "b2b", "scope": ["user"]},
+            headers={"Authorization": f"bearer {self.b2b_tokens['trusted_channel_secondary_user']}"},
+            name=f"{self.url_prefix}/token",
+        )
+
         with self.client.post(
             f"{self.url_prefix}/token",
             json={"grant_type": "b2b", "scope": ["user"]},

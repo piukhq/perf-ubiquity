@@ -82,7 +82,7 @@ class TokenGen:
             token = self.generate_b2b_token(email, sub, trusted_channel_client_name, private_key)
             b2b_tokens[f"trusted_channel_{user}"] = token
 
-        logger.info(f"generated test tokens: {str(b2b_tokens)}")
+        logger.info(f"Generated test tokens: {str(b2b_tokens)}")
         return b2b_tokens
 
 

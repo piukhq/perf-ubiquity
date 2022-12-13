@@ -63,7 +63,7 @@ class UserBehavior(SequentialTaskSet):
 
     def get_tokens(self):
         tokens = json.loads(r.lpop("user_tokens"))
-        logger.info(f"user tokens: {tokens}")
+        logger.info(f"User tokens: {tokens}")
         self.b2b_tokens = tokens
 
     @repeatable_task()
@@ -222,6 +222,7 @@ class UserBehavior(SequentialTaskSet):
         # ADD_AND_AUTH with primary user - creates new card
 
         plan_id = random.choice(range(1, self.loyalty_plan_count))
+        logger.info(f"Access tokens before trusted channel POST: {self.access_tokens}")
 
         data = {
             "loyalty_plan_id": plan_id,

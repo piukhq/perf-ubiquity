@@ -394,7 +394,7 @@ class UserBehavior(SequentialTaskSet):
             name=f"{self.url_prefix}/loyalty_cards/[id]/authorise",
             json=data,
         ) as response:
-            if response.json()["id"] == card_id:
+            if response.json()["id"] != card_id:
                 self.trusted_loyalty_cards[card_id]["state"] = "TRUSTED_PUT"
             else:
                 response.failure()

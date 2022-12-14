@@ -46,7 +46,7 @@ class WebsiteUser(HttpUser):
         "put_loyalty_cards_join": 1,
         "get_loyalty_cards_vouchers": 1,
         "get_loyalty_cards_transactions": 1,
-        "get_loyalty_cards_balance": 1,
+        "get_loyalty_cards_balance": 0,
         # --PAYMENT_ACCOUNTS--
         "post_payment_account": 1,  # Single and Multiuser (1 each) - Adds 1 card
         "post_payment_account_trusted_channel_user": 1,  # Single and Multiuser (1 each) - Adds 1 card

@@ -52,6 +52,7 @@ class Counters:
             self.services,
             self.membership_cards,
             self.membership_card_associations,
+            self.membership_card_answers,
             self.payment_cards,
             self.payment_card_associations,
             self.pll_links,

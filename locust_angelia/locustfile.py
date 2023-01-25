@@ -36,12 +36,12 @@ class WebsiteUser(HttpUser):
         "get_loyalty_plans_overview": 3,
         # --LOYALTY_CARDS--
         "post_loyalty_cards_add": 2,  # Single and Multiuser (1 each) - Adds 1 card
-        "post_loyalty_cards_trusted_add": 0,  # Single and Multiuser (1 each) - Adds 1 card
+        "post_loyalty_cards_trusted_add": 1,  # Single and Multiuser (1 each) - Adds 1 card
         "post_loyalty_cards_add_and_auth": 1,  # Single and Multiuser (1 each) - Adds 1 card
         "put_loyalty_cards_authorise": 1,  # Will 404 if > post_loyalty_cards_add
         "post_loyalty_cards_add_and_register": 1,  # Single User - Adds 1 card
         "put_loyalty_cards_register": 1,  # Will 404 if > (post_loyalty_cards_add - put_authorise)
-        "put_loyalty_cards_trusted_channel": 0,  # Will 404 if > post_loyalty_cards_trusted_add
+        "put_loyalty_cards_trusted_channel": 1,  # Will 404 if > post_loyalty_cards_trusted_add
         "post_loyalty_cards_join": 1,
         "put_loyalty_cards_join": 1,
         "get_loyalty_cards_vouchers": 1,

@@ -232,7 +232,7 @@ class UserBehavior(SequentialTaskSet):
                 response.failure()
 
     @repeatable_task()
-    def post_loyalty_cards_trusted_add(self):
+    def post_loyalty_cards_add_trusted(self):
         """POSTS a trusted channel add request."""
 
         # ADD_AND_AUTH with primary user - creates new card
@@ -251,9 +251,9 @@ class UserBehavior(SequentialTaskSet):
         }
 
         with self.client.post(
-            f"{self.url_prefix}/loyalty_cards/trusted_add",
+            f"{self.url_prefix}/loyalty_cards/add_trusted",
             headers={"Authorization": f"bearer {self.access_tokens['trusted_channel_primary_user']}"},
-            name=f"{self.url_prefix}/loyalty_cards/trusted_add",
+            name=f"{self.url_prefix}/loyalty_cards/add_trusted",
             json=data,
         ) as response:
             loyalty_card_id = response.json()["id"]
@@ -264,9 +264,9 @@ class UserBehavior(SequentialTaskSet):
         #  ADD with secondary user (Multiuser) - links secondary user to just-created card
 
         with self.client.post(
-            f"{self.url_prefix}/loyalty_cards/trusted_add",
+            f"{self.url_prefix}/loyalty_cards/add_trusted",
             headers={"Authorization": f"bearer {self.access_tokens['trusted_channel_secondary_user']}"},
-            name=f"{self.url_prefix}/loyalty_cards/trusted_add (MULTIUSER)",
+            name=f"{self.url_prefix}/loyalty_cards/add_trusted (MULTIUSER)",
             json=data,
         ) as response:
             loyalty_card_id = response.json()["id"]
@@ -389,7 +389,7 @@ class UserBehavior(SequentialTaskSet):
         }
 
         with self.client.put(
-            f"{self.url_prefix}/loyalty_cards/{card_id}/trusted_add",
+            f"{self.url_prefix}/loyalty_cards/{card_id}/add_trusted",
             headers={"Authorization": f"bearer {self.access_tokens['trusted_channel_primary_user']}"},
             name=f"{self.url_prefix}/loyalty_cards/[id]/authorise",
             json=data,

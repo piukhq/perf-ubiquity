@@ -738,7 +738,7 @@ class UserBehavior(SequentialTaskSet):
         self.client.get(
             f"{self.url_prefix}/wallet/payment_account_channel_links",
             headers={"Authorization": f"bearer {self.access_tokens['trusted_channel_primary_user']}"},
-            name=f"{self.url_prefix}/wallet_overview",
+            name=f"{self.url_prefix}/wallet/payment_account_channel_links",
         )
 
     @repeatable_task()

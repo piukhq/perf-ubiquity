@@ -56,6 +56,7 @@ class WebsiteUser(HttpUser):
         "get_wallet_trusted_channel": 1,
         "get_wallet_overview": 3,
         "get_wallet_overview_trusted_channel": 1,
+        "get_trusted_channel_payment_account_channel_links": 1,
         "get_wallet_loyalty_card": 1,  # Will 404 if no loyalty cards
         # --DELETE--
         "delete_join": 0,  # Should be less than total joins (or will 404)

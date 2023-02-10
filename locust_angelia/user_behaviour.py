@@ -733,6 +733,15 @@ class UserBehavior(SequentialTaskSet):
         )
 
     @repeatable_task()
+    def get_trusted_channel_payment_account_channel_links(self):
+
+        self.client.get(
+            f"{self.url_prefix}/wallet/payment_account_channel_links",
+            headers={"Authorization": f"bearer {self.access_tokens['trusted_channel_primary_user']}"},
+            name=f"{self.url_prefix}/wallet_overview",
+        )
+
+    @repeatable_task()
     def get_wallet_loyalty_card(self):
 
         if self.loyalty_cards:

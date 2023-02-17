@@ -5,6 +5,7 @@ from locust.exception import StopUser
 from requests import codes
 
 from data_population.fixtures.client import CLIENT_ONE, CLIENT_RESTRICTED, NON_RESTRICTED_CLIENTS
+from locust_angelia.database.jobs import set_status_for_loyalty_card
 from locust_config import (
     AUTOLINK,
     MEMBERSHIP_PLANS,
@@ -18,7 +19,7 @@ from locust_config import (
     repeat_task,
 )
 from request_data import membership_card, payment_card, service
-from request_data.hermes import post_scheme_account_status, wait_for_scheme_account_status
+from request_data.hermes import wait_for_scheme_account_status
 from vault import load_secrets
 
 
@@ -499,7 +500,7 @@ class UserBehavior(SequentialTaskSet):
 
             updated = wait_for_scheme_account_status(membership_card.PRE_REGISTERED_CARD_STATUS, mcard_id)
             if not updated:
-                post_scheme_account_status(membership_card.PRE_REGISTERED_CARD_STATUS, mcard_id)
+                set_status_for_loyalty_card(mcard_id, membership_card.PRE_REGISTERED_CARD_STATUS)
             self.client.patch(
                 f"{self.url_prefix}/membership_card/{mcard_id}",
                 json=mcard_json,

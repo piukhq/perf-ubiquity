@@ -5,9 +5,9 @@ from locust import HttpUser, SequentialTaskSet, constant, task
 from locust.exception import StopUser
 
 from data_population.fixtures.client import CLIENT_ONE, NON_RESTRICTED_CLIENTS
+from locust_angelia.database.jobs import set_status_for_loyalty_card
 from locust_config import AUTOLINK, MEMBERSHIP_PLANS, check_suite_whitelist, repeat_task
 from request_data import membership_card, payment_card, service
-from request_data.hermes import post_scheme_account_status
 from vault import load_secrets
 
 
@@ -135,7 +135,7 @@ class UserBehavior(SequentialTaskSet):
         }
         self.membership_cards.append(mcard)
 
-        post_scheme_account_status(membership_card.PRE_REGISTERED_CARD_STATUS, mcard_id)
+        set_status_for_loyalty_card(mcard_id, membership_card.PRE_REGISTERED_CARD_STATUS)
         register_json = membership_card.random_registration_json(self.pub_key)
         self.client.patch(
             f"{self.url_prefix}/membership_card/{mcard_id}",

@@ -1,12 +1,15 @@
+import logging
 import time
 
 import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
+from locust_angelia.database.jobs import query_status
 from settings import HERMES_URL, SERVICE_API_KEY
 
 REQUEST_TIMEOUT = 6
+logger = logging.getLogger(__name__)
 
 
 def retry_session():
@@ -22,18 +25,24 @@ def headers():
     return {"Content-Type": "application/json", "Authorization": f"token {SERVICE_API_KEY}"}
 
 
-def wait_for_scheme_account_status(status, scheme_account_id):
-    auth_header = headers()
-    params = {"id": scheme_account_id}
+def wait_for_scheme_account_status(status: int, scheme_account_id: int) -> bool:
+    current_retry = 0
+    timeout = 30
+    retry_wait_time = 1
     match = False
-    for _ in range(REQUEST_TIMEOUT):
-        resp = requests.get(f"{HERMES_URL}/schemes/accounts/query", headers=auth_header, params=params)
 
-        if resp.json()[0]["status"] == status:
+    while current_retry < timeout:
+        if query_status(scheme_account_id) == status:  # 901 = ENROL_FAILED
             match = True
             break
-
-        time.sleep(5)
+        else:
+            time.sleep(retry_wait_time)
+            current_retry += retry_wait_time
+    if current_retry >= timeout:
+        logger.error(
+            f"STATUS TIMEOUT: Loyalty Card {scheme_account_id} still not processed after {timeout} seconds. Sending "
+            f"request anyway."
+        )
 
     return match
 

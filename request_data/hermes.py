@@ -32,7 +32,7 @@ def wait_for_scheme_account_status(status: int, scheme_account_id: int) -> bool:
     match = False
 
     while current_retry < timeout:
-        if query_status(scheme_account_id) == status:  # 901 = ENROL_FAILED
+        if status in query_status(scheme_account_id):  # 901 = ENROL_FAILED
             match = True
             break
         else:

@@ -11,7 +11,7 @@ from settings import fake
 logger = logging.getLogger("Database_Handler")
 
 
-def query_status(card_id: int) -> int:
+def query_status(card_id: int) -> list:
     """Queries a loyalty card's current status.
 
     :param card_id: id of the card to be queried
@@ -26,11 +26,11 @@ def query_status(card_id: int) -> int:
         )
 
         try:
-            result = session.execute(query).one()
+            result = session.execute(query).all()
         except DatabaseError:
             logger.error(f"Could not fetch card status for card {card_id}!")
         else:
-            return result[0]
+            return [x[0] for x in result]
 
 
 def set_status_for_loyalty_card(card_id: int, status: int) -> None:

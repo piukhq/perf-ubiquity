@@ -768,7 +768,7 @@ class UserBehavior(SequentialTaskSet):
         if self.join_ids:
             card_id = self.join_ids.pop(0)
             while current_retry < timeout:
-                if query_status(card_id) == 901:  # 901 = ENROL_FAILED
+                if 901 in query_status(card_id):  # 901 = ENROL_FAILED
                     break
                 else:
                     time.sleep(retry_time)

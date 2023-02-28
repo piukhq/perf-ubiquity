@@ -56,7 +56,7 @@ TEST_SUITE = {
     # barclays specific tests
     "post_membership_cards": True,
     # config functions
-    "stop_locust_after_test_suite": False,
+    "stop_locust_after_test_suite": True,
 }
 
 repeat_tasks = {}  # values assigned by locustfile

@@ -67,7 +67,7 @@ class WebsiteUser(HttpUser):
         "post_email_update": 1,
         "delete_me": 1,
         # --SPECIAL--
-        "stop_locust_after_test_suite": 0,
+        "stop_locust_after_test_suite": 1,
     }
 
     set_channels(TOTAL_CHANNELS, TOTAL_TRUSTED_CHANNELS)

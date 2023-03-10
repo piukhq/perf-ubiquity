@@ -1,8 +1,11 @@
 import csv
+import logging
 
 import psycopg2
 
 from settings import DB_CONNECTION_URI, HERMES_DB, TSV_BASE_DIR
+
+logger = logging.getLogger("generate-harmonia-data")
 
 
 def _get_token_slug_mapping():
@@ -11,7 +14,7 @@ def _get_token_slug_mapping():
 
     with psycopg2.connect(**db_connection_info) as connection:
         with connection.cursor() as cursor:
-            # logger.debug(f"Fetching token to slug mappings from Harmonia")
+            logger.debug(f"Fetching token to slug mappings from Harmonia")
             statement = (
                 "SELECT"
                 " t2.token, t4.slug, t5.slug FROM ubiquity_paymentcardschemeentry t1 "

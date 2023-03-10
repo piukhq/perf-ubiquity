@@ -1,5 +1,7 @@
 from dataclasses import dataclass
 
+from data_population.fixtures.membership_plan import SCHEME_SLUGS
+
 
 @dataclass
 class DataConfig:
@@ -12,6 +14,7 @@ class DataConfig:
     payment_cards: int
     payment_cards_history: int
     transactions: int
+    real_plans: bool = False
 
 
 test = DataConfig(
@@ -117,6 +120,20 @@ barclays_internal_test = DataConfig(
     transactions=10000,
 )
 
+
+harmonia_2023 = DataConfig(
+    name="harmonia_2023",
+    membership_plans=len(SCHEME_SLUGS),
+    users=5000,
+    users_history=5000,
+    membership_cards=5000,
+    membership_cards_history=5000,
+    payment_cards=2000,
+    payment_cards_history=2000,
+    transactions=10000,
+    real_plans=True,
+)
+
 all_configs = [
     test,
     benchmark,
@@ -126,5 +143,6 @@ all_configs = [
     barclays_2024,
     barclays_internal_test,
     benchmark_old,
+    harmonia_2023,
 ]
 all_config_names = [config.name for config in all_configs]

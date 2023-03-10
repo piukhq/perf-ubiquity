@@ -3,7 +3,10 @@ from enum import Enum
 import click
 
 from data_population import data_population_config
-from data_population.database_tables import HadesTables, HermesHistoryTables, HermesTables
+from data_population.database_tables import (HadesTables, HermesHistoryTables,
+                                             HermesTables)
+from data_population.generate_harmonia_data import \
+    generate_harmonia_pc_token_to_slug_mappings
 from data_population.tsv_generation import hades, hermes, hermes_history
 from data_population.upload_tsv import upload_named_group_of_tsv_files
 from settings import HADES_DB, HERMES_DB
@@ -102,3 +105,5 @@ def populate_db(group_config: str, size_config: str):
     all_data_to_upload = data_mapping[group_config]["upload_lists"]
     for data_to_upload in all_data_to_upload:
         upload_named_group_of_tsv_files(data_to_upload["database"], data_to_upload["tables"])
+    if group_config not in ["hades", "hermeshistory"] and size_config.real_plans:
+        generate_harmonia_pc_token_to_slug_mappings()

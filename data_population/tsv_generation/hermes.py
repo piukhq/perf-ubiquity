@@ -6,18 +6,22 @@ from functools import partial
 
 from data_population.data_population_config import DataConfig
 from data_population.database_tables import HermesTables
-from data_population.fixtures.client import ALL_CLIENTS, NON_RESTRICTED_CLIENTS, TRUSTED_CHANNEL_CLIENTS
-from data_population.fixtures.payment_scheme import ALL_PAYMENT_PROVIDER_STATUS_MAPPINGS
-from data_population.job_creation import MCARDS_PER_SERVICE, PCARDS_PER_SERVICE, CardTypes, cores, create_tsv_jobs
-from data_population.row_generation import (
-    create_association,
-    create_channel,
-    create_mcard,
-    create_pcard,
-    create_plan,
-    create_service,
-)
-from data_population.tsv_generation.common import delete_old_tsv_files, write_to_tsv_part
+from data_population.fixtures.client import (ALL_CLIENTS,
+                                             NON_RESTRICTED_CLIENTS,
+                                             TRUSTED_CHANNEL_CLIENTS)
+from data_population.fixtures.membership_plan import SCHEME_SLUGS
+from data_population.fixtures.payment_scheme import \
+    ALL_PAYMENT_PROVIDER_STATUS_MAPPINGS
+from data_population.generate_harmonia_data import \
+    generate_harmonia_pc_token_to_slug_mappings
+from data_population.job_creation import (MCARDS_PER_SERVICE,
+                                          PCARDS_PER_SERVICE, CardTypes, cores,
+                                          create_tsv_jobs)
+from data_population.row_generation import (create_association, create_channel,
+                                            create_mcard, create_pcard,
+                                            create_plan, create_service)
+from data_population.tsv_generation.common import (delete_old_tsv_files,
+                                                   write_to_tsv_part)
 
 BULK_SIZE = 10000
 
@@ -97,7 +101,7 @@ def create_payment_scheme_tsv_files():
     write_to_tsv_part(HermesTables.PROVIDER_STATUS_MAPPING, 0, ALL_PAYMENT_PROVIDER_STATUS_MAPPINGS)
 
 
-def create_membership_plan_tsv_files(total_plans: int):
+def create_membership_plan_tsv_files(total_plans: int, real_plans: bool = False):
     categories = [create_plan.category()]
     write_to_tsv_part(HermesTables.CATEGORY, 0, categories)
 
@@ -111,14 +115,19 @@ def create_membership_plan_tsv_files(total_plans: int):
     third_party_consents = []
     voucher_schemes = []
     third_party_consent_index = 1
-    for count in range(1, total_plans + 1):
-        if count % 2 == 0:  # Even-numbered plans are non-voucher
-            plan_name = f"performance mock {count}"
-            plan_slug = f"performance-mock-{count}"
-        else:  # Odd-numbered plans are voucher plans
-            plan_name = f"performance voucher mock {count}"
-            plan_slug = f"performance-voucher-mock-{count}"
-            voucher_schemes.append(create_plan.voucher_scheme(count, count))
+    mcard_range = range(1, len(SCHEME_SLUGS) + 1) if real_plans else range(1, total_plans + 1)
+    for count in mcard_range:
+        if real_plans:
+            plan_name = list(SCHEME_SLUGS.values())[count - 1]
+            plan_slug = list(SCHEME_SLUGS.keys())[count - 1]
+        else:
+            if count % 2 == 0:  # Even-numbered plans are non-voucher
+                plan_name = f"performance mock {count}"
+                plan_slug = f"performance-mock-{count}"
+            else:  # Odd-numbered plans are voucher plans
+                plan_name = f"performance voucher mock {count}"
+                plan_slug = f"performance-voucher-mock-{count}"
+                voucher_schemes.append(create_plan.voucher_scheme(count, count))
 
         membership_plans.append(create_plan.membership_plan(count, plan_name, plan_slug))
         plan_questions.append(create_plan.card_no_question(count, count))
@@ -324,7 +333,7 @@ def create_tsv_files(data_config: DataConfig):
     logger.debug(f"Completed payment schemes (2/4). Elapsed time: {time.perf_counter() - start}")
 
     logger.debug("Creating membership plan tsv files (3/4)...")
-    create_membership_plan_tsv_files(data_config.membership_plans)
+    create_membership_plan_tsv_files(data_config.membership_plans, data_config.real_plans)
     logger.debug(f"Completed membership plans (3/4). Elapsed time: {time.perf_counter() - start}")
 
     logger.debug("Creating service, mcard and pcard tsv files (4/4)...")

@@ -6,8 +6,7 @@ from locust.exception import StopUser
 
 from data_population.fixtures.client import CLIENT_ONE, NON_RESTRICTED_CLIENTS
 from locust_angelia.database.jobs import set_status_for_loyalty_card
-from locust_config import (AUTOLINK, MEMBERSHIP_PLANS, check_suite_whitelist,
-                           repeat_task)
+from locust_config import AUTOLINK, MEMBERSHIP_PLANS, check_suite_whitelist, repeat_task
 from request_data import membership_card, payment_card, service
 from vault import load_secrets
 

@@ -5,8 +5,7 @@ import time
 from data_population.data_population_config import DataConfig
 from data_population.database_tables import HadesTables
 from data_population.row_generation import create_mcard
-from data_population.tsv_generation.common import (delete_old_tsv_files,
-                                                   write_to_tsv_part)
+from data_population.tsv_generation.common import delete_old_tsv_files, write_to_tsv_part
 
 logger = logging.getLogger(__name__)
 cores = multiprocessing.cpu_count()

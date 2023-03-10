@@ -3,10 +3,8 @@ from enum import Enum
 import click
 
 from data_population import data_population_config
-from data_population.database_tables import (HadesTables, HermesHistoryTables,
-                                             HermesTables)
-from data_population.generate_harmonia_data import \
-    generate_harmonia_pc_token_to_slug_mappings
+from data_population.database_tables import HadesTables, HermesHistoryTables, HermesTables
+from data_population.generate_harmonia_data import generate_harmonia_pc_token_to_slug_mappings
 from data_population.tsv_generation import hades, hermes, hermes_history
 from data_population.upload_tsv import upload_named_group_of_tsv_files
 from settings import HADES_DB, HERMES_DB

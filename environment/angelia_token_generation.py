@@ -8,8 +8,7 @@ import redis
 from locust.env import Environment
 
 import settings
-from data_population.fixtures.client import (NON_RESTRICTED_CLIENTS,
-                                             TRUSTED_CHANNEL_CLIENTS)
+from data_population.fixtures.client import NON_RESTRICTED_CLIENTS, TRUSTED_CHANNEL_CLIENTS
 from request_data import angelia
 from vault import load_secrets
 

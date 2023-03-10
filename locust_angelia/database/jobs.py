@@ -5,8 +5,7 @@ from sqlalchemy import select, update
 from sqlalchemy.exc import DatabaseError
 
 from locust_angelia.database.db import DB
-from locust_angelia.database.models import (SchemeAccount,
-                                            SchemeAccountUserAssociation, User)
+from locust_angelia.database.models import SchemeAccount, SchemeAccountUserAssociation, User
 from settings import fake
 
 logger = logging.getLogger("Database_Handler")

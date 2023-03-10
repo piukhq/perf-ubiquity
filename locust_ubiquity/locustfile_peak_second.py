@@ -4,14 +4,20 @@ from locust import HttpUser, SequentialTaskSet, constant, task
 from locust.exception import StopUser
 from requests import codes
 
-from data_population.fixtures.client import (CLIENT_ONE, CLIENT_RESTRICTED,
-                                             NON_RESTRICTED_CLIENTS)
+from data_population.fixtures.client import CLIENT_ONE, CLIENT_RESTRICTED, NON_RESTRICTED_CLIENTS
 from locust_angelia.database.jobs import set_status_for_loyalty_card
-from locust_config import (AUTOLINK, MEMBERSHIP_PLANS,
-                           MULTIPLE_PROPERTY_PCARD_INDEX, NON_PATCH_PLANS,
-                           PATCH_PLANS, TOTAL_CLIENTS, LocustLabel,
-                           check_suite_whitelist, increment_locust_counter,
-                           repeat_task)
+from locust_config import (
+    AUTOLINK,
+    MEMBERSHIP_PLANS,
+    MULTIPLE_PROPERTY_PCARD_INDEX,
+    NON_PATCH_PLANS,
+    PATCH_PLANS,
+    TOTAL_CLIENTS,
+    LocustLabel,
+    check_suite_whitelist,
+    increment_locust_counter,
+    repeat_task,
+)
 from request_data import membership_card, payment_card, service
 from request_data.hermes import wait_for_scheme_account_status
 from vault import load_secrets

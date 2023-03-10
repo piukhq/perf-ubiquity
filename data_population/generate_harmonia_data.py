@@ -14,7 +14,7 @@ def _get_token_slug_mapping():
 
     with psycopg2.connect(**db_connection_info) as connection:
         with connection.cursor() as cursor:
-            logger.debug(f"Fetching token to slug mappings for Harmonia")
+            logger.debug("Fetching token to slug mappings for Harmonia")
             statement = (
                 "SELECT"
                 " t2.token, t4.slug, t5.slug FROM ubiquity_paymentcardschemeentry t1 "

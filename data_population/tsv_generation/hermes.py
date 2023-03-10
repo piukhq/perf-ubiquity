@@ -12,8 +12,6 @@ from data_population.fixtures.client import (ALL_CLIENTS,
 from data_population.fixtures.membership_plan import SCHEME_SLUGS
 from data_population.fixtures.payment_scheme import \
     ALL_PAYMENT_PROVIDER_STATUS_MAPPINGS
-from data_population.generate_harmonia_data import \
-    generate_harmonia_pc_token_to_slug_mappings
 from data_population.job_creation import (MCARDS_PER_SERVICE,
                                           PCARDS_PER_SERVICE, CardTypes, cores,
                                           create_tsv_jobs)

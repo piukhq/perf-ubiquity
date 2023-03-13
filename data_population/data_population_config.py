@@ -121,8 +121,8 @@ barclays_internal_test = DataConfig(
 )
 
 
-harmonia_2023 = DataConfig(
-    name="harmonia_2023",
+harmonia_real_slugs = DataConfig(
+    name="harmonia_real_slugs",
     membership_plans=len(SCHEME_SLUGS),
     users=5000,
     users_history=5000,
@@ -143,6 +143,6 @@ all_configs = [
     barclays_2024,
     barclays_internal_test,
     benchmark_old,
-    harmonia_2023,
+    harmonia_real_slugs,
 ]
 all_config_names = [config.name for config in all_configs]

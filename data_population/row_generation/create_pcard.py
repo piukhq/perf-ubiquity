@@ -117,8 +117,8 @@ def create_all_payment_card_account_images():
 
 def payment_card(card_id):
     token = str(uuid.uuid4())
-    pcard_id_list = [1] * 1 + [2] * 4 + [3] * 5
-    payment_card_id = random.choice(pcard_id_list)
+    pcard_id_list = list(range(1, len(PAYMENT_SCHEME_INFO)+1))
+    payment_card_id = random.choices(pcard_id_list, weights=[1, 4, 5], k=1)
     return [
         card_id,  # id
         "performance test",  # name_on_card

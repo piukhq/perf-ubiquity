@@ -17,7 +17,7 @@ def _get_token_slug_mapping():
             logger.debug("Fetching token to slug mappings for Harmonia")
             statement = (
                 "SELECT"
-                " t2.token, t4.slug, t5.slug, t2.pan_start, t2.pan_end FROM ubiquity_paymentcardschemeentry t1 "
+                " t2.token, t4.slug, t2.pan_start, t2.pan_end, t5.slug FROM ubiquity_paymentcardschemeentry t1 "
                 "INNER JOIN payment_card_paymentcardaccount t2 ON t1.payment_card_account_id=t2.id "
                 "INNER JOIN scheme_schemeaccount t3 ON t1.scheme_account_id=t3.id "
                 "INNER JOIN scheme_scheme t4 ON t3.scheme_id=t4.id "

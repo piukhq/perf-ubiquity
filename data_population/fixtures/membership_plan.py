@@ -5,5 +5,5 @@ SCHEME_SLUGS = {
     "squaremeal": "SquareMeal Restaurant Rewards",
     "wasabi-club": "Wasabi Club",
     "iceland-bonus-card": "Iceland Bonus Card",
-    "costa": "Costa"
+    "costa": "Costa",
 }

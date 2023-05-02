@@ -301,4 +301,6 @@ def voucher_scheme(pk, scheme_id):
         4,  # earn_target_value
         "",  # body_text_cancelled
         "",  # headline_cancelled
+        "",  # body_text_pending
+        "",  # headline_pending
     ]

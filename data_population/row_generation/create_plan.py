@@ -71,6 +71,7 @@ def membership_plan(scheme_id: int, name: str, slug: str):
         0,  # plan_popularity
         "000000",  # text_colour
         1200,  # balance_renew_period
+        "NULL",  # go_live
     ]
 
 

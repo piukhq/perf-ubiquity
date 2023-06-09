@@ -20,7 +20,6 @@ def query_status(card_id: int) -> list:
 
     """
     with DB().open() as session:
-
         query = select(SchemeAccountUserAssociation.link_status).where(
             SchemeAccountUserAssociation.scheme_account_id == card_id
         )
@@ -67,7 +66,6 @@ def add_join(email: str, loyalty_plan: int):  # Not currently used - for future 
 
     """
     with DB().open() as session:
-
         query = select(User).where(User.email == email)
 
         result = session.execute(query).one()

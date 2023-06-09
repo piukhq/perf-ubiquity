@@ -362,7 +362,6 @@ class UserBehavior(SequentialTaskSet):
                 catch_response=True,
                 name=f"{self.url_prefix}/membership_cards {LocustLabel.MULTI_PROPERTY}",
             ) as response:
-
                 new_mcard_id = response.json()["id"]
                 if new_mcard_id == mcard["id"]:
                     response.success()
@@ -379,7 +378,6 @@ class UserBehavior(SequentialTaskSet):
                 catch_response=True,
                 name=f"{self.url_prefix}/membership_cards {LocustLabel.MULTI_PROPERTY}",
             ) as response:
-
                 new_mcard_id = response.json()["id"]
                 if new_mcard_id == mcard["id"]:
                     response.success()

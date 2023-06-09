@@ -19,7 +19,9 @@ def truncate_table(cur, table_name):
     cur.execute(truncate_statement)
 
 
-def delete_client_app_perf_records(cur,):
+def delete_client_app_perf_records(
+    cur,
+):
     organisation_delete = f"DELETE FROM {HermesTables.ORGANISATION} WHERE id <> 1"
     cur.execute(organisation_delete)
     delete_statement = f"DELETE FROM {HermesTables.CLIENT_APP} WHERE organisation_id <> 1"

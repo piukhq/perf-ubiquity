@@ -539,7 +539,6 @@ class UserBehavior(SequentialTaskSet):
 
     @repeatable_task()
     def get_loyalty_cards_balance(self):
-
         if self.loyalty_cards:
             card_id = random.choice(list(self.loyalty_cards.keys()))
         else:
@@ -553,7 +552,6 @@ class UserBehavior(SequentialTaskSet):
 
     @repeatable_task()
     def get_loyalty_cards_transactions(self):
-
         if self.loyalty_cards:
             card_id = random.choice(list(self.loyalty_cards.keys()))
         else:
@@ -567,7 +565,6 @@ class UserBehavior(SequentialTaskSet):
 
     @repeatable_task()
     def get_loyalty_cards_vouchers(self):
-
         if self.loyalty_cards:
             card_id = random.choice(list(self.loyalty_cards.keys()))
         else:
@@ -698,7 +695,6 @@ class UserBehavior(SequentialTaskSet):
 
     @repeatable_task()
     def get_wallet(self):
-
         self.client.get(
             f"{self.url_prefix}/wallet",
             headers={"Authorization": f"bearer {self.access_tokens['primary_user']}"},
@@ -707,7 +703,6 @@ class UserBehavior(SequentialTaskSet):
 
     @repeatable_task()
     def get_wallet_trusted_channel(self):
-
         self.client.get(
             f"{self.url_prefix}/wallet",
             headers={"Authorization": f"bearer {self.access_tokens['trusted_channel_primary_user']}"},
@@ -716,7 +711,6 @@ class UserBehavior(SequentialTaskSet):
 
     @repeatable_task()
     def get_wallet_overview(self):
-
         self.client.get(
             f"{self.url_prefix}/wallet_overview",
             headers={"Authorization": f"bearer {self.access_tokens['primary_user']}"},
@@ -725,7 +719,6 @@ class UserBehavior(SequentialTaskSet):
 
     @repeatable_task()
     def get_wallet_overview_trusted_channel(self):
-
         self.client.get(
             f"{self.url_prefix}/wallet_overview",
             headers={"Authorization": f"bearer {self.access_tokens['trusted_channel_primary_user']}"},
@@ -734,7 +727,6 @@ class UserBehavior(SequentialTaskSet):
 
     @repeatable_task()
     def get_trusted_channel_payment_account_channel_links(self):
-
         self.client.get(
             f"{self.url_prefix}/wallet/payment_account_channel_links",
             headers={"Authorization": f"bearer {self.access_tokens['trusted_channel_primary_user']}"},
@@ -743,7 +735,6 @@ class UserBehavior(SequentialTaskSet):
 
     @repeatable_task()
     def get_wallet_loyalty_card(self):
-
         if self.loyalty_cards:
             card_id = random.choice(list(self.loyalty_cards.keys()))
         else:
@@ -840,7 +831,6 @@ class UserBehavior(SequentialTaskSet):
 
     @repeatable_task()
     def post_email_update(self):
-
         data = {"email": "updated-" + str(uuid.uuid4()) + "@testbink.com"}
 
         self.client.post(

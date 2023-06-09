@@ -7,7 +7,6 @@ from vault import load_secrets
 
 
 class WebsiteUser(HttpUser):
-
     load_secrets()
 
     """

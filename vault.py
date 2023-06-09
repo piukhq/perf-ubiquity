@@ -30,10 +30,8 @@ class KeyVault:
 
 
 def load_secrets():
-
     global channel_info
     if channel_info is None:
-
         channel_info = {}
 
         if LOCAL_SECRETS:

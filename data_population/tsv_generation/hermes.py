@@ -272,7 +272,10 @@ def create_service_mcard_and_pcard_job(total_plans: int, total_mcards: int, tran
 
     overflow_mcard_start = job[f"{CardTypes.MCARD}_start"] + len(counters.membership_cards)
     overflow_pcard_start = job[f"{CardTypes.PCARD}_start"] + len(counters.payment_cards)
-    (overflow_mcards, overflow_pcards,) = create_remaining_mcards_and_pcards(
+    (
+        overflow_mcards,
+        overflow_pcards,
+    ) = create_remaining_mcards_and_pcards(
         overflow_mcard_start,
         overflow_pcard_start,
         counters.remaining_overflow_mcards,

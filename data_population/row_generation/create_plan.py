@@ -95,6 +95,8 @@ def card_no_question(question_id: int, scheme_id: int):
         False,  # auth_field
         False,  # enrol_field
         False,  # register_field
+        "",  # validation description
+        False,  # is_optional
     ]
 
 
@@ -118,6 +120,8 @@ def password_question(question_id: int, scheme_id: int):
         True,  # auth_field
         True,  # enrol_field
         True,  # register_field
+        "",  # validation description
+        False,  # is_optional
     ]
 
 
@@ -141,6 +145,8 @@ def merchant_identifier_question(question_id: int, scheme_id: int):
         False,  # auth_field
         False,  # enrol_field
         False,  # register_field
+        "",  # validation description
+        False,  # is_optional
     ]
 
 
@@ -164,6 +170,8 @@ def first_name_question(question_id, scheme_id):
         False,  # auth_field
         True,  # enrol_field
         True,  # register_field
+        "",  # validation description
+        False,  # is_optional
     ]
 
 

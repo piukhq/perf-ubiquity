@@ -19,6 +19,13 @@ def truncate_table(cur, table_name):
     cur.execute(truncate_statement)
 
 
+def delete_client_app_perf_records(cur,):
+    organisation_delete = f"DELETE FROM {HermesTables.ORGANISATION} WHERE id <> 1"
+    cur.execute(organisation_delete)
+    delete_statement = f"DELETE FROM {HermesTables.CLIENT_APP} WHERE organisation_id <> 1"
+    cur.execute(delete_statement)
+
+
 def upload_tsv(cur, table_name, tsv):
     with open(tsv) as f:
         cur.copy_from(f, table_name, sep="\t", null="NULL")
@@ -40,7 +47,14 @@ def truncate_and_populate_tables(db_name: str, tables: Enum):
         with connection.cursor() as cursor:
             logger.debug(f"Truncating tables defined in '{tables}'")
             for table in tables:
-                truncate_table(cursor, table)
+                # We need to keep certain django data in the organisation and client application tables
+                # So use delete rather than truncate. This allows django admin access
+                if table is HermesTables.ORGANISATION:
+                    continue
+                if table is HermesTables.CLIENT_APP:
+                    delete_client_app_perf_records(cursor)
+                else:
+                    truncate_table(cursor, table)
 
             for table in tables:
                 path = os.path.join(TSV_BASE_DIR, table + "-*.tsv")

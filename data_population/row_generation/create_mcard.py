@@ -4,6 +4,7 @@ import uuid
 
 import arrow
 
+from data_population.encryption import encrypt_credentials
 from data_population.fixtures.membership_card import STATIC_MCARD_HISTORY_BODY
 
 
@@ -85,7 +86,7 @@ def card_number_answer(answer_id: int, question_id: int, scheme_account_entry_id
 def password_answer(answer_id: int, question_id: int, scheme_account_entry_id: int):
     return [
         answer_id,  # id
-        str(uuid.uuid4()),  # answer
+        encrypt_credentials(str(uuid.uuid4())),  # answer
         question_id,  # question_id
         scheme_account_entry_id,  # scheme_account_entry_id
     ]

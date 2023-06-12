@@ -193,5 +193,10 @@ cython_debug/
 tsv/
 *.tsv
 
+# Local secrets files
+data_population/secrets/*
+# exception to the rule
+!data_population/secrets/.gitkeep
+
 # Jet brains settings files
 .idea/

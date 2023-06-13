@@ -42,7 +42,7 @@ class AESCipher(object):
 def get_aes_key(filename: str):
     with open(filename) as reader:
         vault_aes_keys = reader.read()
-        aes_key = json.loads(vault_aes_keys)["AES_KEY"]
+        aes_key = json.loads(vault_aes_keys)["LOCAL_AES_KEY"]
     return aes_key.encode()
 
 

@@ -55,7 +55,7 @@ def membership_card(card_id, scheme_id, transaction_total):
         json.dumps([]),  # pll_links
         "{}",  # formatted_images
         5,  # originating_journey
-        "",  # merchant_identifier
+        card_number,  # merchant_identifier
     ]
 
 

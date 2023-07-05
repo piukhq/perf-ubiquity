@@ -5,8 +5,10 @@ RUN poetry build
 
 WORKDIR /tmp/copy
 RUN cp /src/dist/*.whl .
-RUN cp -R /src/ubiquity_performance_test/locust_angelia .
-RUN cp -R /src/ubiquity_performance_test/locust_ubiquity .
+WORKDIR /tmp/copy/locust_angelia
+RUN cp -R /src/ubiquity_performance_test/locust_angelia/locustfile* .
+WORKDIR /tmp/copy/locust_ubiquity
+RUN cp -R /src/ubiquity_performance_test/locust_ubiquity/locustfile* .
 
 FROM ghcr.io/binkhq/python:3.11 as main
 

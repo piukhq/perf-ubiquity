@@ -84,7 +84,7 @@ def card_no_question(question_id: int, scheme_id: int) -> list:
         0,  # order
         True,  # manual_question
         False,  # scan_question
-        False,  # third_party_identifier
+        True,  # third_party_identifier
         False,  # one_question_link
         6,  # options
         0,  # answer_type

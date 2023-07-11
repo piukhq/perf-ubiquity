@@ -19,8 +19,10 @@ WORKDIR /app
 COPY --from=build /tmp/copy/ ./
 
 RUN apt update && \
-    apt -y install gcc vim nano tmux postgresql-client && \
-    pip install $wheel && \
-    rm $wheel && \
-    apt -y autoremove gcc && \
+    apt -y install gcc vim nano tmux postgresql-client
+
+RUN pip install $wheel && \
+    rm $wheel 
+
+RUN apt -y autoremove gcc && \
     rm -rf /var/lib/apt/lists/*

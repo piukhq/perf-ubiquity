@@ -16,7 +16,13 @@ class KeyVaultError(Exception):
 
 class KeyVault:
     def __init__(self, vault_url: str) -> None:
-        kv_credential = DefaultAzureCredential(exclude_shared_token_cache_credential=True,)
+        kv_credential = DefaultAzureCredential(
+            exclude_environment_credential=True,
+            exclude_shared_token_cache_credential=True,
+            exclude_visual_studio_code_credential=True,
+            exclude_interactive_browser_credential=True,
+            additionally_allowed_tenants=["a6e2367a-92ea-4e5a-b565-723830bcc095"],
+        )
         self.client = SecretClient(vault_url=vault_url, credential=kv_credential)
 
     def get_secret(self, secret_name: str) -> str:

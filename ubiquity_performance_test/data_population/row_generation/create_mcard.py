@@ -86,7 +86,7 @@ def card_number_answer(answer_id: int, question_id: int, scheme_account_entry_id
 def password_answer(answer_id: int, question_id: int, scheme_account_entry_id: int) -> list:
     return [
         answer_id,  # id
-        encrypt_credentials(str(uuid.uuid4().bytes)),  # answer
+        encrypt_credentials(str(uuid.uuid4())),  # answer
         question_id,  # question_id
         scheme_account_entry_id,  # scheme_account_entry_id
     ]
@@ -95,7 +95,7 @@ def password_answer(answer_id: int, question_id: int, scheme_account_entry_id: i
 def merchant_identifier_answer(answer_id: int, question_id: int, scheme_account_entry_id: int) -> list:
     return [
         answer_id,  # id
-        encrypt_credentials(str(uuid.uuid4().bytes)),  # answer
+        encrypt_credentials(str(uuid.uuid4())),  # answer
         question_id,  # question_id
         scheme_account_entry_id,  # scheme_account_entry_id
     ]

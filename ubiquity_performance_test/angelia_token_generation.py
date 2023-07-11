@@ -3,16 +3,13 @@ import random
 from datetime import UTC, datetime, timedelta
 
 import jwt
-import redis
 from locust.env import Environment
 from loguru import logger
 
 from ubiquity_performance_test.data_population.fixtures.client import NON_RESTRICTED_CLIENTS, TRUSTED_CHANNEL_CLIENTS
 from ubiquity_performance_test.request_data import angelia
-from ubiquity_performance_test.settings import REDIS_URL
+from ubiquity_performance_test.settings import redis
 from ubiquity_performance_test.vault import vault_secrets
-
-r = redis.from_url(REDIS_URL)
 
 channels_to_test = 0  # number of channels to be tested. Value assigned by locustfile
 trusted_channels_to_test = 0  # number of trusted channels to be tested. Value assigned by locustfile
@@ -26,11 +23,11 @@ class TokenGen:
             raise ValueError("Runner unexpectedly None")
 
         total_users = environment.runner.target_user_count
-        r.delete("user_tokens")  # Clear the list first to avoid expired tokens from previous tests
+        redis.delete("user_tokens")  # Clear the list first to avoid expired tokens from previous tests
 
         for _ in range(total_users):
             user_tokens = self.generate_all_b2b_tokens()
-            r.lpush("user_tokens", json.dumps(user_tokens))
+            redis.lpush("user_tokens", json.dumps(user_tokens))
 
         logger.info(f"{total_users} tokens successfully pushed to Redis queue 'b2b_tokens'.")
 

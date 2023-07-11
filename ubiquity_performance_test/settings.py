@@ -4,6 +4,7 @@ from bink_logging_utils import init_loguru_root_sink
 from bink_logging_utils.factories import loguru_intercept_handler_factory
 from decouple import Choices, config
 from faker import Faker
+from redis import Redis
 
 InterceptHandler = loguru_intercept_handler_factory()
 
@@ -23,6 +24,7 @@ LOCAL_SECRETS: bool = config("LOCAL_SECRETS", False, cast=bool)
 LOCAL_SECRETS_PATH: str = config("LOCAL_SECRETS_PATH", "local_secrets.json")
 
 REDIS_URL: str = config("REDIS_URL", "redis://localhost:6379/0")
+REDIS_SPAWN_COMPLETED_KEY = config("REDIS_SPAWN_COMPLETED_KEY", "performance:ubiquity:spawning-complete")
 
 VAULT_CONFIG: dict[str, str] = {
     "VAULT_URL": config("VAULT_URL", ""),
@@ -37,3 +39,6 @@ HADES_DB: str = config("HADES_DB", "hades")
 HERMES_URL: str = config("HERMES_URL")
 SERVICE_API_KEY = "F616CE5C88744DD52DB628FAD8B3D"
 SECRETS_LOCATION: str | None = config("SECRETS_LOCATION", None)
+
+
+redis = Redis.from_url(REDIS_URL, decode_responses=True)

@@ -3,16 +3,25 @@ from enum import IntEnum, auto
 from typing import TYPE_CHECKING
 
 from locust import HttpUser, SequentialTaskSet, constant, task
-from locust.exception import StopUser
 
 from ubiquity_performance_test.data_population.fixtures.client import CLIENT_ONE, NON_RESTRICTED_CLIENTS
 from ubiquity_performance_test.locust_angelia.database.jobs import set_status_for_loyalty_card
-from ubiquity_performance_test.locust_config import AUTOLINK, MEMBERSHIP_PLANS, check_suite_whitelist, repeat_task
+from ubiquity_performance_test.locust_config import (
+    AUTOLINK,
+    MEMBERSHIP_PLANS,
+    check_suite_whitelist,
+    init_redis_events,
+    repeat_task,
+    spawn_completed,
+)
 from ubiquity_performance_test.request_data import membership_card, payment_card, service
 from ubiquity_performance_test.vault import vault_secrets
 
 if TYPE_CHECKING:
     from ubiquity_performance_test.request_data.service import ConsentType
+
+
+init_redis_events()
 
 
 class MembershipCardJourney(IntEnum):
@@ -208,7 +217,11 @@ class UserBehavior(SequentialTaskSet):
     @check_suite_whitelist
     @task
     def stop_locust_after_test_suite(self) -> None:
-        raise StopUser()
+        if spawn_completed():
+            self.user.environment.runner.stop()
+
+        while True:
+            self._sleep(60)
 
 
 class WebsiteUser(HttpUser):

@@ -16,7 +16,7 @@ ARG PIP_INDEX_URL=https://269fdc63-af3d-4eca-8101-8bddc22d6f14:b694b5b1-f97e-49e
 ARG wheel=ubiquity_performance_test-*-py3-none-any.whl
 
 WORKDIR /app
-COPY --from=build /tmp/copy ./
+COPY --from=build /tmp/copy/ ./
 
 RUN apt update && \
     apt -y install gcc vim nano tmux postgresql-client && \

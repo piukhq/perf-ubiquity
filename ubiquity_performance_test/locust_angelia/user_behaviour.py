@@ -4,20 +4,25 @@ import time
 import uuid
 from copy import deepcopy
 
-import redis
 from faker import Faker
 from locust import SequentialTaskSet
 from locust.exception import StopUser
 from loguru import logger
 
 from ubiquity_performance_test.locust_angelia.database.jobs import query_status, set_status_for_loyalty_card
-from ubiquity_performance_test.locust_config import MEMBERSHIP_PLANS, repeatable_task
-from ubiquity_performance_test.settings import REDIS_URL
-
-r = redis.from_url(REDIS_URL)
+from ubiquity_performance_test.locust_config import (
+    MEMBERSHIP_PLANS,
+    init_redis_events,
+    repeatable_task,
+    spawn_completed,
+)
+from ubiquity_performance_test.settings import redis
 
 retry_time: float = 0.0
 timeout: float = 0.0
+
+
+init_redis_events()
 
 
 class UserBehavior(SequentialTaskSet):
@@ -61,7 +66,7 @@ class UserBehavior(SequentialTaskSet):
             raise StopUser() from None
 
     def get_tokens(self) -> None:
-        tokens = json.loads(r.lpop("user_tokens"))
+        tokens = json.loads(redis.lpop("user_tokens"))
         logger.info(f"User tokens: {tokens}")
         self.b2b_tokens = tokens
 
@@ -829,7 +834,11 @@ class UserBehavior(SequentialTaskSet):
 
     @repeatable_task()
     def stop_locust_after_test_suite(self) -> None:
-        raise StopUser()
+        if spawn_completed():
+            self.user.environment.runner.stop()
+
+        while True:
+            self._sleep(60)
 
 
 def set_retry_and_timeout(retry_time_value: float, timeout_value: float) -> None:

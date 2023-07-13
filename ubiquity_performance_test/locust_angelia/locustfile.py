@@ -79,7 +79,7 @@ class WebsiteUser(HttpUser):
     set_retry_and_timeout(retry_time_value=RETRY_TIME, timeout_value=TIMEOUT)
 
     tasks = [UserBehavior]  # noqa: RUF012
-    wait_time = constant(0)
+    wait_time = constant(0.5)
 
 
 @events.test_start.add_listener

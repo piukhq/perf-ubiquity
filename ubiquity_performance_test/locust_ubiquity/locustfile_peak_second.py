@@ -20,9 +20,7 @@ from ubiquity_performance_test.locust_config import (
     LocustLabel,
     check_suite_whitelist,
     increment_locust_counter,
-    init_redis_events,
     repeat_task,
-    spawn_completed,
 )
 from ubiquity_performance_test.request_data import membership_card, payment_card, service
 from ubiquity_performance_test.request_data.hermes import wait_for_scheme_account_status
@@ -30,8 +28,6 @@ from ubiquity_performance_test.vault import vault_secrets
 
 if TYPE_CHECKING:
     from ubiquity_performance_test.request_data.service import ConsentType
-
-init_redis_events()
 
 
 class UserBehavior(SequentialTaskSet):
@@ -605,16 +601,7 @@ class UserBehavior(SequentialTaskSet):
 
         self.service_counter += 1
 
-    @check_suite_whitelist
-    @task
-    def stop_locust_after_test_suite(self) -> None:
-        if spawn_completed():
-            self.user.environment.runner.stop()
-
-        while True:
-            self._sleep(60)
-
 
 class WebsiteUser(HttpUser):
     tasks = [UserBehavior]  # noqa: RUF012
-    wait_time = constant(0)
+    wait_time = constant(0.5)

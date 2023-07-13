@@ -10,19 +10,11 @@ from locust.exception import StopUser
 from loguru import logger
 
 from ubiquity_performance_test.locust_angelia.database.jobs import query_status, set_status_for_loyalty_card
-from ubiquity_performance_test.locust_config import (
-    MEMBERSHIP_PLANS,
-    init_redis_events,
-    repeatable_task,
-    spawn_completed,
-)
+from ubiquity_performance_test.locust_config import MEMBERSHIP_PLANS, repeatable_task
 from ubiquity_performance_test.settings import redis
 
 retry_time: float = 0.0
 timeout: float = 0.0
-
-
-init_redis_events()
 
 
 class UserBehavior(SequentialTaskSet):
@@ -829,16 +821,6 @@ class UserBehavior(SequentialTaskSet):
             headers={"Authorization": f"bearer {self.access_tokens['primary_user']}"},
             name=f"{self.url_prefix}/me",
         )
-
-    # ---------------------------------SPECIAL TASKS---------------------------------
-
-    @repeatable_task()
-    def stop_locust_after_test_suite(self) -> None:
-        if spawn_completed():
-            self.user.environment.runner.stop()
-
-        while True:
-            self._sleep(60)
 
 
 def set_retry_and_timeout(retry_time_value: float, timeout_value: float) -> None:

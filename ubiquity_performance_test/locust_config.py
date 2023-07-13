@@ -3,11 +3,9 @@ from enum import StrEnum
 from functools import wraps
 from typing import Any
 
-from locust import events, task
-from locust.env import Environment
+from locust import task
 
 from ubiquity_performance_test.request_data.locust_setup_requests import request_membership_plan_total
-from ubiquity_performance_test.settings import REDIS_SPAWN_COMPLETED_KEY, redis
 
 # Change this to specify how many channels the locust tests use
 MEMBERSHIP_PLANS = request_membership_plan_total()
@@ -112,19 +110,3 @@ def increment_locust_counter(count: int, max_count: int) -> int:
 def set_task_repeats(repeats: dict) -> None:
     global repeat_tasks  # noqa: PLW0603
     repeat_tasks = repeats
-
-
-def init_redis_events() -> None:
-    def delete_redis_cache(environment: Environment) -> None:  # noqa: ARG001
-        redis.delete(REDIS_SPAWN_COMPLETED_KEY)
-
-    events.test_start.add_listener(delete_redis_cache)
-    events.test_stop.add_listener(delete_redis_cache)
-
-    @events.spawning_complete.add_listener
-    def on_spawning_complete(user_count: int) -> None:  # noqa: ARG001
-        redis.set(REDIS_SPAWN_COMPLETED_KEY, 1)
-
-
-def spawn_completed() -> bool:
-    return bool(redis.get(REDIS_SPAWN_COMPLETED_KEY))

@@ -88,7 +88,7 @@ class SecretsLoader:
         else:
             raw_value = json.loads(self.key_vault.get_secret("aes-keys"))
 
-        return raw_value["AES_KEY"].encode()
+        return raw_value["LOCAL_AES_KEY"].encode()
 
     @property
     def key_vault(self) -> KeyVault:

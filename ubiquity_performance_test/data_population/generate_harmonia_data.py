@@ -3,12 +3,12 @@ import csv
 import psycopg2
 from loguru import logger
 
-from ubiquity_performance_test.settings import DB_CONNECTION_URI, HERMES_DB, TSV_BASE_DIR
+from ubiquity_performance_test.config import settings
 
 
 def _get_token_slug_mapping() -> list:
-    db_connection_info = psycopg2.extensions.parse_dsn(DB_CONNECTION_URI)
-    db_connection_info["dbname"] = HERMES_DB
+    db_connection_info = psycopg2.extensions.parse_dsn(settings.DB_CONNECTION_URI)
+    db_connection_info["dbname"] = settings.HERMES_DB
 
     with psycopg2.connect(**db_connection_info) as connection, connection.cursor() as cursor:
         logger.debug("Fetching token to slug mappings for Harmonia")
@@ -26,7 +26,7 @@ def _get_token_slug_mapping() -> list:
 
 def write_token_slug_mapping_file() -> None:
     data = _get_token_slug_mapping()
-    with open(f"{TSV_BASE_DIR}/harmonia_token_to_slug.csv", "w") as out:
+    with open(f"{settings.TSV_BASE_DIR}/harmonia_token_to_slug.csv", "w") as out:
         csv_out = csv.writer(out)
         for row in data:
             csv_out.writerow(row)

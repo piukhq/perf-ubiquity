@@ -3,9 +3,9 @@ import time
 import requests
 from loguru import logger
 
+from ubiquity_performance_test.config import settings
 from ubiquity_performance_test.data_population.fixtures.client import CLIENT_ONE
 from ubiquity_performance_test.request_data import service
-from ubiquity_performance_test.settings import HERMES_URL
 
 
 def slow_retry_request(
@@ -30,7 +30,7 @@ def slow_retry_request(
 
 
 def request_membership_plan_total() -> int:
-    if not HERMES_URL:
+    if not settings.HERMES_URL:
         logger.debug("No HERMES_URL environment variable set, skipping membership plan total setup")
         return 7
 
@@ -39,11 +39,11 @@ def request_membership_plan_total() -> int:
 
     headers = service.generate_auth_header(email, timestamp, CLIENT_ONE, CLIENT_ONE["secret"])
     body = service.generate_setup_user()
-    service_url = f"{HERMES_URL}/ubiquity/service"
+    service_url = f"{settings.HERMES_URL}/ubiquity/service"
     slow_retry_request("POST", service_url, headers, json=body)  # type: ignore [arg-type]
 
     params = {"fields": "id"}
-    plan_url = f"{HERMES_URL}/ubiquity/membership_plans"
+    plan_url = f"{settings.HERMES_URL}/ubiquity/membership_plans"
     resp = slow_retry_request("GET", plan_url, headers, params=params)
     membership_plan_total = len(resp.json())
 

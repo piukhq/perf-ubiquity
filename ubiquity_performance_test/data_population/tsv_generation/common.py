@@ -5,14 +5,14 @@ from contextlib import suppress
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from ubiquity_performance_test.settings import TSV_BASE_DIR
+from ubiquity_performance_test.config import settings
 
 if TYPE_CHECKING:
     from enum import StrEnum
 
 
 def tsv_path(table_name: str) -> str:
-    return f"{TSV_BASE_DIR}/{table_name}.tsv"
+    return f"{settings.TSV_BASE_DIR}/{table_name}.tsv"
 
 
 def write_to_tsv_part(file_name: str, part: int, rows: list) -> None:
@@ -28,10 +28,10 @@ def write_to_tsv(file_name: str, rows: list) -> None:
 
 
 def delete_old_tsv_files(table_enum: type["StrEnum"]) -> None:
-    Path(TSV_BASE_DIR).mkdir(exist_ok=True, parents=True)
+    Path(settings.TSV_BASE_DIR).mkdir(exist_ok=True, parents=True)
 
     for table in table_enum:
         with suppress(FileNotFoundError):
-            path = os.path.join(TSV_BASE_DIR, table + "*.tsv")
+            path = os.path.join(settings.TSV_BASE_DIR, table + "*.tsv")
             for file in glob.glob(path):
                 Path(file).unlink()

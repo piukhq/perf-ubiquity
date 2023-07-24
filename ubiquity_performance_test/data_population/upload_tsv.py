@@ -6,8 +6,8 @@ from typing import TYPE_CHECKING
 import psycopg2
 from loguru import logger
 
+from ubiquity_performance_test.config import settings
 from ubiquity_performance_test.data_population.database_tables import HermesTables
-from ubiquity_performance_test.settings import DB_CONNECTION_URI, TSV_BASE_DIR
 
 if TYPE_CHECKING:
     from enum import StrEnum
@@ -48,7 +48,7 @@ def update_seq(cur: "CursorType", table_name: str) -> None:
 
 
 def truncate_and_populate_tables(db_name: str, tables: "StrEnum") -> None:
-    db_connection_info = psycopg2.extensions.parse_dsn(DB_CONNECTION_URI)
+    db_connection_info = psycopg2.extensions.parse_dsn(settings.DB_CONNECTION_URI)
     db_connection_info["dbname"] = db_name
 
     connection: "ConnectionType"
@@ -66,7 +66,7 @@ def truncate_and_populate_tables(db_name: str, tables: "StrEnum") -> None:
                 truncate_table(cursor, table)
 
         for table in tables:
-            path = os.path.join(TSV_BASE_DIR, table + "-*.tsv")
+            path = os.path.join(settings.TSV_BASE_DIR, table + "-*.tsv")
             for tsv in glob.glob(path):
                 logger.debug(f"Uploading file {tsv} to table {table}")
                 upload_tsv(cursor, table, tsv)

@@ -7,7 +7,7 @@ from azure.identity import DefaultAzureCredential
 from azure.keyvault.secrets import SecretClient
 from loguru import logger
 
-from ubiquity_performance_test.settings import LOCAL_SECRETS, LOCAL_SECRETS_PATH, SECRETS_LOCATION, VAULT_CONFIG
+from ubiquity_performance_test.config import settings
 
 
 class KeyVaultError(Exception):
@@ -41,7 +41,7 @@ class KeyVault:
 
 class SecretsLoader:
     def __init__(self) -> None:
-        self._key_vault = None if LOCAL_SECRETS else KeyVault(vault_url=VAULT_CONFIG["VAULT_URL"])
+        self._key_vault = None if settings.LOCAL_SECRETS else KeyVault(vault_url=settings.VAULT_URL)
         self._channel_info: dict | None = None
         self._aes_key: bytes | None = None
 
@@ -55,8 +55,10 @@ class SecretsLoader:
     def _get_channel_info(self) -> dict:
         info: dict = {}
 
-        if LOCAL_SECRETS:
-            secrets: dict[str, dict] = json.load(Path(LOCAL_SECRETS_PATH).read_text())  # type: ignore [arg-type]
+        if settings.LOCAL_SECRETS:
+            secrets: dict[str, dict] = json.load(
+                Path(settings.LOCAL_SECRETS_PATH).read_text()  # type: ignore [arg-type]
+            )
             info = secrets["channel_secrets"]
 
         else:
@@ -72,7 +74,7 @@ class SecretsLoader:
             for secret_name in secrets_to_load:
                 channel_secrets |= json.loads(self.key_vault.get_secret(secret_name))
 
-            api2_private_keys = self.key_vault.get_secret(VAULT_CONFIG["API2_PRIVATE_KEYS_NAME"])
+            api2_private_keys = self.key_vault.get_secret(settings.API2_PRIVATE_KEYS_NAME)
 
             info |= {"channel_secrets": channel_secrets, "api2_private_keys": json.loads(api2_private_keys)}
 
@@ -81,12 +83,12 @@ class SecretsLoader:
     def _get_aes_key(self) -> bytes:
         raw_value: dict[str, str]
 
-        if SECRETS_LOCATION:
-            file_path = os.path.join(SECRETS_LOCATION, "aes-keys")
+        if settings.SECRETS_LOCATION:
+            file_path = os.path.join(settings.SECRETS_LOCATION, settings.AES_KEYS_VAULT_NAME)
             raw_value = json.loads(Path(file_path).read_text())
 
         else:
-            raw_value = json.loads(self.key_vault.get_secret("aes-keys"))
+            raw_value = json.loads(self.key_vault.get_secret(settings.AES_KEYS_VAULT_NAME))
 
         return raw_value["LOCAL_AES_KEY"].encode()
 

@@ -5,8 +5,8 @@ from loguru import logger
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
+from ubiquity_performance_test.config import settings
 from ubiquity_performance_test.locust_angelia.database.jobs import query_status
-from ubiquity_performance_test.settings import HERMES_URL, SERVICE_API_KEY
 
 REQUEST_TIMEOUT = 6
 
@@ -26,7 +26,7 @@ def retry_session() -> requests.Session:
 
 
 def headers() -> dict:
-    return {"Content-Type": "application/json", "Authorization": f"token {SERVICE_API_KEY}"}
+    return {"Content-Type": "application/json", "Authorization": f"token {settings.SERVICE_API_KEY}"}
 
 
 def wait_for_scheme_account_status(status: int, scheme_account_id: int) -> bool:
@@ -55,6 +55,6 @@ def post_scheme_account_status(status: int, scheme_account_id: int) -> None:
     session = retry_session()
     data = {"status": status}
     auth_header = headers()
-    session.post(f"{HERMES_URL}/schemes/accounts/{scheme_account_id}/status", json=data, headers=auth_header)
+    session.post(f"{settings.HERMES_URL}/schemes/accounts/{scheme_account_id}/status", json=data, headers=auth_header)
 
     wait_for_scheme_account_status(status, scheme_account_id)

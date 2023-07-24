@@ -4,9 +4,9 @@ from loguru import logger
 from sqlalchemy import select, update
 from sqlalchemy.exc import DatabaseError
 
+from ubiquity_performance_test.config import fake
 from ubiquity_performance_test.locust_angelia.database.models import SchemeAccount, SchemeAccountUserAssociation, User
 from ubiquity_performance_test.locust_angelia.database.session import db_session
-from ubiquity_performance_test.settings import fake
 
 
 def query_status(card_id: int) -> list:

@@ -9,9 +9,9 @@ from locust import SequentialTaskSet
 from locust.exception import StopUser
 from loguru import logger
 
+from ubiquity_performance_test.config import redis
 from ubiquity_performance_test.locust_angelia.database.jobs import query_status, set_status_for_loyalty_card
 from ubiquity_performance_test.locust_config import MEMBERSHIP_PLANS, repeatable_task
-from ubiquity_performance_test.settings import redis
 
 retry_time: float = 0.0
 timeout: float = 0.0

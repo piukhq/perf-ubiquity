@@ -6,9 +6,9 @@ import jwt
 from locust.env import Environment
 from loguru import logger
 
+from ubiquity_performance_test.config import redis
 from ubiquity_performance_test.data_population.fixtures.client import NON_RESTRICTED_CLIENTS, TRUSTED_CHANNEL_CLIENTS
 from ubiquity_performance_test.request_data import angelia
-from ubiquity_performance_test.settings import redis
 from ubiquity_performance_test.vault import vault_secrets
 
 channels_to_test = 0  # number of channels to be tested. Value assigned by locustfile

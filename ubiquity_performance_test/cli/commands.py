@@ -3,12 +3,12 @@ from typing import TYPE_CHECKING
 
 import typer
 
+from ubiquity_performance_test.config import settings
 from ubiquity_performance_test.data_population import data_population_config
 from ubiquity_performance_test.data_population.database_tables import HadesTables, HermesHistoryTables, HermesTables
 from ubiquity_performance_test.data_population.generate_harmonia_data import write_token_slug_mapping_file
 from ubiquity_performance_test.data_population.tsv_generation import hades, hermes, hermes_history
 from ubiquity_performance_test.data_population.upload_tsv import upload_named_group_of_tsv_files
-from ubiquity_performance_test.settings import HADES_DB, HERMES_DB
 
 if TYPE_CHECKING:
     from typing import TypedDict
@@ -42,22 +42,22 @@ BAD_SIZE_CONFIG_ERROR = f"Invalid size config entered, please enter one from {da
 data_mapping: dict[DataGroups, "DataMappingPayloadType"] = {
     DataGroups.HERMES: {
         "data_creation_modules": [hermes],
-        "upload_lists": [{"database": HERMES_DB, "tables": HermesTables}],
+        "upload_lists": [{"database": settings.HERMES_DB, "tables": HermesTables}],
     },
     DataGroups.HERMESHISTORY: {
         "data_creation_modules": [hermes_history],
-        "upload_lists": [{"database": HERMES_DB, "tables": HermesHistoryTables}],
+        "upload_lists": [{"database": settings.HERMES_DB, "tables": HermesHistoryTables}],
     },
     DataGroups.HADES: {
         "data_creation_modules": [hades],
-        "upload_lists": [{"database": HADES_DB, "tables": HadesTables}],
+        "upload_lists": [{"database": settings.HADES_DB, "tables": HadesTables}],
     },
     DataGroups.ALL: {
         "data_creation_modules": [hermes, hermes_history, hades],
         "upload_lists": [
-            {"database": HERMES_DB, "tables": HermesTables},
-            {"database": HERMES_DB, "tables": HermesHistoryTables},
-            {"database": HADES_DB, "tables": HadesTables},
+            {"database": settings.HERMES_DB, "tables": HermesTables},
+            {"database": settings.HERMES_DB, "tables": HermesHistoryTables},
+            {"database": settings.HADES_DB, "tables": HadesTables},
         ],
     },
 }

@@ -2,9 +2,9 @@ import uuid
 
 from shared_config_storage.credentials.encryption import RSACipher
 
+from ubiquity_performance_test.config import fake
 from ubiquity_performance_test.data_population.fixtures.membership_plan import CONSENT_LABEL
 from ubiquity_performance_test.data_population.row_generation.create_plan import SENSITIVE_FIELDS
-from ubiquity_performance_test.settings import fake
 
 ACTIVE = 1
 WALLET_ONLY = 10

@@ -5,7 +5,7 @@ from enum import StrEnum
 
 from shared_config_storage.credentials.encryption import RSACipher
 
-from ubiquity_performance_test.settings import fake
+from ubiquity_performance_test.config import fake
 
 FIELDS_TO_ENCRYPT = ("first_six_digits", "last_four_digits", "month", "year", "hash")
 

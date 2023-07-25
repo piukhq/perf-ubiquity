@@ -503,7 +503,7 @@ class UserBehavior(SequentialTaskSet):
 
         if join_ids:
             card_id = join_ids.pop(0)
-            set_status_for_loyalty_card(card_id, 901)
+            set_status_for_loyalty_card(card_id, 902)
         else:
             card_id = "NO_CARD"
 

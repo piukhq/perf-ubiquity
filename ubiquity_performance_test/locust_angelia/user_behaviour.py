@@ -503,7 +503,7 @@ class UserBehavior(SequentialTaskSet):
 
         if join_ids:
             card_id = join_ids.pop(0)
-            set_status_for_loyalty_card(card_id, 902)
+            set_status_for_loyalty_card(card_id, 901)
         else:
             card_id = "NO_CARD"
 
@@ -821,6 +821,11 @@ class UserBehavior(SequentialTaskSet):
             headers={"Authorization": f"bearer {self.access_tokens['primary_user']}"},
             name=f"{self.url_prefix}/me",
         )
+        self.loyalty_cards = {}
+        self.trusted_loyalty_cards = {}
+        self.join_ids = []
+        self.payment_cards = {}
+        self.trusted_channel_payment_cards = {}
 
 
 def set_retry_and_timeout(retry_time_value: float, timeout_value: float) -> None:

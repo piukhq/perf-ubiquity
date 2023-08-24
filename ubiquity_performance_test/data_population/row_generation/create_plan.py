@@ -311,4 +311,6 @@ def voucher_scheme(pk: int, scheme_id: int) -> list:
         "",  # headline_cancelled
         "",  # body_text_pending
         "",  # headline_pending
+        False,  # default
+        "NULL",  # slug
     ]
